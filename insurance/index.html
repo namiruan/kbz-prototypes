@@ -1,0 +1,203 @@
+<!-- design-system: v0.5.1 -->
+<!-- prototype: 4대보험 신고 — 프로토타입 허브(전체 화면 링크 맵) -->
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>4대보험 신고 프로토타입 — 화면 목록</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+  <link rel="stylesheet" href="https://namiruan.github.io/kbz_3.0_ui_stytem/tokens.css">
+  <link rel="stylesheet" href="https://namiruan.github.io/kbz_3.0_ui_stytem/components.css">
+  <script src="https://namiruan.github.io/kbz_3.0_ui_stytem/components.js"></script>
+  <style>
+    /* 이 페이지 고유 레이아웃만 — 컴포넌트·프로토타입 크롬은 components.css가 처리 */
+    .hub-header { margin-bottom: var(--space-stack-2xl); }
+    .hub-header > * + * { margin-top: var(--space-stack-sm); }
+    .hub-header__desc { color: var(--color-text-subtle); }
+    /* 섹션 간 간격 — .table-container는 자체 외부 margin이 없다 */
+    .hub-section + .hub-section { margin-top: var(--space-generic-xl); }
+    /* 화면명 셀 — 링크 + 상태 뱃지를 한 줄로 배치.
+       셀 폰트는 컴포넌트 CSS가 결정하므로 text-* 유틸을 얹지 않는다 (table-cell.md Don't) */
+    .hub-name { display: flex; align-items: center; gap: var(--space-gap-sm); }
+    /* 안내 블록 — 아이콘 + 본문 가로 배치 */
+    .hub-note { margin-top: var(--space-generic-xl); display: flex; gap: var(--space-gap-sm); color: var(--color-text-subtle); }
+    .hub-note__title { margin-bottom: var(--space-stack-xs); }
+    .hub-note__list { padding-left: var(--space-inset-xl); display: flex; flex-direction: column; gap: var(--space-gap-xs); }
+  </style>
+</head>
+<body>
+<!-- @flow
+title: 화면 목록
+exits: insurance-join-status.html
+-->
+
+
+<main class="page">
+
+  <div class="hub-header">
+    <h1 class="text-page-title">4대보험 신고 프로토타입</h1>
+    <p class="text-description hub-header__desc">Figma 「4대보험 신고 기획안」 기준. 화면 단위로 파일을 나누고, 각 화면에서 여는 모달은 해당 파일 안에 오버레이로 담습니다.</p>
+  </div>
+
+  <!-- ══ 섹션 1: 페이지 ══ -->
+  <section class="hub-section">
+    <div class="table-container">
+      <div class="table__toolbar">
+        <div class="table__title-group">
+          <span class="table__count">총 <b class="table__count-value">4</b>건</span>
+          <div class="table__title" id="tbl-page-title">페이지</div>
+        </div>
+      </div>
+      <table class="table table--info table--dense" aria-labelledby="tbl-page-title">
+        <thead class="table__head">
+          <tr>
+            <th class="table__head-cell" scope="col">화면</th>
+            <th class="table__head-cell" scope="col">파일</th>
+            <th class="table__head-cell" scope="col">함께 담기는 모달</th>
+          </tr>
+        </thead>
+        <tbody class="table__body">
+          <tr class="table__row">
+            <td class="table__cell">
+              <span class="hub-name">
+                <a class="link link--disabled" aria-disabled="true" tabindex="-1">근무지 관리</a>
+                <span class="badge badge--neutral">미작성</span>
+              </span>
+            </td>
+            <td class="table__cell">workplace-manage.html</td>
+            <td class="table__cell">근무지 추가</td>
+          </tr>
+          <tr class="table__row">
+            <td class="table__cell">
+              <span class="hub-name">
+                <a class="link link--disabled" aria-disabled="true" tabindex="-1">근로자정보 · 4대보험 tab</a>
+                <span class="badge badge--neutral">미작성</span>
+              </span>
+            </td>
+            <td class="table__cell">worker-info-insurance.html</td>
+            <td class="table__cell">—</td>
+          </tr>
+          <tr class="table__row">
+            <td class="table__cell">
+              <span class="hub-name">
+                <a class="link link--disabled" aria-disabled="true" tabindex="-1">근로자정보 · 인사정보 tab</a>
+                <span class="badge badge--neutral">미작성</span>
+              </span>
+            </td>
+            <td class="table__cell">worker-info-personnel.html</td>
+            <td class="table__cell">—</td>
+          </tr>
+          <tr class="table__row">
+            <td class="table__cell">
+              <span class="hub-name">
+                <a class="link" href="insurance-join-status.html">4대보험 관리 · 가입현황 tab</a>
+                <span class="badge badge--success">작성 완료</span>
+              </span>
+            </td>
+            <td class="table__cell">insurance-join-status.html</td>
+            <td class="table__cell">4대보험 상세 · 사업장 선택 · 검증 Alert 5종</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ══ 섹션 2: 신고 모달 ══ -->
+  <section class="hub-section">
+    <div class="table-container">
+      <div class="table__toolbar">
+        <div class="table__title-group">
+          <span class="table__count">총 <b class="table__count-value">4</b>건</span>
+          <div class="table__title" id="tbl-report-title">신고 모달</div>
+        </div>
+      </div>
+      <table class="table table--info table--dense" aria-labelledby="tbl-report-title">
+        <thead class="table__head">
+          <tr>
+            <th class="table__head-cell" scope="col">신고 그룹</th>
+            <th class="table__head-cell" scope="col">파일</th>
+            <th class="table__head-cell" scope="col">담기는 모달</th>
+          </tr>
+        </thead>
+        <tbody class="table__body">
+          <tr class="table__row">
+            <td class="table__cell">
+              <span class="hub-name">
+                <a class="link link--disabled" aria-disabled="true" tabindex="-1">취득</a>
+                <span class="badge badge--neutral">미작성</span>
+              </span>
+            </td>
+            <td class="table__cell">report-acquire.html</td>
+            <td class="table__cell">취득신고 · 정정신고(취득) · 직종 검색</td>
+          </tr>
+          <tr class="table__row">
+            <td class="table__cell">
+              <span class="hub-name">
+                <a class="link link--disabled" aria-disabled="true" tabindex="-1">상실</a>
+                <span class="badge badge--neutral">미작성</span>
+              </span>
+            </td>
+            <td class="table__cell">report-loss.html</td>
+            <td class="table__cell">상실신고 · 정정신고(상실)</td>
+          </tr>
+          <tr class="table__row">
+            <td class="table__cell">
+              <span class="hub-name">
+                <a class="link link--disabled" aria-disabled="true" tabindex="-1">변경</a>
+                <span class="badge badge--neutral">미작성</span>
+              </span>
+            </td>
+            <td class="table__cell">report-change.html</td>
+            <td class="table__cell">보수 변경신고 · 사업장 이동 신고</td>
+          </tr>
+          <tr class="table__row">
+            <td class="table__cell">
+              <span class="hub-name">
+                <a class="link link--disabled" aria-disabled="true" tabindex="-1">휴복직</a>
+                <span class="badge badge--neutral">미작성</span>
+              </span>
+            </td>
+            <td class="table__cell">report-leave.html</td>
+            <td class="table__cell">휴직 신고 · 복직 신고</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ══ 안내 ══ -->
+  <div class="hub-note">
+    <span class="icon icon--sm" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-info"/></svg></span>
+    <div class="text-description">
+      <p class="hub-note__title">구성 원칙 · 확인 필요 사항</p>
+      <ul class="hub-note__list">
+        <li>파일 간 이동은 상대경로 링크, 모달은 소속 파일 안의 <code>data-overlay</code>로 처리합니다.</li>
+        <li>중첩 모달(직종 검색 등)은 부모 모달과 같은 파일에 둡니다.</li>
+        <li>각 파일이 만들어지는 대로 링크를 활성화합니다.</li>
+        <li>사업장 선택 모달은 취득·사업장 이동 두 흐름이 공유하므로 가입현황에 남겼습니다.</li>
+        <li>정정 신고는 드롭다운 값이 「정정」 하나뿐이라, 행의 자격 상태(취득/상실)로 대상 파일을 나눴습니다. 확인이 필요합니다.</li>
+        <li>신고 내용 조회 · 상세보기는 「신고대상&amp;진행현황」 탭 소속이며, 해당 탭은 아직 범위 밖입니다.</li>
+        <li>Figma 「tree」의 접수증 Layer Modal은 프리미엄 섹션에 대응 프레임이 없어 제외했습니다.</li>
+        <li>전입/전출 신고는 사업장 이동 신고로 개칭된 것으로 보고 변경 그룹에 넣었습니다.</li>
+        <li>근로자 추가는 Figma에 "화면 생략"으로 표기되어 제외했습니다.</li>
+      </ul>
+    </div>
+  </div>
+
+</main>
+
+<script>
+  /* ── 아이콘 스프라이트 주입 — Safari·file://·재호스팅 대응 ── */
+  fetch('https://namiruan.github.io/kbz_3.0_ui_stytem/icons/sprite.svg')
+    .then(function(r) { return r.text(); })
+    .then(function(svg) {
+      var d = document.createElement('div');
+      d.style.cssText = 'position:absolute;width:0;height:0;overflow:hidden';
+      d.innerHTML = svg;
+      document.body.insertBefore(d, document.body.firstChild);
+    });
+</script>
+
+</body>
+</html>

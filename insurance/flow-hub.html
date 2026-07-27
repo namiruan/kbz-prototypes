@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>4대보험 신고 — 플로우 허브</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+  <link rel="stylesheet" href="https://namiruan.github.io/kbz_3.0_ui_stytem/tokens.css">
+  <link rel="stylesheet" href="https://namiruan.github.io/kbz_3.0_ui_stytem/components.css">
+  <style>
+    body { margin: 0; padding: var(--space-24); background: var(--color-surface-subtle); font-family: var(--font-family-base); color: var(--color-text-body); }
+    .flow-hub__title { font-size: var(--font-size-title); font-weight: var(--font-weight-heading); margin: 0 0 var(--space-24); }
+    .flow-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: var(--space-16); }
+    .flow-card { background: var(--color-surface-base); border: var(--stroke-sm) var(--stroke-solid) var(--color-border-subtle); border-radius: var(--radius-lg); padding: var(--space-16); }
+    .flow-card__head { display: flex; align-items: center; justify-content: space-between; gap: var(--space-8); }
+    .flow-card__title { font-size: var(--font-size-lg); font-weight: var(--font-weight-heading); margin: 0; }
+    .flow-card__file { font-size: var(--font-size-sm); color: var(--color-text-subtle); margin: var(--space-4) 0 var(--space-12); }
+    .flow-card__rel { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: var(--space-4) var(--space-8); font-size: var(--font-size-sm); }
+    .flow-card__rel dt { color: var(--color-text-subtle); white-space: nowrap; }
+    .flow-card__rel dd { margin: 0; }
+    .flow-card__rel a { color: var(--color-text-brand); text-decoration: none; }
+    .flow-card__rel a:hover { text-decoration: underline; }
+    .flow-none { color: var(--color-text-disabled); }
+  </style>
+</head>
+<body>
+  <h1 class="flow-hub__title">4대보험 신고 — 플로우 허브</h1>
+  <div class="flow-grid">
+    <div class="flow-card">
+      <div class="flow-card__head">
+        <h2 class="flow-card__title">화면 목록</h2>
+        <a class="btn btn--secondary btn--solid btn--xs" href="index.html">열기</a>
+      </div>
+      <p class="flow-card__file">index.html</p>
+      <dl class="flow-card__rel">
+        <dt>← 들어오는 화면</dt><dd><a href="insurance-join-status.html">4대보험 가입현황</a> · <a href="report-acquire.html">취득신고</a></dd>
+        <dt>→ 나가는 화면</dt><dd><a href="insurance-join-status.html">4대보험 가입현황</a></dd>
+      </dl>
+    </div>
+    <div class="flow-card">
+      <div class="flow-card__head">
+        <h2 class="flow-card__title">4대보험 가입현황</h2>
+        <a class="btn btn--secondary btn--solid btn--xs" href="insurance-join-status.html">열기</a>
+      </div>
+      <p class="flow-card__file">insurance-join-status.html</p>
+      <dl class="flow-card__rel">
+        <dt>← 들어오는 화면</dt><dd><a href="index.html">화면 목록</a></dd>
+        <dt>→ 나가는 화면</dt><dd><a href="report-acquire.html">취득신고</a> · <a href="report-change.html" style="opacity:.5">report-change.html</a> · <a href="report-leave.html" style="opacity:.5">report-leave.html</a> · <a href="report-loss.html" style="opacity:.5">report-loss.html</a> · <a href="worker-insurance-tab.html" style="opacity:.5">worker-insurance-tab.html</a> · <a href="index.html">화면 목록</a></dd>
+      </dl>
+    </div>
+    <div class="flow-card">
+      <div class="flow-card__head">
+        <h2 class="flow-card__title">취득신고</h2>
+        <a class="btn btn--secondary btn--solid btn--xs" href="report-acquire.html">열기</a>
+      </div>
+      <p class="flow-card__file">report-acquire.html</p>
+      <dl class="flow-card__rel">
+        <dt>← 들어오는 화면</dt><dd><a href="insurance-join-status.html">4대보험 가입현황</a></dd>
+        <dt>→ 나가는 화면</dt><dd><a href="index.html">화면 목록</a></dd>
+      </dl>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,1515 @@
+<!-- design-system: v0.5.1 -->
+<!-- prototype: 4대보험 취득신고 Layer Modal (report-acquire.html) -->
+<!-- 파일 분리 구조: 허브 index.html · 진입 경로 insurance-join-status.html(사업장 선택 후) -->
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>4대보험 취득신고</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+  <link rel="stylesheet" href="https://namiruan.github.io/kbz_3.0_ui_stytem/tokens.css">
+  <link rel="stylesheet" href="https://namiruan.github.io/kbz_3.0_ui_stytem/components.css">
+  <script src="https://namiruan.github.io/kbz_3.0_ui_stytem/components.js"></script>
+  <style>
+    /* 이 페이지 고유 레이아웃만 — 컴포넌트·프로토타입 크롬은 components.css가 처리 */
+    /* 허브 복귀 링크 — 사이드바 최상단. .link는 인라인이라 블록 배치·여백을 페이지에서 준다 */
+    .proto-hub-link { display: block; padding: var(--space-inset-squish-sm); font-size: var(--font-size-sm); }
+    /* 모달 본문 2열 — 좌 첨부파일(Figma 314px) + 우 폼.
+       modal__aside는 "읽기 전용만" 규칙이라 인터랙티브한 FileUpload를 넣을 수 없어
+       modal__content 안에서 그리드로 구성한다 (→ modal.md 소제목 모달 제약) */
+    .acq-grid { display: grid; grid-template-columns: 314px 1fr; gap: var(--space-gap-2xl); align-items: start; }
+    /* 폼 세로 스택 — form-field-group보다 섹션 간격을 넓게 */
+    .acq-form { display: flex; flex-direction: column; gap: var(--space-gap-xl); }
+    /* 가입보험 섹션 — 라벨 + 테이블 */
+    .acq-section { display: flex; flex-direction: column; gap: var(--space-gap-sm); }
+    /* 직종 선택 — 인풋 + 검색 버튼 한 줄 */
+    .acq-job { display: flex; gap: var(--space-gap-sm); align-items: flex-start; }
+    .acq-job__input { flex: 1; min-width: 0; }
+    /* 연금 취득월납부 라벨 — 텍스트 + 툴팁 트리거를 한 줄로 */
+    .acq-label-row { display: flex; align-items: center; gap: var(--space-gap-2xs); }
+    /* 테이블 셀 안 드롭다운 — 셀 폭을 채운다 (.dropdown은 max-content) */
+    .acq-cell-select .dropdown,
+    .acq-cell-select .dropdown__trigger { width: 100%; }
+    .acq-cell-select .dropdown__value { overflow: hidden; text-overflow: ellipsis; }
+    /* 예상보험료 배너 본문 — 줄 사이 간격 */
+    .acq-banner-lines { display: flex; flex-direction: column; gap: var(--space-gap-2xs); }
+    /* 로딩 스켈레톤 행 */
+    .acq-skeleton-row { display: flex; gap: var(--space-gap-md); }
+    .acq-skeleton-row > * { flex: 1; }
+  </style>
+</head>
+<body>
+<!-- @flow
+title: 취득신고
+exits: index.html
+-->
+
+
+<div class="proto-layout">
+
+  <aside class="proto-sidebar" id="proto-sidebar">
+    <!-- 허브 복귀 — 파일 분리 구조 -->
+    <a class="link proto-hub-link" href="index.html">← 화면 목록</a>
+
+    <div class="segment segment--md" role="radiogroup" aria-label="보기 모드" id="mode-segment">
+      <span class="segment__slider" aria-hidden="true"></span>
+      <button class="segment__item segment__item--selected" role="radio" aria-checked="true" type="button" data-mode="scenario">시나리오</button>
+      <button class="segment__item" role="radio" aria-checked="false" type="button" data-mode="interactive">인터랙티브</button>
+    </div>
+
+    <div class="proto-nav-divider" id="proto-nav-divider"></div>
+
+    <nav class="proto-nav" id="proto-nav" aria-label="시나리오 선택">
+      <button class="proto-nav-btn is-active" data-scenario="작성-중" type="button">작성 중</button>
+      <button class="proto-nav-btn" data-scenario="첫-진입" type="button">첫 진입</button>
+      <button class="proto-nav-btn" data-scenario="로딩" type="button">로딩</button>
+      <button class="proto-nav-btn" data-scenario="제약-케이스" type="button">제약 케이스</button>
+      <button class="proto-nav-btn" data-scenario="저장-실패" type="button">저장 실패</button>
+    </nav>
+  </aside>
+
+  <main class="proto-content">
+
+    <div id="pane-panels">
+
+    <!-- ══════════════ 시나리오 1: 작성 중 (Figma 기본 상태) ══════════════ -->
+    <section class="scenario-panel" data-scenario="작성-중" data-step>
+      <div class="page">
+        <div class="modal" role="dialog" aria-modal="true" aria-labelledby="s1-title" style="width:958px;max-width:100%">
+
+          <div class="modal__header">
+            <h2 class="modal__title text-modal-title-sm" id="s1-title">취득신고서</h2>
+            <button class="icon-on--lg" type="button" aria-label="닫기"><svg aria-hidden="true"><use href="#icon-close"/></svg></button>
+          </div>
+
+          <div class="modal__body">
+            <div class="modal__content">
+              <div class="acq-grid">
+
+                <!-- ── 1 area: 첨부파일 ── -->
+                <div class="file-upload" id="s1-upload" data-max-mb="200">
+                  <input type="file" id="s1-file-input" hidden multiple>
+                  <div class="file-upload__header">
+                    <span class="text-form-label file-upload__label" style="font-weight:var(--font-weight-heading)">첨부파일</span>
+                    <span class="text-form-label file-upload__usage">0MB / 200MB</span>
+                  </div>
+                  <div class="file-upload__meta">
+                    <p class="text-body file-upload__description">파일을 마우스로 끌어다 놓거나, 추가하기 버튼을 사용해 직접 업로드해 보세요.</p>
+                    <p class="text-body file-upload__constraint">*파일당 10MB 이하 업로드 가능</p>
+                  </div>
+                  <div class="file-upload__dropzone">
+                    <button class="btn btn--secondary btn--sm btn--icon-left" type="button">
+                      <span class="icon icon--sm" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-plus"/></svg></span>추가하기
+                    </button>
+                    <div class="file-upload__grid"></div>
+                  </div>
+                </div>
+
+                <!-- ── 우측 폼 ── -->
+                <div class="acq-form">
+
+                  <!-- 피부양자 안내 배너 -->
+                  <div class="banner" role="status">
+                    <span class="icon--md banner__icon" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-info"/></svg></span>
+                    <div class="text-description banner__body">
+                      <p class="banner__title">피부양자 취득 신고 안내</p>
+                      <p class="banner__message">피부양자 취득신고는 현재 지원하지 않아요. (추후 제공 예정) 피부양자 취득신고는 비즈씨를 통해 진행해주세요.</p>
+                    </div>
+                  </div>
+
+                  <!-- ── 2 area: 근로자 기본 정보 (수정 불가) ── -->
+                  <div class="form-field-group--horizontal">
+                    <div class="form-field form-field--disabled">
+                      <label class="form-field__label text-form-label" for="s1-name">이름</label>
+                      <div class="form-field__body">
+                        <input class="input input--disabled" type="text" id="s1-name" value="유가영" disabled aria-disabled="true" tabindex="-1">
+                      </div>
+                    </div>
+                    <div class="form-field form-field--disabled">
+                      <label class="form-field__label text-form-label" for="s1-rrn">주민번호</label>
+                      <div class="form-field__body">
+                        <input class="input input--disabled" type="text" id="s1-rrn" value="123456-1234567" disabled aria-disabled="true" tabindex="-1">
+                      </div>
+                    </div>
+                    <div class="form-field form-field--disabled">
+                      <label class="form-field__label text-form-label" for="s1-hire">입사일</label>
+                      <div class="form-field__body">
+                        <input class="input input--disabled" type="text" id="s1-hire" value="2025-12-12" disabled aria-disabled="true" tabindex="-1">
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- ── 3 area: 가입 보험 ── -->
+                  <div class="acq-section">
+                    <span class="text-form-label" id="s1-ins-label">가입 보험</span>
+                    <div class="table-container">
+                      <table class="table" aria-labelledby="s1-ins-label">
+                        <colgroup>
+                          <col style="width:40px">
+                          <col style="width:150px">
+                          <col>
+                          <col style="width:220px">
+                        </colgroup>
+                        <thead class="table__head">
+                          <tr>
+                            <th class="table__cell table__cell--check" scope="col"><span class="sr-only">선택</span></th>
+                            <th class="table__head-cell" scope="col">보험</th>
+                            <th class="table__head-cell" scope="col">신고사업장</th>
+                            <th class="table__head-cell" scope="col">제외 사유</th>
+                          </tr>
+                        </thead>
+                        <tbody class="table__body">
+                          <tr class="table__row">
+                            <td class="table__cell table__cell--check">
+                              <label class="checkbox checkbox--sm"><input type="checkbox" checked disabled aria-disabled="true" tabindex="-1" aria-label="국민연금 선택"><span class="checkbox__control" aria-hidden="true"><span class="checkbox__icon-check"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span></label>
+                            </td>
+                            <td class="table__cell">국민연금</td>
+                            <td class="table__cell">(주)남웅건설</td>
+                            <td class="table__cell">—</td>
+                          </tr>
+                          <tr class="table__row">
+                            <td class="table__cell table__cell--check">
+                              <label class="checkbox checkbox--sm"><input type="checkbox" checked disabled aria-disabled="true" tabindex="-1" aria-label="건강보험 선택"><span class="checkbox__control" aria-hidden="true"><span class="checkbox__icon-check"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span></label>
+                            </td>
+                            <td class="table__cell">건강보험</td>
+                            <td class="table__cell">LG U+ 파주 1239 신축공사 철근콘크리트공사</td>
+                            <td class="table__cell">—</td>
+                          </tr>
+                          <tr class="table__row">
+                            <td class="table__cell table__cell--check">
+                              <label class="checkbox checkbox--sm"><input type="checkbox" disabled aria-disabled="true" tabindex="-1" aria-label="고용보험 선택"><span class="checkbox__control" aria-hidden="true"><span class="checkbox__icon-check"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span></label>
+                            </td>
+                            <td class="table__cell">고용보험</td>
+                            <td class="table__cell">—</td>
+                            <td class="table__cell acq-cell-select">
+                              <div class="dropdown dropdown--button dropdown--menu dropdown--sm">
+                                <button class="dropdown__trigger" type="button" aria-haspopup="listbox" aria-expanded="false" aria-label="고용보험 제외 사유">
+                                  <span class="dropdown__value dropdown__value--placeholder">제외 사유 선택</span>
+                                  <span class="dropdown__chevron" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-chevron-down"/></svg></span>
+                                </button>
+                                <div class="dropdown__panel">
+                                  <ul class="dropdown__list" role="listbox" aria-label="고용보험 제외 사유">
+                                    <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">대표자/사업주</span></li>
+                                    <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">만 65세 이상</span></li>
+                                    <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">외국인 (체류자격 제외 대상)</span></li>
+                                  </ul>
+                                </div>
+                              </div>
+                            </td>
+                          </tr>
+                          <tr class="table__row">
+                            <td class="table__cell table__cell--check">
+                              <label class="checkbox checkbox--sm"><input type="checkbox" disabled aria-disabled="true" tabindex="-1" aria-label="산재보험 선택"><span class="checkbox__control" aria-hidden="true"><span class="checkbox__icon-check"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span></label>
+                            </td>
+                            <td class="table__cell">산재보험</td>
+                            <td class="table__cell">—</td>
+                            <td class="table__cell acq-cell-select">
+                              <div class="dropdown dropdown--button dropdown--menu dropdown--sm dropdown--disabled">
+                                <button class="dropdown__trigger" type="button" aria-haspopup="listbox" aria-expanded="false" disabled aria-disabled="true" aria-label="산재보험 제외 사유">
+                                  <span class="dropdown__value">자진신고 사업장</span>
+                                  <span class="dropdown__chevron" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-chevron-down"/></svg></span>
+                                </button>
+                                <div class="dropdown__panel">
+                                  <ul class="dropdown__list" role="listbox" aria-label="산재보험 제외 사유">
+                                    <li class="dropdown__option" role="option" aria-selected="true" tabindex="-1"><span class="dropdown__option-label">자진신고 사업장</span></li>
+                                  </ul>
+                                </div>
+                              </div>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+
+                  <!-- ── 4·5·6 area: 근로시간 · 월급여액 · 연금 취득월납부 ── -->
+                  <div class="form-field-group--horizontal">
+                    <div class="form-field">
+                      <label class="form-field__label text-form-label" for="s1-hours">주소정근로시간 <span class="form-field__required" aria-hidden="true">(필수)</span></label>
+                      <div class="form-field__body">
+                        <input class="input" type="text" id="s1-hours" placeholder="주소정근로시간 입력" inputmode="numeric" aria-required="true" aria-describedby="s1-hours-footer">
+                        <div class="form-field__footer" id="s1-hours-footer">
+                          <p class="form-field__error text-helper" id="s1-hours-err" role="alert">100 이하 숫자로 입력해 주세요.</p>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="form-field">
+                      <label class="form-field__label text-form-label" for="s1-pay">월급여액 <span class="form-field__required" aria-hidden="true">(필수)</span></label>
+                      <div class="form-field__body">
+                        <input class="input input--complete" type="text" id="s1-pay" value="2,300,000" inputmode="numeric" aria-required="true" aria-describedby="s1-pay-footer">
+                        <div class="form-field__footer" id="s1-pay-footer">
+                          <p class="form-field__error text-helper" id="s1-pay-err" role="alert">숫자만 입력해 주세요.</p>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="form-field">
+                      <div class="form-field__label text-form-label acq-label-row" id="s1-pension-label">
+                        연금 취득월납부
+                        <span class="tooltip-wrapper" onmouseenter="this.querySelector('.tooltip-panel').classList.add('tooltip-panel--visible')" onmouseleave="this.querySelector('.tooltip-panel').classList.remove('tooltip-panel--visible')">
+                          <button class="tooltip-trigger" type="button" aria-label="연금 취득월납부 안내" aria-describedby="s1-pension-tip" onfocus="this.closest('.tooltip-wrapper').querySelector('.tooltip-panel').classList.add('tooltip-panel--visible')" onblur="this.closest('.tooltip-wrapper').querySelector('.tooltip-panel').classList.remove('tooltip-panel--visible')"><svg aria-hidden="true"><use href="#icon-help"/></svg></button>
+                          <div class="tooltip-panel elevation-tooltip tooltip-panel--bottom" id="s1-pension-tip" role="tooltip">입사일이 매월 1일이면 취득월부터 납부해요. 그 외에는 다음 달부터 납부하며, 희망을 선택하면 취득월부터 납부할 수 있어요.</div>
+                        </span>
+                      </div>
+                      <div class="form-field__body">
+                        <fieldset class="radio-group radio-group--horizontal" aria-labelledby="s1-pension-label">
+                          <label class="radio radio--sm"><input type="radio" name="s1-pension"><span class="radio__control" aria-hidden="true"></span><span class="radio__label">희망</span></label>
+                          <label class="radio radio--sm"><input type="radio" name="s1-pension" checked><span class="radio__control" aria-hidden="true"></span><span class="radio__label">미희망</span></label>
+                        </fieldset>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- ── 5-1 area: 예상보험료 안내 배너 ── -->
+                  <div class="banner banner--caution" role="status" id="s1-estimate">
+                    <span class="icon--md banner__icon" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-triangle-alert"/></svg></span>
+                    <div class="text-description banner__body">
+                      <div class="banner__message acq-banner-lines">
+                        <span>예상 반영 고지월: 국민연금 2026-01 / 건강보험 2025-12</span>
+                        <span>예상부과금액: 국민연금 3,567원 / 건강보험 12,500원</span>
+                        <span>※ 실제 부과금액 및 반영 시기는 신고일, 보수월액, 기관 처리 일정 등에 따라 달라질 수 있어요.</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- ── 7·7-1 area: 직종 선택 ── -->
+                  <div class="form-field">
+                    <label class="form-field__label text-form-label" for="s1-job">직종 선택 <span class="form-field__required" aria-hidden="true">(필수)</span></label>
+                    <div class="form-field__body">
+                      <div class="acq-job">
+                        <div class="acq-job__input">
+                          <input class="input" type="text" id="s1-job" placeholder="직종 선택" readonly aria-required="true">
+                        </div>
+                        <button class="btn btn--primary btn--solid btn--md" type="button" data-overlay-open="overlay-job-search">선택</button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- ── 8 area: 메모 ── -->
+                  <div class="form-field">
+                    <label class="form-field__label text-form-label" for="s1-memo">메모</label>
+                    <div class="form-field__body">
+                      <div class="textarea-wrap textarea-wrap--char-count">
+                        <textarea class="textarea" id="s1-memo" rows="4" maxlength="100" placeholder="요청하시는 업무와 관련하여 담당자에게 전달할 내용을 기재해주세요."></textarea>
+                        <span class="textarea-char-count" aria-hidden="true">0/100</span>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ── 9·10·11 area: 취소 / 임시저장 / 신고요청 ── -->
+          <div class="modal__footer">
+            <button class="btn btn--ghost btn--md" type="button" data-overlay-open="overlay-cancel">취소</button>
+            <button class="btn btn--secondary btn--solid btn--md" type="button" data-overlay-open="overlay-draft">임시저장</button>
+            <button class="btn btn--primary btn--solid btn--md" type="button" id="s1-submit">신고요청</button>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════ 시나리오 2: 첫 진입 (빈 폼) ══════════════ -->
+    <section class="scenario-panel" data-scenario="첫-진입" data-step hidden>
+      <div class="page">
+        <div class="modal" role="dialog" aria-modal="true" aria-labelledby="s2-title" style="width:958px;max-width:100%">
+
+          <div class="modal__header">
+            <h2 class="modal__title text-modal-title-sm" id="s2-title">취득신고서</h2>
+            <button class="icon-on--lg" type="button" aria-label="닫기"><svg aria-hidden="true"><use href="#icon-close"/></svg></button>
+          </div>
+
+          <div class="modal__body">
+            <div class="modal__content">
+              <div class="acq-grid">
+
+                <div class="file-upload" id="s2-upload" data-max-mb="200">
+                  <input type="file" id="s2-file-input" hidden multiple>
+                  <div class="file-upload__header">
+                    <span class="text-form-label file-upload__label" style="font-weight:var(--font-weight-heading)">첨부파일</span>
+                    <span class="text-form-label file-upload__usage">0MB / 200MB</span>
+                  </div>
+                  <div class="file-upload__meta">
+                    <p class="text-body file-upload__description">파일을 마우스로 끌어다 놓거나, 추가하기 버튼을 사용해 직접 업로드해 보세요.</p>
+                    <p class="text-body file-upload__constraint">*파일당 10MB 이하 업로드 가능</p>
+                  </div>
+                  <div class="file-upload__dropzone">
+                    <button class="btn btn--secondary btn--sm btn--icon-left" type="button">
+                      <span class="icon icon--sm" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-plus"/></svg></span>추가하기
+                    </button>
+                    <div class="file-upload__grid"></div>
+                  </div>
+                </div>
+
+                <div class="acq-form">
+
+                  <div class="banner" role="status">
+                    <span class="icon--md banner__icon" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-info"/></svg></span>
+                    <div class="text-description banner__body">
+                      <p class="banner__title">피부양자 취득 신고 안내</p>
+                      <p class="banner__message">피부양자 취득신고는 현재 지원하지 않아요. (추후 제공 예정) 피부양자 취득신고는 비즈씨를 통해 진행해주세요.</p>
+                    </div>
+                  </div>
+
+                  <div class="form-field-group--horizontal">
+                    <div class="form-field form-field--disabled">
+                      <label class="form-field__label text-form-label" for="s2-name">이름</label>
+                      <div class="form-field__body">
+                        <input class="input input--disabled" type="text" id="s2-name" value="유가영" disabled aria-disabled="true" tabindex="-1">
+                      </div>
+                    </div>
+                    <div class="form-field form-field--disabled">
+                      <label class="form-field__label text-form-label" for="s2-rrn">주민번호</label>
+                      <div class="form-field__body">
+                        <input class="input input--disabled" type="text" id="s2-rrn" value="123456-1234567" disabled aria-disabled="true" tabindex="-1">
+                      </div>
+                    </div>
+                    <div class="form-field form-field--disabled">
+                      <label class="form-field__label text-form-label" for="s2-hire">입사일</label>
+                      <div class="form-field__body">
+                        <input class="input input--disabled" type="text" id="s2-hire" value="2025-12-12" disabled aria-disabled="true" tabindex="-1">
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="acq-section">
+                    <span class="text-form-label" id="s2-ins-label">가입 보험</span>
+                    <div class="table-container">
+                      <table class="table" aria-labelledby="s2-ins-label">
+                        <colgroup>
+                          <col style="width:40px">
+                          <col style="width:150px">
+                          <col>
+                          <col style="width:220px">
+                        </colgroup>
+                        <thead class="table__head">
+                          <tr>
+                            <th class="table__cell table__cell--check" scope="col"><span class="sr-only">선택</span></th>
+                            <th class="table__head-cell" scope="col">보험</th>
+                            <th class="table__head-cell" scope="col">신고사업장</th>
+                            <th class="table__head-cell" scope="col">제외 사유</th>
+                          </tr>
+                        </thead>
+                        <tbody class="table__body">
+                          <tr class="table__row">
+                            <td class="table__cell table__cell--check">
+                              <label class="checkbox checkbox--sm"><input type="checkbox" checked disabled aria-disabled="true" tabindex="-1" aria-label="국민연금 선택"><span class="checkbox__control" aria-hidden="true"><span class="checkbox__icon-check"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span></label>
+                            </td>
+                            <td class="table__cell">국민연금</td>
+                            <td class="table__cell">(주)남웅건설</td>
+                            <td class="table__cell">—</td>
+                          </tr>
+                          <tr class="table__row">
+                            <td class="table__cell table__cell--check">
+                              <label class="checkbox checkbox--sm"><input type="checkbox" checked disabled aria-disabled="true" tabindex="-1" aria-label="건강보험 선택"><span class="checkbox__control" aria-hidden="true"><span class="checkbox__icon-check"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span></label>
+                            </td>
+                            <td class="table__cell">건강보험</td>
+                            <td class="table__cell">LG U+ 파주 1239 신축공사 철근콘크리트공사</td>
+                            <td class="table__cell">—</td>
+                          </tr>
+                          <tr class="table__row">
+                            <td class="table__cell table__cell--check">
+                              <label class="checkbox checkbox--sm"><input type="checkbox" disabled aria-disabled="true" tabindex="-1" aria-label="고용보험 선택"><span class="checkbox__control" aria-hidden="true"><span class="checkbox__icon-check"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span></label>
+                            </td>
+                            <td class="table__cell">고용보험</td>
+                            <td class="table__cell">—</td>
+                            <td class="table__cell acq-cell-select">
+                              <div class="dropdown dropdown--button dropdown--menu dropdown--sm">
+                                <button class="dropdown__trigger" type="button" aria-haspopup="listbox" aria-expanded="false" aria-label="고용보험 제외 사유">
+                                  <span class="dropdown__value dropdown__value--placeholder">제외 사유 선택</span>
+                                  <span class="dropdown__chevron" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-chevron-down"/></svg></span>
+                                </button>
+                                <div class="dropdown__panel">
+                                  <ul class="dropdown__list" role="listbox" aria-label="고용보험 제외 사유">
+                                    <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">대표자/사업주</span></li>
+                                    <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">만 65세 이상</span></li>
+                                    <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">외국인 (체류자격 제외 대상)</span></li>
+                                  </ul>
+                                </div>
+                              </div>
+                            </td>
+                          </tr>
+                          <tr class="table__row">
+                            <td class="table__cell table__cell--check">
+                              <label class="checkbox checkbox--sm"><input type="checkbox" disabled aria-disabled="true" tabindex="-1" aria-label="산재보험 선택"><span class="checkbox__control" aria-hidden="true"><span class="checkbox__icon-check"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span></label>
+                            </td>
+                            <td class="table__cell">산재보험</td>
+                            <td class="table__cell">—</td>
+                            <td class="table__cell acq-cell-select">
+                              <div class="dropdown dropdown--button dropdown--menu dropdown--sm dropdown--disabled">
+                                <button class="dropdown__trigger" type="button" aria-haspopup="listbox" aria-expanded="false" disabled aria-disabled="true" aria-label="산재보험 제외 사유">
+                                  <span class="dropdown__value">자진신고 사업장</span>
+                                  <span class="dropdown__chevron" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-chevron-down"/></svg></span>
+                                </button>
+                                <div class="dropdown__panel">
+                                  <ul class="dropdown__list" role="listbox" aria-label="산재보험 제외 사유">
+                                    <li class="dropdown__option" role="option" aria-selected="true" tabindex="-1"><span class="dropdown__option-label">자진신고 사업장</span></li>
+                                  </ul>
+                                </div>
+                              </div>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+
+                  <div class="form-field-group--horizontal">
+                    <div class="form-field">
+                      <label class="form-field__label text-form-label" for="s2-hours">주소정근로시간 <span class="form-field__required" aria-hidden="true">(필수)</span></label>
+                      <div class="form-field__body">
+                        <input class="input" type="text" id="s2-hours" placeholder="주소정근로시간 입력" inputmode="numeric" aria-required="true" aria-describedby="s2-hours-footer">
+                        <div class="form-field__footer" id="s2-hours-footer">
+                          <p class="form-field__error text-helper" id="s2-hours-err" role="alert">100 이하 숫자로 입력해 주세요.</p>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="form-field">
+                      <label class="form-field__label text-form-label" for="s2-pay">월급여액 <span class="form-field__required" aria-hidden="true">(필수)</span></label>
+                      <div class="form-field__body">
+                        <input class="input" type="text" id="s2-pay" placeholder="월급여액 입력" inputmode="numeric" aria-required="true" aria-describedby="s2-pay-footer">
+                        <div class="form-field__footer" id="s2-pay-footer">
+                          <p class="form-field__error text-helper" id="s2-pay-err" role="alert">숫자만 입력해 주세요.</p>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="form-field">
+                      <div class="form-field__label text-form-label acq-label-row" id="s2-pension-label">
+                        연금 취득월납부
+                        <span class="tooltip-wrapper" onmouseenter="this.querySelector('.tooltip-panel').classList.add('tooltip-panel--visible')" onmouseleave="this.querySelector('.tooltip-panel').classList.remove('tooltip-panel--visible')">
+                          <button class="tooltip-trigger" type="button" aria-label="연금 취득월납부 안내" aria-describedby="s2-pension-tip" onfocus="this.closest('.tooltip-wrapper').querySelector('.tooltip-panel').classList.add('tooltip-panel--visible')" onblur="this.closest('.tooltip-wrapper').querySelector('.tooltip-panel').classList.remove('tooltip-panel--visible')"><svg aria-hidden="true"><use href="#icon-help"/></svg></button>
+                          <div class="tooltip-panel elevation-tooltip tooltip-panel--bottom" id="s2-pension-tip" role="tooltip">입사일이 매월 1일이면 취득월부터 납부해요. 그 외에는 다음 달부터 납부하며, 희망을 선택하면 취득월부터 납부할 수 있어요.</div>
+                        </span>
+                      </div>
+                      <div class="form-field__body">
+                        <fieldset class="radio-group radio-group--horizontal" aria-labelledby="s2-pension-label">
+                          <label class="radio radio--sm"><input type="radio" name="s2-pension"><span class="radio__control" aria-hidden="true"></span><span class="radio__label">희망</span></label>
+                          <label class="radio radio--sm"><input type="radio" name="s2-pension" checked><span class="radio__control" aria-hidden="true"></span><span class="radio__label">미희망</span></label>
+                        </fieldset>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- 5-1 배너 없음 — 월급여액 미입력 상태에서는 예상보험료를 산정할 수 없다 -->
+
+                  <div class="form-field">
+                    <label class="form-field__label text-form-label" for="s2-job">직종 선택 <span class="form-field__required" aria-hidden="true">(필수)</span></label>
+                    <div class="form-field__body">
+                      <div class="acq-job">
+                        <div class="acq-job__input">
+                          <input class="input" type="text" id="s2-job" placeholder="직종 선택" readonly aria-required="true">
+                        </div>
+                        <button class="btn btn--primary btn--solid btn--md" type="button" data-overlay-open="overlay-job-search">선택</button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="form-field">
+                    <label class="form-field__label text-form-label" for="s2-memo">메모</label>
+                    <div class="form-field__body">
+                      <div class="textarea-wrap textarea-wrap--char-count">
+                        <textarea class="textarea" id="s2-memo" rows="4" maxlength="100" placeholder="요청하시는 업무와 관련하여 담당자에게 전달할 내용을 기재해주세요."></textarea>
+                        <span class="textarea-char-count" aria-hidden="true">0/100</span>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="modal__footer">
+            <button class="btn btn--ghost btn--md" type="button" data-overlay-open="overlay-cancel">취소</button>
+            <button class="btn btn--secondary btn--solid btn--md" type="button" data-overlay-open="overlay-draft">임시저장</button>
+            <button class="btn btn--primary btn--solid btn--md" type="button" id="s2-submit">신고요청</button>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════ 시나리오 3: 로딩 (근로자 정보 조회 중) ══════════════ -->
+    <section class="scenario-panel" data-scenario="로딩" data-step hidden>
+      <div class="page">
+        <div class="modal" role="dialog" aria-modal="true" aria-labelledby="s3-title" style="width:958px;max-width:100%">
+
+          <div class="modal__header">
+            <h2 class="modal__title text-modal-title-sm" id="s3-title">취득신고서</h2>
+            <button class="icon-on--lg" type="button" aria-label="닫기"><svg aria-hidden="true"><use href="#icon-close"/></svg></button>
+          </div>
+
+          <div class="modal__body">
+            <div class="modal__content">
+              <p class="sr-only" role="status">근로자 정보를 불러오는 중입니다.</p>
+              <div class="acq-grid">
+                <div class="skeleton" aria-hidden="true" style="height:320px"></div>
+                <div class="acq-form">
+                  <div class="skeleton" aria-hidden="true" style="height:84px"></div>
+                  <div class="acq-skeleton-row">
+                    <div class="skeleton" aria-hidden="true" style="height:64px"></div>
+                    <div class="skeleton" aria-hidden="true" style="height:64px"></div>
+                    <div class="skeleton" aria-hidden="true" style="height:64px"></div>
+                  </div>
+                  <div class="skeleton" aria-hidden="true" style="height:220px"></div>
+                  <div class="acq-skeleton-row">
+                    <div class="skeleton" aria-hidden="true" style="height:64px"></div>
+                    <div class="skeleton" aria-hidden="true" style="height:64px"></div>
+                    <div class="skeleton" aria-hidden="true" style="height:64px"></div>
+                  </div>
+                  <div class="skeleton" aria-hidden="true" style="height:64px"></div>
+                  <div class="skeleton" aria-hidden="true" style="height:120px"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="modal__footer">
+            <button class="btn btn--ghost btn--md" type="button" disabled aria-disabled="true" tabindex="-1">취소</button>
+            <button class="btn btn--secondary btn--solid btn--md" type="button" disabled aria-disabled="true" tabindex="-1">임시저장</button>
+            <button class="btn btn--primary btn--solid btn--md" type="button" disabled aria-disabled="true" tabindex="-1">신고요청</button>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════ 시나리오 4: 제약 케이스 (12·13 area) ══════════════ -->
+    <!-- 12 area 이미 가입된 보험 + 13 area 자진신고 사업장을 한 패널에 함께 표시한다.
+         두 제약 모두 '가입보험 테이블의 선택 불가 표시'라 같은 화면에서 동시에 발생한다. -->
+    <section class="scenario-panel" data-scenario="제약-케이스" data-step hidden>
+      <div class="page">
+        <div class="modal" role="dialog" aria-modal="true" aria-labelledby="s4-title" style="width:958px;max-width:100%">
+
+          <div class="modal__header">
+            <h2 class="modal__title text-modal-title-sm" id="s4-title">취득신고서</h2>
+            <button class="icon-on--lg" type="button" aria-label="닫기"><svg aria-hidden="true"><use href="#icon-close"/></svg></button>
+          </div>
+
+          <div class="modal__body">
+            <div class="modal__content">
+              <div class="acq-grid">
+
+                <div class="file-upload" id="s4-upload" data-max-mb="200">
+                  <input type="file" id="s4-file-input" hidden multiple>
+                  <div class="file-upload__header">
+                    <span class="text-form-label file-upload__label" style="font-weight:var(--font-weight-heading)">첨부파일</span>
+                    <span class="text-form-label file-upload__usage">0MB / 200MB</span>
+                  </div>
+                  <div class="file-upload__meta">
+                    <p class="text-body file-upload__description">파일을 마우스로 끌어다 놓거나, 추가하기 버튼을 사용해 직접 업로드해 보세요.</p>
+                    <p class="text-body file-upload__constraint">*파일당 10MB 이하 업로드 가능</p>
+                  </div>
+                  <div class="file-upload__dropzone">
+                    <button class="btn btn--secondary btn--sm btn--icon-left" type="button">
+                      <span class="icon icon--sm" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-plus"/></svg></span>추가하기
+                    </button>
+                    <div class="file-upload__grid"></div>
+                  </div>
+                </div>
+
+                <div class="acq-form">
+
+                  <div class="banner" role="status">
+                    <span class="icon--md banner__icon" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-info"/></svg></span>
+                    <div class="text-description banner__body">
+                      <p class="banner__title">피부양자 취득 신고 안내</p>
+                      <p class="banner__message">피부양자 취득신고는 현재 지원하지 않아요. (추후 제공 예정) 피부양자 취득신고는 비즈씨를 통해 진행해주세요.</p>
+                    </div>
+                  </div>
+
+                  <div class="form-field-group--horizontal">
+                    <div class="form-field form-field--disabled">
+                      <label class="form-field__label text-form-label" for="s4-name">이름</label>
+                      <div class="form-field__body">
+                        <input class="input input--disabled" type="text" id="s4-name" value="유가영" disabled aria-disabled="true" tabindex="-1">
+                      </div>
+                    </div>
+                    <div class="form-field form-field--disabled">
+                      <label class="form-field__label text-form-label" for="s4-rrn">주민번호</label>
+                      <div class="form-field__body">
+                        <input class="input input--disabled" type="text" id="s4-rrn" value="123456-1234567" disabled aria-disabled="true" tabindex="-1">
+                      </div>
+                    </div>
+                    <div class="form-field form-field--disabled">
+                      <label class="form-field__label text-form-label" for="s4-hire">입사일</label>
+                      <div class="form-field__body">
+                        <input class="input input--disabled" type="text" id="s4-hire" value="2025-12-12" disabled aria-disabled="true" tabindex="-1">
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="acq-section">
+                    <span class="text-form-label" id="s4-ins-label">가입 보험</span>
+                    <div class="table-container">
+                      <table class="table" aria-labelledby="s4-ins-label">
+                        <colgroup>
+                          <col style="width:40px">
+                          <col style="width:150px">
+                          <col>
+                          <col style="width:220px">
+                        </colgroup>
+                        <thead class="table__head">
+                          <tr>
+                            <th class="table__cell table__cell--check" scope="col"><span class="sr-only">선택</span></th>
+                            <th class="table__head-cell" scope="col">보험</th>
+                            <th class="table__head-cell" scope="col">신고사업장</th>
+                            <th class="table__head-cell" scope="col">제외 사유</th>
+                          </tr>
+                        </thead>
+                        <tbody class="table__body">
+                          <!-- 12 area — 이미 가입된 보험: 가입중 뱃지 + 체크박스 비활성 + 사업장 정보 출력 -->
+                          <tr class="table__row">
+                            <td class="table__cell table__cell--check">
+                              <label class="checkbox checkbox--sm checkbox--disabled"><input type="checkbox" checked disabled aria-disabled="true" tabindex="-1" aria-label="국민연금 선택"><span class="checkbox__control" aria-hidden="true"><span class="checkbox__icon-check"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span></label>
+                            </td>
+                            <td class="table__cell">국민연금 <span class="badge badge--success">가입중</span></td>
+                            <td class="table__cell">(주)남웅건설</td>
+                            <td class="table__cell">—</td>
+                          </tr>
+                          <tr class="table__row">
+                            <td class="table__cell table__cell--check">
+                              <label class="checkbox checkbox--sm checkbox--disabled"><input type="checkbox" checked disabled aria-disabled="true" tabindex="-1" aria-label="건강보험 선택"><span class="checkbox__control" aria-hidden="true"><span class="checkbox__icon-check"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span></label>
+                            </td>
+                            <td class="table__cell">건강보험 <span class="badge badge--success">가입중</span></td>
+                            <td class="table__cell">LG U+ 파주 1239 신축공사 철근콘크리트공사</td>
+                            <td class="table__cell">—</td>
+                          </tr>
+                          <tr class="table__row">
+                            <td class="table__cell table__cell--check">
+                              <label class="checkbox checkbox--sm"><input type="checkbox" aria-label="고용보험 선택"><span class="checkbox__control" aria-hidden="true"><span class="checkbox__icon-check"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span></label>
+                            </td>
+                            <td class="table__cell">고용보험</td>
+                            <td class="table__cell">(주)남웅건설</td>
+                            <td class="table__cell">—</td>
+                          </tr>
+                          <!-- 13 area — 자진신고 사업장: 산재보험 선택 불가 + 제외 사유 고정 -->
+                          <tr class="table__row">
+                            <td class="table__cell table__cell--check">
+                              <label class="checkbox checkbox--sm checkbox--disabled"><input type="checkbox" disabled aria-disabled="true" tabindex="-1" aria-label="산재보험 선택"><span class="checkbox__control" aria-hidden="true"><span class="checkbox__icon-check"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span></label>
+                            </td>
+                            <td class="table__cell">산재보험</td>
+                            <td class="table__cell">—</td>
+                            <td class="table__cell acq-cell-select">
+                              <div class="dropdown dropdown--button dropdown--menu dropdown--sm dropdown--disabled">
+                                <button class="dropdown__trigger" type="button" aria-haspopup="listbox" aria-expanded="false" disabled aria-disabled="true" aria-label="산재보험 제외 사유">
+                                  <span class="dropdown__value">자진신고 사업장</span>
+                                  <span class="dropdown__chevron" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-chevron-down"/></svg></span>
+                                </button>
+                                <div class="dropdown__panel">
+                                  <ul class="dropdown__list" role="listbox" aria-label="산재보험 제외 사유">
+                                    <li class="dropdown__option" role="option" aria-selected="true" tabindex="-1"><span class="dropdown__option-label">자진신고 사업장</span></li>
+                                  </ul>
+                                </div>
+                              </div>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+
+                  <div class="form-field-group--horizontal">
+                    <div class="form-field">
+                      <label class="form-field__label text-form-label" for="s4-hours">주소정근로시간 <span class="form-field__required" aria-hidden="true">(필수)</span></label>
+                      <div class="form-field__body">
+                        <input class="input input--complete" type="text" id="s4-hours" value="40" inputmode="numeric" aria-required="true">
+                      </div>
+                    </div>
+                    <div class="form-field">
+                      <label class="form-field__label text-form-label" for="s4-pay">월급여액 <span class="form-field__required" aria-hidden="true">(필수)</span></label>
+                      <div class="form-field__body">
+                        <input class="input input--complete" type="text" id="s4-pay" value="2,300,000" inputmode="numeric" aria-required="true">
+                      </div>
+                    </div>
+                    <div class="form-field">
+                      <div class="form-field__label text-form-label acq-label-row" id="s4-pension-label">
+                        연금 취득월납부
+                        <span class="tooltip-wrapper" onmouseenter="this.querySelector('.tooltip-panel').classList.add('tooltip-panel--visible')" onmouseleave="this.querySelector('.tooltip-panel').classList.remove('tooltip-panel--visible')">
+                          <button class="tooltip-trigger" type="button" aria-label="연금 취득월납부 안내" aria-describedby="s4-pension-tip" onfocus="this.closest('.tooltip-wrapper').querySelector('.tooltip-panel').classList.add('tooltip-panel--visible')" onblur="this.closest('.tooltip-wrapper').querySelector('.tooltip-panel').classList.remove('tooltip-panel--visible')"><svg aria-hidden="true"><use href="#icon-help"/></svg></button>
+                          <div class="tooltip-panel elevation-tooltip tooltip-panel--bottom" id="s4-pension-tip" role="tooltip">입사일이 매월 1일이면 취득월부터 납부해요. 그 외에는 다음 달부터 납부하며, 희망을 선택하면 취득월부터 납부할 수 있어요.</div>
+                        </span>
+                      </div>
+                      <div class="form-field__body">
+                        <!-- 6 area 노출 조건 — 국민연금이 이미 가입중이므로 라디오는 비활성 -->
+                        <fieldset class="radio-group radio-group--horizontal" aria-labelledby="s4-pension-label" disabled>
+                          <label class="radio radio--sm radio--disabled"><input type="radio" name="s4-pension" disabled aria-disabled="true" tabindex="-1"><span class="radio__control" aria-hidden="true"></span><span class="radio__label">희망</span></label>
+                          <label class="radio radio--sm radio--disabled"><input type="radio" name="s4-pension" checked disabled aria-disabled="true" tabindex="-1"><span class="radio__control" aria-hidden="true"></span><span class="radio__label">미희망</span></label>
+                        </fieldset>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="banner banner--caution" role="status">
+                    <span class="icon--md banner__icon" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-triangle-alert"/></svg></span>
+                    <div class="text-description banner__body">
+                      <div class="banner__message acq-banner-lines">
+                        <span>예상 반영 고지월: 고용보험 2026-01</span>
+                        <span>예상부과금액: 고용보험 20,700원</span>
+                        <span>※ 실제 부과금액 및 반영 시기는 신고일, 보수월액, 기관 처리 일정 등에 따라 달라질 수 있어요.</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="form-field">
+                    <label class="form-field__label text-form-label" for="s4-job">직종 선택 <span class="form-field__required" aria-hidden="true">(필수)</span></label>
+                    <div class="form-field__body">
+                      <div class="acq-job">
+                        <div class="acq-job__input">
+                          <input class="input input--complete" type="text" id="s4-job" value="철근공" readonly aria-required="true">
+                        </div>
+                        <button class="btn btn--primary btn--solid btn--md" type="button" data-overlay-open="overlay-job-search">선택</button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="form-field">
+                    <label class="form-field__label text-form-label" for="s4-memo">메모</label>
+                    <div class="form-field__body">
+                      <div class="textarea-wrap textarea-wrap--char-count">
+                        <textarea class="textarea" id="s4-memo" rows="4" maxlength="100" placeholder="요청하시는 업무와 관련하여 담당자에게 전달할 내용을 기재해주세요."></textarea>
+                        <span class="textarea-char-count" aria-hidden="true">0/100</span>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="modal__footer">
+            <button class="btn btn--ghost btn--md" type="button" data-overlay-open="overlay-cancel">취소</button>
+            <button class="btn btn--secondary btn--solid btn--md" type="button" data-overlay-open="overlay-draft">임시저장</button>
+            <button class="btn btn--primary btn--solid btn--md" type="button" id="s4-submit">신고요청</button>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════ 시나리오 5: 저장 실패 ══════════════ -->
+    <section class="scenario-panel" data-scenario="저장-실패" data-step hidden>
+      <div class="page">
+        <div class="modal" role="dialog" aria-modal="true" aria-labelledby="s5-title" style="width:958px;max-width:100%">
+
+          <div class="modal__header">
+            <h2 class="modal__title text-modal-title-sm" id="s5-title">취득신고서</h2>
+            <button class="icon-on--lg" type="button" aria-label="닫기"><svg aria-hidden="true"><use href="#icon-close"/></svg></button>
+          </div>
+
+          <div class="modal__body">
+            <div class="modal__content">
+              <div class="acq-grid">
+
+                <div class="file-upload" id="s5-upload" data-max-mb="200">
+                  <input type="file" id="s5-file-input" hidden multiple>
+                  <div class="file-upload__header">
+                    <span class="text-form-label file-upload__label" style="font-weight:var(--font-weight-heading)">첨부파일</span>
+                    <span class="text-form-label file-upload__usage">0MB / 200MB</span>
+                  </div>
+                  <div class="file-upload__meta">
+                    <p class="text-body file-upload__description">파일을 마우스로 끌어다 놓거나, 추가하기 버튼을 사용해 직접 업로드해 보세요.</p>
+                    <p class="text-body file-upload__constraint">*파일당 10MB 이하 업로드 가능</p>
+                  </div>
+                  <div class="file-upload__dropzone">
+                    <button class="btn btn--secondary btn--sm btn--icon-left" type="button">
+                      <span class="icon icon--sm" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-plus"/></svg></span>추가하기
+                    </button>
+                    <div class="file-upload__grid"></div>
+                  </div>
+                </div>
+
+                <div class="acq-form">
+
+                  <!-- 전송 실패 — 섹션 단위 오류이므로 Banner (→ product.md Error State) -->
+                  <div class="banner banner--error" role="alert">
+                    <span class="icon--md banner__icon" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-circle-x"/></svg></span>
+                    <div class="text-description banner__body">
+                      <p class="banner__title">신고 요청 실패</p>
+                      <p class="banner__message">전산망 연결이 끊겨 신고를 전송하지 못했어요. 작성한 내용은 그대로 있으니 잠시 후 다시 시도해주세요.</p>
+                    </div>
+                  </div>
+
+                  <div class="form-field-group--horizontal">
+                    <div class="form-field form-field--disabled">
+                      <label class="form-field__label text-form-label" for="s5-name">이름</label>
+                      <div class="form-field__body">
+                        <input class="input input--disabled" type="text" id="s5-name" value="유가영" disabled aria-disabled="true" tabindex="-1">
+                      </div>
+                    </div>
+                    <div class="form-field form-field--disabled">
+                      <label class="form-field__label text-form-label" for="s5-rrn">주민번호</label>
+                      <div class="form-field__body">
+                        <input class="input input--disabled" type="text" id="s5-rrn" value="123456-1234567" disabled aria-disabled="true" tabindex="-1">
+                      </div>
+                    </div>
+                    <div class="form-field form-field--disabled">
+                      <label class="form-field__label text-form-label" for="s5-hire">입사일</label>
+                      <div class="form-field__body">
+                        <input class="input input--disabled" type="text" id="s5-hire" value="2025-12-12" disabled aria-disabled="true" tabindex="-1">
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="acq-section">
+                    <span class="text-form-label" id="s5-ins-label">가입 보험</span>
+                    <div class="table-container">
+                      <table class="table" aria-labelledby="s5-ins-label">
+                        <colgroup>
+                          <col style="width:40px">
+                          <col style="width:150px">
+                          <col>
+                          <col style="width:220px">
+                        </colgroup>
+                        <thead class="table__head">
+                          <tr>
+                            <th class="table__cell table__cell--check" scope="col"><span class="sr-only">선택</span></th>
+                            <th class="table__head-cell" scope="col">보험</th>
+                            <th class="table__head-cell" scope="col">신고사업장</th>
+                            <th class="table__head-cell" scope="col">제외 사유</th>
+                          </tr>
+                        </thead>
+                        <tbody class="table__body">
+                          <tr class="table__row">
+                            <td class="table__cell table__cell--check">
+                              <label class="checkbox checkbox--sm"><input type="checkbox" checked disabled aria-disabled="true" tabindex="-1" aria-label="국민연금 선택"><span class="checkbox__control" aria-hidden="true"><span class="checkbox__icon-check"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span></label>
+                            </td>
+                            <td class="table__cell">국민연금</td>
+                            <td class="table__cell">(주)남웅건설</td>
+                            <td class="table__cell">—</td>
+                          </tr>
+                          <tr class="table__row">
+                            <td class="table__cell table__cell--check">
+                              <label class="checkbox checkbox--sm"><input type="checkbox" checked disabled aria-disabled="true" tabindex="-1" aria-label="건강보험 선택"><span class="checkbox__control" aria-hidden="true"><span class="checkbox__icon-check"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span></label>
+                            </td>
+                            <td class="table__cell">건강보험</td>
+                            <td class="table__cell">LG U+ 파주 1239 신축공사 철근콘크리트공사</td>
+                            <td class="table__cell">—</td>
+                          </tr>
+                          <tr class="table__row">
+                            <td class="table__cell table__cell--check">
+                              <label class="checkbox checkbox--sm"><input type="checkbox" disabled aria-disabled="true" tabindex="-1" aria-label="고용보험 선택"><span class="checkbox__control" aria-hidden="true"><span class="checkbox__icon-check"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span></label>
+                            </td>
+                            <td class="table__cell">고용보험</td>
+                            <td class="table__cell">—</td>
+                            <td class="table__cell acq-cell-select">
+                              <div class="dropdown dropdown--button dropdown--menu dropdown--sm">
+                                <button class="dropdown__trigger" type="button" aria-haspopup="listbox" aria-expanded="false" aria-label="고용보험 제외 사유">
+                                  <span class="dropdown__value">만 65세 이상</span>
+                                  <span class="dropdown__chevron" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-chevron-down"/></svg></span>
+                                </button>
+                                <div class="dropdown__panel">
+                                  <ul class="dropdown__list" role="listbox" aria-label="고용보험 제외 사유">
+                                    <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">대표자/사업주</span></li>
+                                    <li class="dropdown__option" role="option" aria-selected="true" tabindex="-1"><span class="dropdown__option-label">만 65세 이상</span></li>
+                                    <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">외국인 (체류자격 제외 대상)</span></li>
+                                  </ul>
+                                </div>
+                              </div>
+                            </td>
+                          </tr>
+                          <tr class="table__row">
+                            <td class="table__cell table__cell--check">
+                              <label class="checkbox checkbox--sm"><input type="checkbox" disabled aria-disabled="true" tabindex="-1" aria-label="산재보험 선택"><span class="checkbox__control" aria-hidden="true"><span class="checkbox__icon-check"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span></label>
+                            </td>
+                            <td class="table__cell">산재보험</td>
+                            <td class="table__cell">—</td>
+                            <td class="table__cell acq-cell-select">
+                              <div class="dropdown dropdown--button dropdown--menu dropdown--sm dropdown--disabled">
+                                <button class="dropdown__trigger" type="button" aria-haspopup="listbox" aria-expanded="false" disabled aria-disabled="true" aria-label="산재보험 제외 사유">
+                                  <span class="dropdown__value">자진신고 사업장</span>
+                                  <span class="dropdown__chevron" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-chevron-down"/></svg></span>
+                                </button>
+                                <div class="dropdown__panel">
+                                  <ul class="dropdown__list" role="listbox" aria-label="산재보험 제외 사유">
+                                    <li class="dropdown__option" role="option" aria-selected="true" tabindex="-1"><span class="dropdown__option-label">자진신고 사업장</span></li>
+                                  </ul>
+                                </div>
+                              </div>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+
+                  <div class="form-field-group--horizontal">
+                    <div class="form-field">
+                      <label class="form-field__label text-form-label" for="s5-hours">주소정근로시간 <span class="form-field__required" aria-hidden="true">(필수)</span></label>
+                      <div class="form-field__body">
+                        <input class="input input--complete" type="text" id="s5-hours" value="40" inputmode="numeric" aria-required="true">
+                      </div>
+                    </div>
+                    <div class="form-field">
+                      <label class="form-field__label text-form-label" for="s5-pay">월급여액 <span class="form-field__required" aria-hidden="true">(필수)</span></label>
+                      <div class="form-field__body">
+                        <input class="input input--complete" type="text" id="s5-pay" value="2,300,000" inputmode="numeric" aria-required="true">
+                      </div>
+                    </div>
+                    <div class="form-field">
+                      <div class="form-field__label text-form-label acq-label-row" id="s5-pension-label">
+                        연금 취득월납부
+                        <span class="tooltip-wrapper" onmouseenter="this.querySelector('.tooltip-panel').classList.add('tooltip-panel--visible')" onmouseleave="this.querySelector('.tooltip-panel').classList.remove('tooltip-panel--visible')">
+                          <button class="tooltip-trigger" type="button" aria-label="연금 취득월납부 안내" aria-describedby="s5-pension-tip" onfocus="this.closest('.tooltip-wrapper').querySelector('.tooltip-panel').classList.add('tooltip-panel--visible')" onblur="this.closest('.tooltip-wrapper').querySelector('.tooltip-panel').classList.remove('tooltip-panel--visible')"><svg aria-hidden="true"><use href="#icon-help"/></svg></button>
+                          <div class="tooltip-panel elevation-tooltip tooltip-panel--bottom" id="s5-pension-tip" role="tooltip">입사일이 매월 1일이면 취득월부터 납부해요. 그 외에는 다음 달부터 납부하며, 희망을 선택하면 취득월부터 납부할 수 있어요.</div>
+                        </span>
+                      </div>
+                      <div class="form-field__body">
+                        <fieldset class="radio-group radio-group--horizontal" aria-labelledby="s5-pension-label">
+                          <label class="radio radio--sm"><input type="radio" name="s5-pension"><span class="radio__control" aria-hidden="true"></span><span class="radio__label">희망</span></label>
+                          <label class="radio radio--sm"><input type="radio" name="s5-pension" checked><span class="radio__control" aria-hidden="true"></span><span class="radio__label">미희망</span></label>
+                        </fieldset>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="banner banner--caution" role="status">
+                    <span class="icon--md banner__icon" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-triangle-alert"/></svg></span>
+                    <div class="text-description banner__body">
+                      <div class="banner__message acq-banner-lines">
+                        <span>예상 반영 고지월: 국민연금 2026-01 / 건강보험 2025-12</span>
+                        <span>예상부과금액: 국민연금 3,567원 / 건강보험 12,500원</span>
+                        <span>※ 실제 부과금액 및 반영 시기는 신고일, 보수월액, 기관 처리 일정 등에 따라 달라질 수 있어요.</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="form-field">
+                    <label class="form-field__label text-form-label" for="s5-job">직종 선택 <span class="form-field__required" aria-hidden="true">(필수)</span></label>
+                    <div class="form-field__body">
+                      <div class="acq-job">
+                        <div class="acq-job__input">
+                          <input class="input input--complete" type="text" id="s5-job" value="철근공" readonly aria-required="true">
+                        </div>
+                        <button class="btn btn--primary btn--solid btn--md" type="button" data-overlay-open="overlay-job-search">선택</button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="form-field">
+                    <label class="form-field__label text-form-label" for="s5-memo">메모</label>
+                    <div class="form-field__body">
+                      <div class="textarea-wrap textarea-wrap--char-count">
+                        <textarea class="textarea" id="s5-memo" rows="4" maxlength="100" placeholder="요청하시는 업무와 관련하여 담당자에게 전달할 내용을 기재해주세요."></textarea>
+                        <span class="textarea-char-count" aria-hidden="true">0/100</span>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="modal__footer">
+            <button class="btn btn--ghost btn--md" type="button" data-overlay-open="overlay-cancel">취소</button>
+            <button class="btn btn--secondary btn--solid btn--md" type="button" data-overlay-open="overlay-draft">임시저장</button>
+            <button class="btn btn--primary btn--solid btn--md" type="button" id="s5-submit">다시 시도</button>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    </div>
+  </main>
+
+</div>
+
+<!-- ══════════════ 9 area — 취소 확인 (Alert) ══════════════ -->
+<div id="overlay-cancel" data-overlay>
+  <div class="alert" role="alertdialog" aria-modal="true" aria-labelledby="cancel-title" aria-describedby="cancel-body">
+    <div class="alert__header">
+      <p class="text-card-title alert__title" id="cancel-title">작성 중인 취득신고를 취소할까요?</p>
+      <button class="icon-on--sm alert__close" type="button" aria-label="닫기" data-overlay-close><svg aria-hidden="true"><use href="#icon-close"/></svg></button>
+    </div>
+    <div class="alert__body" id="cancel-body">
+      <ul class="text-description alert__list">
+        <li>사업장 선택 단계에서 등록한 전입·전출 이력이 삭제돼요.</li>
+        <li>작성한 내용은 저장되지 않아요.</li>
+      </ul>
+    </div>
+    <div class="alert__footer">
+      <button class="btn btn--ghost btn--md" type="button" data-overlay-close>계속 작성</button>
+      <button class="btn btn--secondary btn--md" type="button" data-overlay-close>취소하기</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ 10 area — 임시저장 확인 (Alert) ══════════════ -->
+<div id="overlay-draft" data-overlay>
+  <div class="alert" role="alertdialog" aria-modal="true" aria-labelledby="draft-title" aria-describedby="draft-body">
+    <div class="alert__header">
+      <p class="text-card-title alert__title" id="draft-title">작성 중인 내용을 임시저장할까요?</p>
+      <button class="icon-on--sm alert__close" type="button" aria-label="닫기" data-overlay-close><svg aria-hidden="true"><use href="#icon-close"/></svg></button>
+    </div>
+    <div class="alert__body" id="draft-body">
+      <p class="text-description alert__description">임시저장한 신고는 신고대상&amp;진행현황 탭에서 이어서 작성할 수 있어요.</p>
+    </div>
+    <div class="alert__footer">
+      <button class="btn btn--ghost btn--md" type="button" data-overlay-close>취소</button>
+      <button class="btn btn--primary btn--md" type="button" data-overlay-close>임시저장</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ 11 area — 신고요청 확인 (Alert) ══════════════ -->
+<div id="overlay-submit" data-overlay>
+  <div class="alert" role="alertdialog" aria-modal="true" aria-labelledby="submit-title" aria-describedby="submit-body">
+    <div class="alert__header">
+      <p class="text-card-title alert__title" id="submit-title">취득신고를 요청할까요?</p>
+      <button class="icon-on--sm alert__close" type="button" aria-label="닫기" data-overlay-close><svg aria-hidden="true"><use href="#icon-close"/></svg></button>
+    </div>
+    <div class="alert__body" id="submit-body">
+      <p class="text-description alert__description">선택한 보험이 사업장 이력에 등록되고, 신고 정보가 전산망으로 전송돼요.</p>
+    </div>
+    <div class="alert__footer">
+      <button class="btn btn--ghost btn--md" type="button" data-overlay-close>취소</button>
+      <button class="btn btn--primary btn--md" type="button" id="submit-confirm">신고요청</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ 7-1 area — 직종 검색 Layer Modal (미작성 안내) ══════════════ -->
+<!-- Figma 「직종 검색 Layer Modal」(Group 49)은 아직 마크업하지 않았다.
+     중첩 모달이므로 이 파일에 함께 담길 예정 — 지금은 안내 Alert으로 대체한다. -->
+<div id="overlay-job-search" data-overlay>
+  <div class="alert" role="alertdialog" aria-modal="true" aria-labelledby="job-title" aria-describedby="job-body">
+    <div class="alert__header">
+      <p class="text-card-title alert__title" id="job-title">아직 작성하지 않은 화면입니다</p>
+      <button class="icon-on--sm alert__close" type="button" aria-label="닫기" data-overlay-close><svg aria-hidden="true"><use href="#icon-close"/></svg></button>
+    </div>
+    <div class="alert__body" id="job-body">
+      <p class="text-description alert__description">직종 검색 화면은 이 파일에 중첩 모달로 추가될 예정이에요.</p>
+    </div>
+    <div class="alert__footer">
+      <button class="btn btn--secondary btn--md" type="button" data-overlay-close>확인</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  /* ── 아이콘 sprite fetch 주입 — 로컬 참조(#icon-*)로 Safari·file:// 차단 회피 ── */
+  fetch('https://namiruan.github.io/kbz_3.0_ui_stytem/icons/sprite.svg')
+    .then(function(r) { return r.text(); })
+    .then(function(t) {
+      var d = document.createElement('div');
+      d.style.display = 'none';
+      d.innerHTML = t;
+      document.body.insertBefore(d, document.body.firstChild);
+    });
+
+  /* ── 컴포넌트 초기화 스캐폴드 ── */
+  function _initComponents(root) {
+    root = root || document;
+    if (typeof initInput === 'function') root.querySelectorAll('.input').forEach(function(el) { if (!el.closest('.input-wrap') && !el.dataset.initInput) { el.dataset.initInput = '1'; initInput(el); } });
+    if (typeof initTextareaContainer === 'function') root.querySelectorAll('.textarea-wrap').forEach(function(el) { initTextareaContainer(el); });
+    if (typeof initDropdown === 'function')   root.querySelectorAll('.dropdown').forEach(function(el) { initDropdown(el.parentElement); });
+    if (typeof initSegment === 'function')    root.querySelectorAll('.segment').forEach(function(el) { initSegment(el.parentElement); });
+    if (typeof initFileUpload === 'function') root.querySelectorAll('.file-upload').forEach(function(el) { initFileUpload(el); });
+  }
+  _initComponents();
+
+  /* ── 인터랙티브 보기 폼 검증·버튼 로딩 (planner.md 출력 형식 스캐폴드) ── */
+  function setFieldError(fieldId, errId, msg) {
+    var field = document.getElementById(fieldId), err = document.getElementById(errId);
+    if (!field || !err) return;
+    var wrap = field.querySelector('.input-wrap'), input = field.querySelector('input,textarea,select');
+    var icon = field.querySelector('.input-icon'), iconUse = icon && icon.querySelector('use');
+    if (msg) {
+      field.classList.add('form-field--error');
+      if (wrap) wrap.classList.add('input-wrap--icon-right');
+      if (input) { input.classList.remove('input--success','input--complete'); input.classList.add('input--error'); input.setAttribute('aria-invalid','true'); input.setAttribute('aria-describedby',errId); }
+      if (iconUse) iconUse.setAttribute('href','#icon-warning');
+      if (icon) icon.removeAttribute('hidden');
+      err.textContent = msg; err.removeAttribute('hidden');
+    } else {
+      field.classList.remove('form-field--error');
+      if (wrap) wrap.classList.add('input-wrap--icon-right');
+      if (input) { input.classList.remove('input--error','input--complete'); input.classList.add('input--success'); input.removeAttribute('aria-invalid'); }
+      if (iconUse) iconUse.setAttribute('href','#icon-check');
+      if (icon) icon.removeAttribute('hidden');
+      err.setAttribute('hidden','');
+    }
+  }
+  function setButtonLoading(btn, label) {
+    var orig = btn.dataset.origLabel || btn.textContent.trim();
+    btn.dataset.origLabel = orig;
+    btn.style.minWidth = btn.offsetWidth + 'px';
+    btn.setAttribute('tabindex','-1');
+    btn.setAttribute('aria-label', label || orig + ' 중...');
+    btn.classList.add('btn--loading');
+    /* fill(primary·secondary·danger) = spinner--inverse. ghost·solid = spinner--sm 만. 출처: button.md ## 동작 loading */
+    var isFill = !btn.classList.contains('btn--solid') && !btn.classList.contains('btn--ghost') && !btn.classList.contains('btn--ghost-inverse');
+    btn.innerHTML = '<span class="spinner spinner--sm' + (isFill ? ' spinner--inverse' : '') + '" aria-hidden="true"><span aria-hidden="true"></span></span>' + (label || orig + ' 중...');
+  }
+  function clearButtonLoading(btn) {
+    btn.classList.remove('btn--loading'); btn.removeAttribute('tabindex'); btn.removeAttribute('aria-label');
+    btn.style.minWidth = '';
+    btn.innerHTML = btn.dataset.origLabel || ''; delete btn.dataset.origLabel;
+  }
+
+  /* ── 스캐폴드 헬퍼 ── */
+  var protoPanels = Array.prototype.slice.call(document.querySelectorAll('#pane-panels > .scenario-panel'));
+
+  function showOnlyPanel(target) {
+    protoPanels.forEach(function(p) { p.hidden = p !== target; });
+  }
+
+  /* ── 보기 모드 전환 (시나리오 ↔ 인터랙티브) ── */
+  document.querySelectorAll('#mode-segment .segment__item').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var interactive = this.dataset.mode === 'interactive';
+      document.getElementById('proto-nav').hidden = interactive;
+      document.getElementById('proto-nav-divider').hidden = interactive;
+      closeAllOverlays();
+      if (interactive) {
+        if (protoPanels[0]) { showOnlyPanel(protoPanels[0]); _initComponents(protoPanels[0]); }
+      } else {
+        var active = document.querySelector('.proto-nav-btn.is-active');
+        var name = active ? active.dataset.scenario : (protoPanels[0] && protoPanels[0].dataset.scenario);
+        var target = protoPanels.filter(function(p) { return p.dataset.scenario === name; })[0] || protoPanels[0];
+        if (target) showOnlyPanel(target);
+      }
+    });
+  });
+
+  /* ── 시나리오 네비게이션 전환 (점프) ── */
+  document.querySelectorAll('.proto-nav-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      closeAllOverlays();
+      var name = this.dataset.scenario;
+      protoPanels.forEach(function(p) { p.hidden = p.dataset.scenario !== name; });
+      document.querySelectorAll('.proto-nav-btn').forEach(function(b) { b.classList.toggle('is-active', b.dataset.scenario === name); });
+    });
+  });
+
+  /* ── 스텝 전환 (인터랙티브 보기 전용) ── */
+  document.querySelectorAll('[data-step-next]').forEach(function(el) {
+    el.addEventListener('click', function() {
+      var cur = this.closest('[data-step]'), sib = cur.nextElementSibling;
+      while (sib && !sib.hasAttribute('data-step')) sib = sib.nextElementSibling;
+      if (sib) { cur.hidden = true; sib.hidden = false; _initComponents(sib); }
+    });
+  });
+  document.querySelectorAll('[data-step-prev]').forEach(function(el) {
+    el.addEventListener('click', function() {
+      var cur = this.closest('[data-step]'), sib = cur.previousElementSibling;
+      while (sib && !sib.hasAttribute('data-step')) sib = sib.previousElementSibling;
+      if (sib) { cur.hidden = true; sib.hidden = false; _initComponents(sib); }
+    });
+  });
+
+  /* ── 오버레이 — 스택 지원 (planner.md 출력 형식 스캐폴드) ──
+     열린 순서대로 스택에 쌓아 z-index를 증가시키고(뒤에 연 것이 항상 위),
+     Escape·backdrop 클릭·닫기 버튼은 최상위 하나만 닫으며, 닫을 때 직전 포커스로 복귀한다.
+     Tab은 최상위 오버레이 안에 가둔다. static 오버레이는 backdrop·Escape로 닫히지 않는다. */
+  var _FOCUSABLE = 'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+  var _overlayStack = [];
+  function _topOverlay() { return _overlayStack[_overlayStack.length - 1]; }
+  function _visibleFocusable(ov) {
+    return Array.prototype.filter.call(ov.querySelectorAll(_FOCUSABLE), function(el) { return el.offsetParent !== null; });
+  }
+  function openOverlay(id) {
+    var ov = document.getElementById(id);
+    if (!ov || ov.classList.contains('is-open')) return;
+    ov._returnFocus = document.activeElement;
+    ov.style.zIndex = 'calc(var(--z-backdrop) + ' + (_overlayStack.length + 1) + ')';
+    ov.classList.add('is-open');
+    _overlayStack.push(ov);
+    var f = _visibleFocusable(ov);
+    (ov.querySelector('[autofocus]') || f[0] || ov).focus();
+  }
+  function closeOverlay(ov) {
+    if (!ov || !ov.classList.contains('is-open')) return;
+    ov.classList.remove('is-open');
+    ov.style.zIndex = '';
+    var i = _overlayStack.indexOf(ov);
+    if (i > -1) _overlayStack.splice(i, 1);
+    if (ov._returnFocus && ov._returnFocus.focus) ov._returnFocus.focus();
+    ov._returnFocus = null;
+  }
+  function closeAllOverlays() { _overlayStack.slice().reverse().forEach(closeOverlay); }
+
+  document.querySelectorAll('[data-overlay-open]').forEach(function(el) {
+    el.addEventListener('click', function(e) { e.preventDefault(); openOverlay(this.dataset.overlayOpen); });
+  });
+  /* 닫기 버튼 → 그 버튼이 속한 오버레이만 */
+  document.addEventListener('click', function(e) {
+    if (e.target.closest('[data-overlay-close]')) closeOverlay(e.target.closest('[data-overlay]'));
+  });
+  /* backdrop(오버레이 여백) 클릭 → 최상위만. static 오버레이는 제외 */
+  document.querySelectorAll('[data-overlay]').forEach(function(ov) {
+    ov.addEventListener('mousedown', function(e) {
+      if (e.target === ov && !ov.hasAttribute('data-overlay-static')) closeOverlay(ov);
+    });
+  });
+  /* Escape → 최상위 하나만(static 제외) · Tab → 최상위 안에 가둠 */
+  document.addEventListener('keydown', function(e) {
+    var top = _topOverlay();
+    if (!top) return;
+    if (e.key === 'Escape' && !top.hasAttribute('data-overlay-static')) { e.preventDefault(); closeOverlay(top); return; }
+    if (e.key !== 'Tab') return;
+    var f = _visibleFocusable(top);
+    if (!f.length) return;
+    var first = f[0], last = f[f.length - 1];
+    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+  });
+</script>
+
+<script>
+/* ══════════════ Phase 3 — 인터랙션 구현 (Phase 2 명세 1~14) ══════════════ */
+(function () {
+  var root = document.getElementById('pane-panels');
+  if (!root) return;
+
+  /* 프로토타입 계산용 요율. 실제 요율은 공단 고시값을 따른다 — 근로자 부담분 기준.
+     산재보험은 사업주 전액 부담이라 예상보험료 대상에서 제외한다(5-1 area 명세). */
+  var RATE = { '국민연금': 0.045, '건강보험': 0.03545, '고용보험': 0.009 };
+  var NOTICE_BASE = { '국민연금': '2026-01', '건강보험': '2025-12', '고용보험': '2026-01' };
+  var NOTICE_PENSION_WISH = '2025-12';   /* 취득월 납부 희망 → 신고월 */
+
+  function digits(v) { return String(v == null ? '' : v).replace(/[^0-9]/g, ''); }
+  function comma(n) { return Number(n).toLocaleString('ko-KR'); }
+  function q(panel, suffix) { return panel.querySelector('[id$="' + suffix + '"]'); }
+
+  function insuranceRows(panel) {
+    return Array.prototype.slice.call(panel.querySelectorAll('.acq-section tbody .table__row'));
+  }
+  function rowName(tr) {
+    var td = tr.children[1];
+    return td ? td.textContent.replace(/가입중/g, '').trim() : '';
+  }
+  function checkedInsurances(panel) {
+    return insuranceRows(panel).filter(function (tr) {
+      var cb = tr.querySelector('input[type="checkbox"]');
+      return cb && cb.checked;
+    }).map(rowName);
+  }
+
+  /* ── 9. 예상보험료 배너 단일 렌더 함수 (3·5·7번 공유) ──
+     정적 패널과 동일한 클래스를 사용한다 — 새 클래스를 만들지 않는다. */
+  function renderEstimate(panel) {
+    var form = panel.querySelector('.acq-form');
+    if (!form) return;
+    var existing = form.querySelector('.banner--caution');
+    var payEl = q(panel, '-pay');
+    var pay = payEl ? Number(digits(payEl.value)) : 0;
+
+    var names = checkedInsurances(panel).filter(function (n) { return n !== '산재보험' && RATE[n]; });
+    if (!pay || !names.length) { if (existing) existing.remove(); return; }
+
+    var wish = panel.querySelector('input[name$="-pension"]:checked');
+    var wishYes = !!(wish && wish.parentElement.querySelector('.radio__label').textContent.trim() === '희망');
+
+    var notice = names.map(function (n) {
+      return n + ' ' + ((n === '국민연금' && wishYes) ? NOTICE_PENSION_WISH : NOTICE_BASE[n]);
+    }).join(' / ');
+    var amount = names.map(function (n) {
+      return n + ' ' + comma(Math.round(pay * RATE[n] / 10) * 10) + '원';
+    }).join(' / ');
+
+    var html =
+      '<span class="icon--md banner__icon" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-triangle-alert"/></svg></span>' +
+      '<div class="text-description banner__body">' +
+        '<div class="banner__message acq-banner-lines">' +
+          '<span>예상 반영 고지월: ' + notice + '</span>' +
+          '<span>예상부과금액: ' + amount + '</span>' +
+          '<span>※ 실제 부과금액 및 반영 시기는 신고일, 보수월액, 기관 처리 일정 등에 따라 달라질 수 있어요.</span>' +
+        '</div>' +
+      '</div>';
+
+    if (existing) { existing.innerHTML = html; return; }
+    var el = document.createElement('div');
+    el.className = 'banner banner--caution';
+    el.setAttribute('role', 'status');
+    el.innerHTML = html;
+    var jobField = form.querySelector(':scope > .form-field');   /* 직종 선택 바로 앞 = 정적 패널과 같은 위치 */
+    if (jobField) form.insertBefore(el, jobField); else form.appendChild(el);
+  }
+
+  /* ── 6. 연금 취득월납부(6 area) 노출 조건 ── */
+  function syncPensionField(panel) {
+    var label = panel.querySelector('.acq-label-row');
+    if (!label) return;
+    var field = label.closest('.form-field');
+    if (!field) return;
+    var pensionRow = insuranceRows(panel).filter(function (tr) { return rowName(tr) === '국민연금'; })[0];
+    if (!pensionRow) return;
+    var enrolled = /가입중/.test(pensionRow.children[1].textContent);
+    var cb = pensionRow.querySelector('input[type="checkbox"]');
+    field.hidden = !(cb && cb.checked && !enrolled);
+  }
+
+  /* ── 8. 입사일이 초일이면 「희망」 고정 ── */
+  function applyFirstDayRule(panel) {
+    var hire = q(panel, '-hire');
+    if (!hire || !/-01$/.test(hire.value.trim())) return;
+    panel.querySelectorAll('input[name$="-pension"]').forEach(function (r) {
+      var lb = r.parentElement.querySelector('.radio__label').textContent.trim();
+      if (lb === '희망') { r.checked = true; }
+      else {
+        r.checked = false; r.disabled = true;
+        r.setAttribute('aria-disabled', 'true'); r.setAttribute('tabindex', '-1');
+        r.parentElement.classList.add('radio--disabled');
+      }
+    });
+  }
+
+  /* ── 1. 주소정근로시간 blur 검증 · 2. 월급여액 blur 검증 + 콤마 ── */
+  root.addEventListener('blur', function (e) {
+    var el = e.target;
+    if (!el.id) return;
+    var panel = el.closest('.scenario-panel');
+    var field = el.closest('.form-field');
+    var err = field && field.querySelector('.form-field__error');
+    if (!field || !err) return;
+    if (!field.id) field.id = el.id + '-field';
+
+    if (/-hours$/.test(el.id)) {                                                    /* 1 */
+      var raw = el.value.trim();
+      if (!raw) return;
+      var n = Number(raw);
+      setFieldError(field.id, err.id, (!/^\d+$/.test(raw) || n < 1 || n > 100) ? '100 이하 숫자로 입력해 주세요' : '');
+    }
+
+    if (/-pay$/.test(el.id)) {                                                      /* 2 */
+      var v = el.value.trim();
+      if (!v) return;
+      var onlyNum = /^[0-9,]+$/.test(v);
+      setFieldError(field.id, err.id, onlyNum ? '' : '숫자만 입력해 주세요');
+      if (onlyNum) { el.value = comma(digits(v)); renderEstimate(panel); }
+    }
+  }, true);
+
+  /* ── 3. 월급여액 input → 예상보험료 재계산 ── */
+  root.addEventListener('input', function (e) {
+    if (!e.target.id || !/-pay$/.test(e.target.id)) return;
+    renderEstimate(e.target.closest('.scenario-panel'));
+  });
+
+  root.addEventListener('change', function (e) {
+    var el = e.target;
+    var panel = el.closest('.scenario-panel');
+    if (!panel) return;
+
+    if (el.type === 'checkbox' && el.closest('.acq-section')) {
+      var tr = el.closest('.table__row');
+
+      /* 4. 같은 행 제외사유 드롭다운 활성/비활성 — 고정 행은 건너뛴다 */
+      var dd = tr.querySelector('.dropdown');
+      if (dd && !dd.dataset.locked) {
+        var trg = dd.querySelector('.dropdown__trigger');
+        var val = dd.querySelector('.dropdown__value');
+        dd.classList.toggle('dropdown--disabled', el.checked);
+        if (trg) { trg.disabled = el.checked; trg.setAttribute('aria-disabled', String(el.checked)); }
+        if (el.checked && val) {
+          val.textContent = '제외 사유 선택';
+          val.classList.add('dropdown__value--placeholder');
+          dd.querySelectorAll('.dropdown__option').forEach(function (o) { o.setAttribute('aria-selected', 'false'); });
+        }
+      }
+
+      syncPensionField(panel);   /* 6 */
+      renderEstimate(panel);     /* 5 */
+    }
+
+    /* ── 7. 연금 취득월납부 라디오 → 고지월 재계산 ── */
+    if (el.type === 'radio' && /-pension$/.test(el.name)) renderEstimate(panel);
+  });
+
+  /* 자진신고 등 값이 고정된 드롭다운은 4번이 건드리지 않도록 잠근다 */
+  root.querySelectorAll('.dropdown--disabled').forEach(function (dd) {
+    var v = dd.querySelector('.dropdown__value');
+    if (v && !v.classList.contains('dropdown__value--placeholder')) dd.dataset.locked = '1';
+  });
+
+  /* 패널 초기화 — 8번 규칙 + 6 area 노출 동기화 */
+  protoPanels.forEach(function (panel) {
+    if (panel.dataset.scenario === '로딩') return;
+    applyFirstDayRule(panel);
+    syncPensionField(panel);
+  });
+
+  /* ── 10·14. 신고요청 / 다시 시도 → 검증 후 확인 Alert ── */
+  function validate(panel) {
+    var ok = true, firstBad = null;
+
+    ['-hours', '-pay'].forEach(function (sfx) {
+      var el = q(panel, sfx);
+      if (!el) return;
+      var field = el.closest('.form-field');
+      var err = field && field.querySelector('.form-field__error');
+      if (!field || !err) return;
+      if (!field.id) field.id = el.id + '-field';
+      var v = el.value.trim(), msg = '';
+      if (sfx === '-hours') {
+        var n = Number(v);
+        if (!v || !/^\d+$/.test(v) || n < 1 || n > 100) msg = '100 이하 숫자로 입력해 주세요';
+      } else if (!v || !/^[0-9,]+$/.test(v)) {
+        msg = '숫자만 입력해 주세요';
+      }
+      setFieldError(field.id, err.id, msg);
+      if (msg) { ok = false; firstBad = firstBad || el; }
+    });
+
+    if (!checkedInsurances(panel).length) {
+      ok = false;
+      firstBad = firstBad || panel.querySelector('.acq-section input[type="checkbox"]:not([disabled])');
+    }
+    var job = q(panel, '-job');
+    if (job && !job.value.trim()) { ok = false; firstBad = firstBad || job; }
+
+    if (!ok && firstBad && firstBad.focus) firstBad.focus();
+    return ok;
+  }
+
+  root.addEventListener('click', function (e) {
+    var btn = e.target.closest('button');
+    if (!btn || !btn.id || !/-submit$/.test(btn.id)) return;      /* 10 · 14 */
+    if (!validate(btn.closest('.scenario-panel'))) return;
+    openOverlay('overlay-submit');
+  });
+
+  /* ── 11. 확인 Alert의 신고요청 → 전송 연출 후 목록 복귀 ── */
+  var submitConfirm = document.getElementById('submit-confirm');
+  if (submitConfirm) submitConfirm.addEventListener('click', function () {
+    var btn = this;
+    setButtonLoading(btn, '전송 중...');
+    setTimeout(function () {
+      clearButtonLoading(btn);
+      closeOverlay(document.getElementById('overlay-submit'));
+      location.href = 'insurance-join-status.html';
+    }, 1500);   /* 프로토타입 연출용 딜레이 */
+  });
+
+  /* ── 12. 임시저장 → 저장 연출 후 화면 유지 ── */
+  var draftOv = document.getElementById('overlay-draft');
+  if (draftOv) {
+    var draftBtn = draftOv.querySelector('.btn--primary');
+    if (draftBtn) draftBtn.addEventListener('click', function (e) {
+      e.stopPropagation();                        /* data-overlay-close 즉시 닫힘 방지 */
+      var btn = this;
+      setButtonLoading(btn, '저장 중...');
+      setTimeout(function () { clearButtonLoading(btn); closeOverlay(draftOv); }, 1000);
+    });
+  }
+
+  /* ── 13. 취소하기 → 목록으로 복귀 ── */
+  var cancelOv = document.getElementById('overlay-cancel');
+  if (cancelOv) {
+    var cancelBtn = cancelOv.querySelector('.btn--secondary');
+    if (cancelBtn) cancelBtn.addEventListener('click', function () {
+      location.href = 'insurance-join-status.html';
+    });
+  }
+})();
+</script>
+
+</body>
+</html>
