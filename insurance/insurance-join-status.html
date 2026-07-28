@@ -50,6 +50,9 @@
     .table__cell--action .dropdown__option--disabled .tooltip-wrapper { display: block; }
     #dt-list { margin: 0; padding-left: var(--space-gap-lg); display: flex; flex-direction: column; gap: var(--space-gap-xs); }
     .ws-banner { margin: var(--space-stack-md) 0 0; }
+    /* 사업장 선택 Modal — 유효성 피드백 (필드 에러 메시지 · 폼 레벨 '보험 미선택' 안내) */
+    .ws-field-error, .ws-form-error { margin: var(--space-stack-xs) 0 0; color: var(--color-text-error); font-size: var(--font-size-label); }
+    .ws-form-error { margin-top: var(--space-stack-md); }
     /* 사업장 선택 Modal — 보험별 선택 항목을 박스로 분리 (UI 시안).
        시스템에 '선택 카드' 컴포넌트가 없어 페이지 레이아웃으로 구성. 토큰만 사용 */
     /* 항목 구분은 하단 라인으로. radius·배경 없음 */
@@ -1608,6 +1611,26 @@ exits: report-acquire.html, report-change.html, report-leave.html, report-loss.h
   var ws = document.getElementById('overlay-worksite');
   if (ws) {
     var banner = ws.querySelector('.ws-banner');
+    /* 15b. 유효성 피드백 요소 생성 — 각 사업장 select 아래 필드 에러, 모달 하단 폼 레벨 안내 */
+    ws.querySelectorAll('.ws-row__select').forEach(function (selWrap) {
+      if (selWrap.querySelector('.ws-field-error')) return;
+      var m = document.createElement('p');
+      m.className = 'ws-field-error'; m.setAttribute('role', 'alert'); m.hidden = true;
+      m.textContent = '사업장을 선택해주세요.';
+      selWrap.appendChild(m);
+    });
+    var wsFormError = document.createElement('p');
+    wsFormError.className = 'ws-form-error'; wsFormError.setAttribute('role', 'alert'); wsFormError.hidden = true;
+    wsFormError.textContent = '취득할 보험을 하나 이상 선택해주세요.';
+    var wsContent = ws.querySelector('.modal__content');
+    if (wsContent) wsContent.appendChild(wsFormError);
+    function clearWsError(dd) {   /* 사업장 선택/체크 해제 시 해당 필드 에러 제거 */
+      if (!dd) return;
+      dd.classList.remove('dropdown--error');
+      var w = dd.closest('.ws-row__select');
+      var m = w && w.querySelector('.ws-field-error');
+      if (m) m.hidden = true;
+    }
     function syncBanner() {   /* 14b. 건강연금 + 건설현장 선택 시에만 배너 노출 */
       var row = ws.querySelector('.ws-row[data-ins="gungang"]');
       var cb  = row ? row.querySelector('input[type="checkbox"]') : null;
@@ -1622,6 +1645,7 @@ exits: report-acquire.html, report-change.html, report-leave.html, report-loss.h
       if (!cb || cb.disabled || !dd) return;
       var trg = dd ? dd.querySelector('.dropdown__trigger') : null;
       cb.addEventListener('change', function () {   /* 14. 보험 선택 시 사업장 selectbox 노출 (6-1 명세) */
+        if (wsFormError) wsFormError.hidden = true;   /* 선택 상태 바뀜 → 폼 레벨 안내 제거 */
         if (wrap) wrap.hidden = !cb.checked;   /* 미체크 → select 숨김, 체크 → 노출 */
         if (dd) dd.classList.toggle('dropdown--disabled', !cb.checked);
         if (trg) { trg.disabled = !cb.checked; trg.setAttribute('aria-disabled', String(!cb.checked)); }
@@ -1639,23 +1663,29 @@ exits: report-acquire.html, report-change.html, report-leave.html, report-loss.h
         syncBanner();
       });
       if (dd) dd.querySelectorAll('.dropdown__option').forEach(function (o) {
-        o.addEventListener('click', function () { setTimeout(syncBanner, 0); });
+        o.addEventListener('click', function () { clearWsError(dd); setTimeout(syncBanner, 0); });
       });
     });
     var saveBtn = ws.querySelector('.modal__footer .btn--primary');
     if (saveBtn) saveBtn.addEventListener('click', function () {   /* 15. 필수값 검증 */
-      var bad = 0;
+      var firstBad = null;
       ws.querySelectorAll('.ws-row').forEach(function (rowEl) {
         var cb = rowEl.querySelector('input[type="checkbox"]');
         var dd = rowEl.querySelector('.dropdown');
-        if (!cb || !dd || !cb.checked) return;
+        var selWrap = rowEl.querySelector('.ws-row__select');
+        if (!cb || !dd || !cb.checked) { clearWsError(dd); return; }
         var empty = dd.querySelector('.dropdown__value').classList.contains('dropdown__value--placeholder');
         dd.classList.toggle('dropdown--error', empty);
-        if (empty) bad++;
+        var msg = selWrap && selWrap.querySelector('.ws-field-error');
+        if (msg) msg.hidden = !empty;
+        if (empty && !firstBad) firstBad = dd.querySelector('.dropdown__trigger');
       });
       var anyChecked = Array.prototype.some.call(ws.querySelectorAll('.ws-row input[type="checkbox"]'),
         function (c) { return c.checked && !c.disabled; });
-      if (!anyChecked || bad) return;
+      /* 보험 미선택 → 폼 레벨 안내 노출 후 중단, 사업장 미선택 → 첫 에러 필드로 포커스 */
+      wsFormError.hidden = anyChecked;
+      if (!anyChecked) return;
+      if (firstBad) { firstBad.focus(); return; }
       ws.classList.remove('is-open');
       /* 사업장 이력 등록 후 → 진입 경로(취득 / 사업장 이동)에 해당하는 신고 파일로 이동 */
       goToReport(ws.dataset.entry || '취득', null);   /* 취득·사업장 이동은 행 상태 분기가 없다 */
