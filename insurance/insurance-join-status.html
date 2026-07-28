@@ -1410,7 +1410,7 @@ exits: report-acquire.html, report-change.html, report-leave.html, report-loss.h
     '휴직':      'report-leave.html',
     '복직':      'report-leave.html'
   };
-  var BUILT = {};   /* 작성 완료된 신고 파일만 등록. 예: BUILT['report-acquire.html'] = true; */
+  var BUILT = { 'report-acquire.html': true };   /* 작성 완료된 신고 파일만 등록. 취득신고 완료. */
 
   /* 정정은 드롭다운 값이 '정정' 하나뿐이라 행의 자격 상태로 대상 파일이 갈린다.
      ⚠️ Figma에 정정신고(취득)·정정신고(상실)이 별도 프레임이라 이렇게 추정했다 — 확인 필요. */
