@@ -50,8 +50,8 @@
       border-radius: var(--radius-sm);
     }
     /* 상태별 표현 구분 — 취득할 대상 / 이미 취득완료 / 제외를 한눈에 구별 */
-    /* 취득: 이번 신고로 취득할 대상 → 선택된 것처럼 브랜드 라인(테두리)으로 강조 */
-    .acq-ins-item[data-status="취득"]   { background: var(--color-surface-base); box-shadow: inset 0 0 0 var(--stroke-md) var(--color-border-brand); }
+    /* 취득: 이번 신고로 취득할 대상 → 선택된 것처럼 초록 라인(테두리)으로 강조(취득 배지와 톤 일치) */
+    .acq-ins-item[data-status="취득"]   { background: var(--color-surface-base); box-shadow: inset 0 0 0 var(--stroke-md) var(--color-border-success); }
     /* 취득완료: 이미 완료 → 연한 초록 채움 */
     .acq-ins-item[data-status="취득완료"] { background: var(--color-surface-success-subtle); }
     /* 제외: 신고 대상 아님 → 연한 회색 채움 */
