@@ -35,6 +35,12 @@
        (사업장 선택 Modal 설명은 디자인 시스템 modal__header-text·modal__description
         슬롯으로 이전 → 로컬 규칙 불필요) */
     #dt-desc { margin: 0 0 var(--space-stack-md); }
+    /* Step-4 반려 상세 박스 — 기획 caution 톤(신고유형·반려사유 라벨/값) */
+    .st4-detail { margin: var(--space-stack-md) 0; padding: var(--space-inset-lg); display: grid; gap: var(--space-gap-xs); background: var(--color-surface-caution-subtle); border: var(--stroke-sm) var(--stroke-solid) var(--color-border-caution-subtle); border-radius: var(--radius-md); }
+    .st4-detail__row { display: grid; grid-template-columns: 76px 1fr; gap: var(--space-gap-md); }
+    .st4-detail dt { color: var(--color-text-caution); }
+    .st4-detail dd { margin: 0; color: var(--color-text-body); }
+    .st4-note { margin-top: var(--space-stack-md); color: var(--color-text-subtle); }
     /* 신고하기 메뉴의 비활성 '취득' 옵션 hover 사유 툴팁 — DS는 옵션에 pointer-events:none,
        패널/목록에 overflow 잠금이라 툴팁이 잘린다. 이 메뉴에 한해서만 해제(옵션 수가 적어 스크롤 불필요).
        클릭은 aria-disabled + JS 가드로 여전히 차단된다. */
@@ -1119,7 +1125,7 @@ exits: report-acquire.html, report-change.html, report-leave.html, report-loss.h
 <!-- ══════════════ 검증 프로세스 Alert (Step-1 ~ Step-5) ══════════════ -->
 
 <div id="overlay-step1" data-overlay>
-  <div class="alert" role="alertdialog" aria-modal="true" aria-labelledby="st1-title" aria-describedby="st1-body">
+  <div class="alert alert--caution" role="alertdialog" aria-modal="true" aria-labelledby="st1-title" aria-describedby="st1-body">
     <div class="alert__header">
       <p class="text-card-title alert__title" id="st1-title">이미 접수완료된 신고입니다</p>
       <button class="icon-on--sm alert__close" type="button" aria-label="닫기" data-overlay-close><svg aria-hidden="true"><use href="#icon-close"/></svg></button>
@@ -1134,7 +1140,7 @@ exits: report-acquire.html, report-change.html, report-leave.html, report-loss.h
 </div>
 
 <div id="overlay-step2" data-overlay>
-  <div class="alert" role="alertdialog" aria-modal="true" aria-labelledby="st2-title" aria-describedby="st2-body">
+  <div class="alert alert--caution" role="alertdialog" aria-modal="true" aria-labelledby="st2-title" aria-describedby="st2-body">
     <div class="alert__header">
       <p class="text-card-title alert__title" id="st2-title">작성 중이던 신고서가 있어요</p>
       <button class="icon-on--sm alert__close" type="button" aria-label="닫기" data-overlay-close><svg aria-hidden="true"><use href="#icon-close"/></svg></button>
@@ -1143,20 +1149,19 @@ exits: report-acquire.html, report-change.html, report-leave.html, report-loss.h
       <p class="text-description alert__description">신고서가 임시저장되어 있어요.<br>이어서 작성할까요?</p>
     </div>
     <div class="alert__footer">
-      <button class="btn btn--ghost btn--md" type="button" data-overlay-close>취소</button>
       <button class="btn btn--secondary btn--md" type="button" data-overlay-close>이어서 작성</button>
     </div>
   </div>
 </div>
 
 <div id="overlay-step3" data-overlay>
-  <div class="alert" role="alertdialog" aria-modal="true" aria-labelledby="st3-title" aria-describedby="st3-body">
+  <div class="alert alert--caution" role="alertdialog" aria-modal="true" aria-labelledby="st3-title" aria-describedby="st3-body">
     <div class="alert__header">
       <p class="text-card-title alert__title" id="st3-title">진행 중인 신고가 있습니다</p>
       <button class="icon-on--sm alert__close" type="button" aria-label="닫기" data-overlay-close><svg aria-hidden="true"><use href="#icon-close"/></svg></button>
     </div>
     <div class="alert__body" id="st3-body">
-      <p class="text-description alert__description">근로자별 신고는 동시에 하나만 접수할 수 있어요.<br>기존 신고가 완료된 후 진행해주세요.</p>
+      <p class="text-description alert__description">근로자별 신고는 동시에 하나만 접수할 수 있어요.<br>기존 신고가 완료된 후 추가 신고를 진행해주세요.</p>
     </div>
     <div class="alert__footer">
       <button class="btn btn--secondary btn--md" type="button" data-overlay-close>확인</button>
@@ -1165,17 +1170,18 @@ exits: report-acquire.html, report-change.html, report-leave.html, report-loss.h
 </div>
 
 <div id="overlay-step4" data-overlay>
-  <div class="alert" role="alertdialog" aria-modal="true" aria-labelledby="st4-title" aria-describedby="st4-body">
+  <div class="alert alert--caution" role="alertdialog" aria-modal="true" aria-labelledby="st4-title" aria-describedby="st4-body">
     <div class="alert__header">
       <p class="text-card-title alert__title" id="st4-title">반려된 신고가 존재합니다</p>
       <button class="icon-on--sm alert__close" type="button" aria-label="닫기" data-overlay-close><svg aria-hidden="true"><use href="#icon-close"/></svg></button>
     </div>
     <div class="alert__body" id="st4-body">
-      <p class="text-description alert__description">이전 신고가 반려된 상태예요. 반려 신고를 처리한 후 새 신고를 진행해주세요.</p>
-      <ul class="text-description alert__list">
-        <li>신고유형 — 상실</li>
-        <li>반려사유 — 신고된 상실일과 실제 근로 종료일이 일치하지 않음</li>
-      </ul>
+      <p class="text-description alert__description">이전 신고가 반려된 상태예요.<br>반려 신고를 처리한 후 새 신고를 진행해주세요.</p>
+      <dl class="st4-detail text-description">
+        <div class="st4-detail__row"><dt>신고유형</dt><dd>상실</dd></div>
+        <div class="st4-detail__row"><dt>반려사유</dt><dd>신고된 상실일과 실제 근로 종료일이 일치하지 않음</dd></div>
+      </dl>
+      <p class="text-description alert__description st4-note">반려된 신고를 다시 작성해 처리를 완료하거나, [신고대상&amp;진행현황] 탭에서 취소해 목록에서 제외한 후 새 신고를 진행할 수 있어요.</p>
     </div>
     <div class="alert__footer">
       <button class="btn btn--secondary btn--md" type="button" data-overlay-close>확인</button>
@@ -1184,9 +1190,9 @@ exits: report-acquire.html, report-change.html, report-leave.html, report-loss.h
 </div>
 
 <div id="overlay-step5" data-overlay>
-  <div class="alert" role="alertdialog" aria-modal="true" aria-labelledby="st5-title" aria-describedby="st5-body">
+  <div class="alert alert--caution" role="alertdialog" aria-modal="true" aria-labelledby="st5-title" aria-describedby="st5-body">
     <div class="alert__header">
-      <p class="text-card-title alert__title" id="st5-title">상실신고 대상자로 지정되어 있습니다</p>
+      <p class="text-card-title alert__title" id="st5-title">해당 근로자는 현재 상실신고 대상자로 지정되어 있습니다</p>
       <button class="icon-on--sm alert__close" type="button" aria-label="닫기" data-overlay-close><svg aria-hidden="true"><use href="#icon-close"/></svg></button>
     </div>
     <div class="alert__body" id="st5-body">
