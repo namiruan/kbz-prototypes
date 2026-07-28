@@ -18,7 +18,11 @@
     /* 모달 본문 2열 — 좌 첨부파일(Figma 314px) + 우 폼.
        modal__aside는 "읽기 전용만" 규칙이라 인터랙티브한 FileUpload를 넣을 수 없어
        modal__content 안에서 그리드로 구성한다 (→ modal.md 소제목 모달 제약) */
-    .acq-grid { display: grid; grid-template-columns: 314px 1fr; gap: var(--space-gap-2xl); align-items: start; }
+    .acq-grid { display: grid; grid-template-columns: 314px 1fr; gap: var(--space-gap-2xl); align-items: stretch; }
+    /* 첨부파일 열을 우측 폼 높이에 맞춰 늘리고, 드롭존이 남는 세로 공간을 채워
+       좌측 아래 빈 여백 없이 드롭 대상이 커지도록 한다. */
+    .acq-grid > .file-upload { height: 100%; }
+    .acq-grid > .file-upload .file-upload__dropzone { flex: 1 1 auto; }
     /* 피부양자 안내 배너 — 특정 필드가 아닌 신고서 전반 안내이므로 헤더 아래 전체폭에 배치.
        우측 배너는 관련 정보 '아래'에 붙을 때 효용이 있어, 전반 안내는 상단 전체폭이 맞다. */
     .acq-intro-banner { margin-bottom: var(--space-gap-xl); }
