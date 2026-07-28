@@ -41,7 +41,7 @@
       box-sizing: border-box;
       /* 3열 고정 정렬: 보험명 · 상태 배지 · 사업장/제외사유.
          배지 열을 고정 폭으로 잡아 취득/취득완료/제외 폭이 달라도 뒤 열의 시작이 맞도록 한다. */
-      grid-template-columns: 76px 68px minmax(0, 1fr);
+      grid-template-columns: 76px 80px minmax(0, 1fr);
       align-items: center;
       column-gap: var(--space-gap-md);
       /* 모든 항목 세로 높이 통일 — 제외 행의 드롭다운(sm, 32px)에 맞춰 min-height 고정 */
@@ -187,12 +187,12 @@ exits: index.html
                     <ul class="acq-ins-list" aria-labelledby="s1-ins-label">
                       <li class="acq-ins-item" data-ins="국민연금" data-status="취득">
                         <span class="acq-ins-item__name">국민연금</span>
-                        <span class="badge badge--success badge--line acq-ins-item__status">취득</span>
+                        <span class="badge badge--success badge--line acq-ins-item__status">취득 예정</span>
                         <span class="acq-ins-item__detail">(주)남웅건설</span>
                       </li>
                       <li class="acq-ins-item" data-ins="건강보험" data-status="취득">
                         <span class="acq-ins-item__name">건강보험</span>
-                        <span class="badge badge--success badge--line acq-ins-item__status">취득</span>
+                        <span class="badge badge--success badge--line acq-ins-item__status">취득 예정</span>
                         <span class="acq-ins-item__detail">LG U+ 파주 1239 신축공사 철근콘크리트공사</span>
                       </li>
                       <li class="acq-ins-item" data-ins="산재보험" data-status="취득완료">
