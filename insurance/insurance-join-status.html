@@ -246,7 +246,7 @@ exits: report-acquire.html, report-change.html, report-leave.html, report-loss.h
                         <span class="badge badge--success">고용<span class="sr-only"> 취득</span></span>
                         <span class="badge badge--success">산재<span class="sr-only"> 취득</span></span>
                         <span class="badge badge--success">건강<span class="sr-only"> 취득</span></span>
-                        <span class="badge badge--success">연금<span class="sr-only"> 취득</span></span>
+                        <span class="tooltip-wrapper" onmouseenter="this.querySelector('.tooltip-panel').classList.add('tooltip-panel--visible')" onmouseleave="this.querySelector('.tooltip-panel').classList.remove('tooltip-panel--visible')"><span class="badge badge--neutral" aria-describedby="tip-nojoin-6">연금<span class="sr-only"> 미가입 — 납부예외 신청</span></span><div class="tooltip-panel elevation-tooltip tooltip-panel--left" id="tip-nojoin-6" role="tooltip"><span class="tip-grid"><span>미가입 사유</span><span>납부예외 신청</span></span></div></span>
                       </td>
                       <td class="table__cell table__cell--number" data-overlay-open="overlay-insurance-detail">2,500,000</td>
                       <td class="table__cell table__cell--action">
@@ -257,8 +257,8 @@ exits: report-acquire.html, report-change.html, report-leave.html, report-loss.h
                           </button>
                           <div class="dropdown__panel">
                             <ul class="dropdown__list" role="listbox" aria-label="신고 유형">
-                              <!-- 4대보험 모두 취득 상태 → '취득' 비활성(6 area 조건). 사유는 hover 툴팁으로 안내(.table__cell--action 한정 overflow·pointer-events 해제) -->
-                              <li class="dropdown__option dropdown__option--disabled" role="option" aria-selected="false" aria-disabled="true" data-report="취득"><span class="tooltip-wrapper" onmouseenter="this.querySelector('.tooltip-panel').classList.add('tooltip-panel--visible')" onmouseleave="this.querySelector('.tooltip-panel').classList.remove('tooltip-panel--visible')" aria-describedby="tip-acq-r1"><span class="dropdown__option-label">취득</span><div class="tooltip-panel elevation-tooltip tooltip-panel--left" id="tip-acq-r1" role="tooltip">4대보험이 모두 취득 상태예요</div></span></li>
+                              <!-- 연금 미가입 → '취득' 가능. 조건 블록(Step) 없음 → 취득 클릭 시 사업장 선택 모달 진행 -->
+                              <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1" data-report="취득"><span class="dropdown__option-label">취득</span></li>
                               <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1" data-report="상실"><span class="dropdown__option-label">상실</span></li>
                               <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1" data-report="사업장 이동"><span class="dropdown__option-label">사업장 이동</span></li>
                               <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1" data-report="보수변경"><span class="dropdown__option-label">보수변경</span></li>
