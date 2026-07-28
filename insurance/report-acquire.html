@@ -32,6 +32,26 @@
     .acq-cell-select .dropdown,
     .acq-cell-select .dropdown__trigger { width: 100%; }
     .acq-cell-select .dropdown__value { overflow: hidden; text-overflow: ellipsis; }
+    /* 가입 보험 — 상태 리스트 (데이터 테이블이 아님).
+       행 선택·정렬·다건 조작이 없고 고정 4항목의 '현재 취득 상태'만 보여주므로
+       테이블 대신 각 항목을 보험명 + 상태 배지 + 사업장/제외사유로 나열한다. */
+    .acq-ins-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--space-gap-2xs); }
+    .acq-ins-item {
+      display: grid;
+      grid-template-columns: 80px auto minmax(0, 1fr);
+      align-items: center;
+      column-gap: var(--space-gap-md);
+      padding: var(--space-inset-squish-sm);
+      border-radius: var(--radius-sm);
+      background: var(--color-surface-subtle);
+    }
+    /* 제외 항목 — 신고 대상이 아님을 배경 없이 테두리로만 구분 */
+    .acq-ins-item--excluded { background: var(--color-surface-base); box-shadow: inset 0 0 0 1px var(--color-border-subtle); }
+    .acq-ins-item__name { font-weight: var(--font-weight-heading); color: var(--color-text-body); }
+    .acq-ins-item__status { justify-self: start; }
+    .acq-ins-item__detail { min-width: 0; color: var(--color-text-subtle); font-size: var(--font-size-sm); }
+    /* 제외사유 드롭다운이 들어가는 detail 셀 — 드롭다운 자체 폭 유지 */
+    .acq-ins-item__detail--control { justify-self: start; }
     /* 예상보험료 배너 본문 — 줄 사이 간격 */
     .acq-banner-lines { display: flex; flex-direction: column; gap: var(--space-gap-2xs); }
     /* 로딩 스켈레톤 행 */
@@ -152,76 +172,45 @@ exits: index.html
                     </div>
                   </div>
 
-                  <!-- ── 3 area: 가입 보험 ── -->
+                  <!-- ── 3 area: 가입 보험 — 상태 리스트 (데이터 테이블 아님. 고정 4항목: 보험명 + 상태 배지 + 사업장/제외사유) ── -->
                   <div class="acq-section">
                     <span class="text-form-label" id="s1-ins-label">가입 보험</span>
-                    <div class="table-container">
-                      <table class="table" aria-labelledby="s1-ins-label">
-                        <colgroup>
-                          <col style="width:40px">
-                          <col style="width:150px">
-                          <col>
-                          <col style="width:220px">
-                        </colgroup>
-                        <thead class="table__head">
-                          <tr>
-                            <th class="table__cell table__cell--check" scope="col"><span class="sr-only">선택</span></th>
-                            <th class="table__head-cell" scope="col">보험</th>
-                            <th class="table__head-cell" scope="col">신고사업장</th>
-                            <th class="table__head-cell" scope="col">제외 사유</th>
-                          </tr>
-                        </thead>
-                        <tbody class="table__body">
-                          <tr class="table__row">
-                            <td class="table__cell table__cell--check">
-                              <label class="checkbox checkbox--sm checkbox--disabled"><input type="checkbox" checked disabled aria-disabled="true" tabindex="-1" aria-label="국민연금 선택"><span class="checkbox__control" aria-hidden="true"><span class="checkbox__icon-check"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span></label>
-                            </td>
-                            <td class="table__cell">국민연금</td>
-                            <td class="table__cell">(주)남웅건설</td>
-                            <td class="table__cell">—</td>
-                          </tr>
-                          <tr class="table__row">
-                            <td class="table__cell table__cell--check">
-                              <label class="checkbox checkbox--sm checkbox--disabled"><input type="checkbox" checked disabled aria-disabled="true" tabindex="-1" aria-label="건강보험 선택"><span class="checkbox__control" aria-hidden="true"><span class="checkbox__icon-check"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span></label>
-                            </td>
-                            <td class="table__cell">건강보험</td>
-                            <td class="table__cell">LG U+ 파주 1239 신축공사 철근콘크리트공사</td>
-                            <td class="table__cell">—</td>
-                          </tr>
-                          <tr class="table__row">
-                            <td class="table__cell table__cell--check">
-                              <label class="checkbox checkbox--sm checkbox--disabled"><input type="checkbox" disabled aria-disabled="true" tabindex="-1" aria-label="고용보험 선택"><span class="checkbox__control" aria-hidden="true"><span class="checkbox__icon-check"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span></label>
-                            </td>
-                            <td class="table__cell">고용보험</td>
-                            <td class="table__cell">—</td>
-                            <td class="table__cell acq-cell-select">
-                              <div class="dropdown dropdown--button dropdown--menu dropdown--sm">
-                                <button class="dropdown__trigger" type="button" aria-haspopup="listbox" aria-expanded="false" aria-label="고용보험 제외 사유">
-                                  <span class="dropdown__value dropdown__value--placeholder">제외 사유 선택</span>
-                                  <span class="dropdown__chevron" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-chevron-down"/></svg></span>
-                                </button>
-                                <div class="dropdown__panel">
-                                  <ul class="dropdown__list" role="listbox" aria-label="고용보험 제외 사유">
-                                    <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">대표자/사업주</span></li>
-                                    <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">만 65세 이상</span></li>
-                                    <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">외국인 (체류자격 제외 대상)</span></li>
-                                  </ul>
-                                </div>
-                              </div>
-                            </td>
-                          </tr>
-                          <!-- 이미 취득한 보험(사업장 선택 시 취득완료) — checked-disabled + 취득완료 배지 + 신고사업장 -->
-                          <tr class="table__row">
-                            <td class="table__cell table__cell--check">
-                              <label class="checkbox checkbox--sm checkbox--disabled"><input type="checkbox" checked disabled aria-disabled="true" tabindex="-1" aria-label="산재보험 선택"><span class="checkbox__control" aria-hidden="true"><span class="checkbox__icon-check"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span></label>
-                            </td>
-                            <td class="table__cell">산재보험 <span class="badge badge--success">취득완료</span></td>
-                            <td class="table__cell">(주)남웅건설</td>
-                            <td class="table__cell">—</td>
-                          </tr>
-                        </tbody>
-                      </table>
-                    </div>
+                    <ul class="acq-ins-list" aria-labelledby="s1-ins-label">
+                      <li class="acq-ins-item" data-ins="국민연금" data-status="취득">
+                        <span class="acq-ins-item__name">국민연금</span>
+                        <span class="badge badge--success badge--line acq-ins-item__status">취득</span>
+                        <span class="acq-ins-item__detail">(주)남웅건설</span>
+                      </li>
+                      <li class="acq-ins-item" data-ins="건강보험" data-status="취득">
+                        <span class="acq-ins-item__name">건강보험</span>
+                        <span class="badge badge--success badge--line acq-ins-item__status">취득</span>
+                        <span class="acq-ins-item__detail">LG U+ 파주 1239 신축공사 철근콘크리트공사</span>
+                      </li>
+                      <li class="acq-ins-item" data-ins="산재보험" data-status="취득완료">
+                        <span class="acq-ins-item__name">산재보험</span>
+                        <span class="badge badge--success badge--fill acq-ins-item__status">취득완료</span>
+                        <span class="acq-ins-item__detail">(주)남웅건설</span>
+                      </li>
+                      <li class="acq-ins-item acq-ins-item--excluded" data-ins="고용보험" data-status="제외">
+                        <span class="acq-ins-item__name">고용보험</span>
+                        <span class="badge badge--neutral acq-ins-item__status">제외</span>
+                        <span class="acq-ins-item__detail acq-ins-item__detail--control">
+                          <div class="dropdown dropdown--button dropdown--menu dropdown--sm">
+                            <button class="dropdown__trigger" type="button" aria-haspopup="listbox" aria-expanded="false" aria-label="고용보험 제외 사유">
+                              <span class="dropdown__value dropdown__value--placeholder">제외 사유 선택</span>
+                              <span class="dropdown__chevron" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-chevron-down"/></svg></span>
+                            </button>
+                            <div class="dropdown__panel">
+                              <ul class="dropdown__list" role="listbox" aria-label="고용보험 제외 사유">
+                                <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">대표자/사업주</span></li>
+                                <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">만 65세 이상</span></li>
+                                <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">외국인 (체류자격 제외 대상)</span></li>
+                              </ul>
+                            </div>
+                          </div>
+                        </span>
+                      </li>
+                    </ul>
                   </div>
 
                   <!-- ── 4·5·6 area: 근로시간 · 월급여액 · 연금 취득월납부 ── -->
@@ -1286,17 +1275,28 @@ exits: index.html
   function comma(n) { return Number(n).toLocaleString('ko-KR'); }
   function q(panel, suffix) { return panel.querySelector('[id$="' + suffix + '"]'); }
 
+  /* 가입 보험은 상태 리스트(.acq-ins-item)로 표시한다. 아직 테이블(.table__row)을
+     쓰는 시나리오가 있어 두 구조를 모두 읽는다. */
   function insuranceRows(panel) {
+    var items = panel.querySelectorAll('.acq-ins-list .acq-ins-item');
+    if (items.length) return Array.prototype.slice.call(items);
     return Array.prototype.slice.call(panel.querySelectorAll('.acq-section tbody .table__row'));
   }
-  function rowName(tr) {
-    var td = tr.children[1];
+  function rowName(el) {
+    if (el.dataset && el.dataset.ins) return el.dataset.ins;
+    var td = el.children[1];
     return td ? td.textContent.replace(/취득완료/g, '').trim() : '';
   }
+  /* '취득' | '취득완료' | '제외' */
+  function rowStatus(el) {
+    if (el.dataset && el.dataset.status) return el.dataset.status;
+    var cb = el.querySelector('input[type="checkbox"]');
+    if (cb && cb.checked) return /취득완료/.test(el.children[1].textContent) ? '취득완료' : '취득';
+    return '제외';
+  }
   function checkedInsurances(panel) {
-    return insuranceRows(panel).filter(function (tr) {
-      var cb = tr.querySelector('input[type="checkbox"]');
-      return cb && cb.checked;
+    return insuranceRows(panel).filter(function (el) {
+      return rowStatus(el) !== '제외';
     }).map(rowName);
   }
 
@@ -1347,11 +1347,11 @@ exits: index.html
     if (!label) return;
     var field = label.closest('.form-field');
     if (!field) return;
-    var pensionRow = insuranceRows(panel).filter(function (tr) { return rowName(tr) === '국민연금'; })[0];
+    var pensionRow = insuranceRows(panel).filter(function (el) { return rowName(el) === '국민연금'; })[0];
     if (!pensionRow) return;
-    var enrolled = /취득완료/.test(pensionRow.children[1].textContent);
-    var cb = pensionRow.querySelector('input[type="checkbox"]');
-    field.hidden = !(cb && cb.checked && !enrolled);
+    /* 국민연금을 이번에 새로 '취득'할 때만 취득월납부 선택을 노출한다
+       (이미 '취득완료'거나 '제외'면 숨긴다). */
+    field.hidden = rowStatus(pensionRow) !== '취득';
   }
 
   /* ── 8. 입사일이 초일이면 「희망」 고정 ── */
