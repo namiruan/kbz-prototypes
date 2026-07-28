@@ -89,7 +89,8 @@
       row-gap: var(--space-gap-2xs);
     }
     .acq-estimate-footer__badge { justify-self: start; }
-    .acq-estimate-footer__label { color: var(--color-text-subtle); font-size: var(--font-size-label); }        /* 라벨 12px */
+    /* 좌측 타이틀 — 뱃지 대신 브랜드 컬러 텍스트, 헤더보다 한 단계 작게(15px). 2행 세로 중앙. */
+    .acq-estimate-footer__title { grid-row: 1 / span 2; align-self: center; color: var(--color-text-brand); font-size: var(--font-size-lg); font-weight: var(--font-weight-heading); line-height: var(--line-height-ui); white-space: nowrap; }
     /* 값 한 줄: 날짜(고지월)와 금액(부과금액)을 세로 구분선 + 서로 다른 스타일로 확실히 구분 */
     .acq-estimate-footer__values { display: inline-flex; align-items: center; gap: var(--space-gap-sm); white-space: nowrap; }
     .acq-estimate-footer__date { color: var(--color-text-subtle); font-size: var(--font-size-lg); }             /* 날짜: 옅게 */
@@ -325,8 +326,7 @@ exits: index.html
           <div class="modal__footer">
             <div class="acq-estimate-footer" role="status">
               <div class="acq-estimate-footer__table">
-                <span class="badge badge--brand acq-estimate-footer__badge">예상</span>
-                <span class="acq-estimate-footer__label">고지월 · 금액</span>
+                <span class="acq-estimate-footer__title">예상<br>고지월 · 부과금액</span>
                 <span class="badge badge--neutral badge--line acq-estimate-footer__badge">국민연금</span>
                 <span class="acq-estimate-footer__values"><span class="acq-estimate-footer__date">2026-01</span><span class="acq-estimate-footer__sep" aria-hidden="true"></span><span class="acq-estimate-footer__amount">3,567원</span></span>
                 <span class="badge badge--neutral badge--line acq-estimate-footer__badge">건강보험</span>
@@ -806,8 +806,7 @@ exits: index.html
           <div class="modal__footer">
             <div class="acq-estimate-footer" role="status">
               <div class="acq-estimate-footer__table">
-                <span class="badge badge--brand acq-estimate-footer__badge">예상</span>
-                <span class="acq-estimate-footer__label">고지월 · 금액</span>
+                <span class="acq-estimate-footer__title">예상<br>고지월 · 부과금액</span>
                 <span class="badge badge--neutral badge--line acq-estimate-footer__badge">고용보험</span>
                 <span class="acq-estimate-footer__values"><span class="acq-estimate-footer__date">2026-01</span><span class="acq-estimate-footer__sep" aria-hidden="true"></span><span class="acq-estimate-footer__amount">20,700원</span></span>
               </div>
@@ -1028,8 +1027,7 @@ exits: index.html
           <div class="modal__footer">
             <div class="acq-estimate-footer" role="status">
               <div class="acq-estimate-footer__table">
-                <span class="badge badge--brand acq-estimate-footer__badge">예상</span>
-                <span class="acq-estimate-footer__label">고지월 · 금액</span>
+                <span class="acq-estimate-footer__title">예상<br>고지월 · 부과금액</span>
                 <span class="badge badge--neutral badge--line acq-estimate-footer__badge">국민연금</span>
                 <span class="acq-estimate-footer__values"><span class="acq-estimate-footer__date">2026-01</span><span class="acq-estimate-footer__sep" aria-hidden="true"></span><span class="acq-estimate-footer__amount">3,567원</span></span>
                 <span class="badge badge--neutral badge--line acq-estimate-footer__badge">건강보험</span>
@@ -1366,8 +1364,7 @@ exits: index.html
     footer.hidden = false;
     footer.innerHTML =
       '<div class="acq-estimate-footer__table">' +
-        '<span class="badge badge--brand acq-estimate-footer__badge">예상</span>' +
-        '<span class="acq-estimate-footer__label">고지월 · 금액</span>' +
+        '<span class="acq-estimate-footer__title">예상<br>고지월 · 부과금액</span>' +
         cols +
       '</div>' +
       '<p class="acq-estimate-footer__note">※ 실제 부과금액 및 반영 시기는 신고일, 보수월액, 기관 처리 일정 등에 따라 달라질 수 있어요.</p>';
