@@ -72,9 +72,10 @@
     /* 예상보험료 배너 — 기획 레이아웃: 데이터 줄마다 아이콘, ※ 문구는 아이콘 없이 분리.
        텍스트는 label-small(12px). caution 색/배경은 DS banner--caution 그대로 유지. */
     .acq-estimate__body { gap: var(--space-gap-2xs); }
-    .acq-estimate__line { display: flex; align-items: flex-start; gap: var(--space-gap-xs); margin: 0; font-size: var(--font-size-label); line-height: var(--line-height-reading); }
-    .acq-estimate__line .banner__icon { margin-top: 1px; }   /* 16px 아이콘을 12px 텍스트 첫 줄에 맞춤 */
-    .acq-estimate__note { margin: var(--space-gap-sm) 0 0; font-size: var(--font-size-label); line-height: var(--line-height-reading); }
+    /* 폰트 크기·색은 DS banner__message가 담당(단일 소스). 여기선 줄 레이아웃만 정의. */
+    .acq-estimate__line { display: flex; align-items: flex-start; gap: var(--space-gap-xs); margin: 0; }
+    .acq-estimate__line .banner__icon { margin-top: 1px; }   /* 16px 아이콘을 텍스트 첫 줄에 맞춤 */
+    .acq-estimate__note { margin: var(--space-gap-sm) 0 0; }
     /* 로딩 스켈레톤 행 */
     .acq-skeleton-row { display: flex; gap: var(--space-gap-md); }
     .acq-skeleton-row > * { flex: 1; }
