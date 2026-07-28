@@ -244,7 +244,8 @@ exits: report-acquire.html, report-change.html, report-leave.html, report-loss.h
                           </button>
                           <div class="dropdown__panel">
                             <ul class="dropdown__list" role="listbox" aria-label="신고 유형">
-                              <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1" data-report="취득"><span class="dropdown__option-label">취득</span></li>
+                              <!-- 4대보험 모두 취득 상태 → '취득' 비활성(6 area 조건). 사유는 인라인 표시(비활성 옵션은 pointer-events:none이라 hover 툴팁 불가) -->
+                              <li class="dropdown__option dropdown__option--disabled" role="option" aria-selected="false" aria-disabled="true" data-report="취득"><span class="dropdown__option-label">취득 (모두 취득 완료)</span></li>
                               <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1" data-report="상실"><span class="dropdown__option-label">상실</span></li>
                               <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1" data-report="사업장 이동"><span class="dropdown__option-label">사업장 이동</span></li>
                               <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1" data-report="보수변경"><span class="dropdown__option-label">보수변경</span></li>
@@ -278,7 +279,8 @@ exits: report-acquire.html, report-change.html, report-leave.html, report-loss.h
                           </button>
                           <div class="dropdown__panel">
                             <ul class="dropdown__list" role="listbox" aria-label="신고 유형">
-                              <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1" data-report="취득"><span class="dropdown__option-label">취득</span></li>
+                              <!-- 4대보험 모두 취득 상태 → '취득' 비활성(6 area 조건). 사유는 인라인 표시(비활성 옵션은 pointer-events:none이라 hover 툴팁 불가) -->
+                              <li class="dropdown__option dropdown__option--disabled" role="option" aria-selected="false" aria-disabled="true" data-report="취득"><span class="dropdown__option-label">취득 (모두 취득 완료)</span></li>
                               <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1" data-report="상실"><span class="dropdown__option-label">상실</span></li>
                               <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1" data-report="사업장 이동"><span class="dropdown__option-label">사업장 이동</span></li>
                               <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1" data-report="보수변경"><span class="dropdown__option-label">보수변경</span></li>
@@ -346,7 +348,8 @@ exits: report-acquire.html, report-change.html, report-leave.html, report-loss.h
                           </button>
                           <div class="dropdown__panel">
                             <ul class="dropdown__list" role="listbox" aria-label="신고 유형">
-                              <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1" data-report="취득"><span class="dropdown__option-label">취득</span></li>
+                              <!-- 4대보험 모두 취득 상태 → '취득' 비활성(6 area 조건). 사유는 인라인 표시(비활성 옵션은 pointer-events:none이라 hover 툴팁 불가) -->
+                              <li class="dropdown__option dropdown__option--disabled" role="option" aria-selected="false" aria-disabled="true" data-report="취득"><span class="dropdown__option-label">취득 (모두 취득 완료)</span></li>
                               <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1" data-report="상실"><span class="dropdown__option-label">상실</span></li>
                               <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1" data-report="사업장 이동"><span class="dropdown__option-label">사업장 이동</span></li>
                               <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1" data-report="보수변경"><span class="dropdown__option-label">보수변경</span></li>
@@ -1463,6 +1466,7 @@ exits: report-acquire.html, report-change.html, report-leave.html, report-loss.h
   tbody.addEventListener('click', function (e) {
     var opt = e.target.closest('.table__cell--action .dropdown__option');
     if (!opt) return;
+    if (opt.classList.contains('dropdown__option--disabled')) return;   /* 비활성 옵션(4대보험 모두 취득 시 '취득') 무시 */
     var row  = opt.closest('tr.table__row');
     var kind = opt.dataset.report;
     var mock = MOCK[baseRows.indexOf(row)] || {};
