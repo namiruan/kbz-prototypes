@@ -45,10 +45,12 @@
       column-gap: var(--space-gap-md);
       padding: var(--space-inset-squish-sm);
       border-radius: var(--radius-sm);
-      background: var(--color-surface-subtle);
     }
-    /* 제외 항목 — 신고 대상이 아님을 배경 없이 테두리로만 구분 */
-    .acq-ins-item--excluded { background: var(--color-surface-base); box-shadow: inset 0 0 0 1px var(--color-border-subtle); }
+    /* 상태별 배경 구분 — 이번 신고로 취득할 대상 / 이미 취득완료 / 제외를 한눈에 구별 */
+    .acq-ins-item[data-status="취득"]   { background: var(--color-surface-brand-subtle); }   /* 이번 신고 대상 */
+    .acq-ins-item[data-status="취득완료"] { background: var(--color-surface-success-subtle); } /* 이미 완료 */
+    /* 제외 — 신고 대상이 아님을 배경 없이 테두리로만 구분 */
+    .acq-ins-item[data-status="제외"]   { background: var(--color-surface-base); box-shadow: inset 0 0 0 1px var(--color-border-subtle); }
     .acq-ins-item__name { font-weight: var(--font-weight-heading); color: var(--color-text-body); }
     .acq-ins-item__status { justify-self: start; }
     .acq-ins-item__detail { min-width: 0; color: var(--color-text-subtle); font-size: var(--font-size-sm); }
