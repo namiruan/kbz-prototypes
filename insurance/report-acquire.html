@@ -78,14 +78,13 @@
     .modal__footer { align-items: center; }   /* 좌측 요약(다줄)과 우측 버튼 세로 가운데 정렬 */
     .acq-estimate-footer { margin-right: auto; display: flex; flex-direction: column; gap: var(--space-gap-xs); text-align: left; min-width: 0; }
     .acq-estimate-footer[hidden] { display: none; }
-    /* 지표(행) × 보험(열) 정렬 그리드 — 예상 고지월·부과금액을 좌측 행 라벨로,
-       보험(뱃지)을 열로 우측에 나열해 보험이 늘면(최대 4개) 옆으로 확장된다. */
+    /* 보험(행) × 지표(열) 정렬 그리드 — 보험당 한 줄에 예상 고지월·부과금액을 나란히.
+       라벨(예상 고지월/부과금액)은 헤더로 1회, 값은 열로 정렬. */
     .acq-estimate-footer__table {
       display: grid;
-      grid-auto-flow: column;
-      grid-template-rows: auto auto auto;   /* 뱃지(보험) / 예상 고지월 / 예상 부과금액 */
+      grid-template-columns: auto auto auto;   /* 보험(뱃지) | 예상 고지월 | 예상 부과금액 */
       align-items: center;
-      column-gap: var(--space-gap-sm);
+      column-gap: var(--space-gap-lg);
       row-gap: var(--space-gap-xs);
     }
     .acq-estimate-footer__badge { justify-self: start; }
