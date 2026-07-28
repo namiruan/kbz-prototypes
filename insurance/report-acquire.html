@@ -38,7 +38,9 @@
     .acq-ins-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--space-gap-2xs); }
     .acq-ins-item {
       display: grid;
-      grid-template-columns: 80px auto minmax(0, 1fr);
+      /* 3열 고정 정렬: 보험명 · 상태 배지 · 사업장/제외사유.
+         배지 열을 고정 폭으로 잡아 취득/취득완료/제외 폭이 달라도 뒤 열의 시작이 맞도록 한다. */
+      grid-template-columns: 76px 68px minmax(0, 1fr);
       align-items: center;
       column-gap: var(--space-gap-md);
       padding: var(--space-inset-squish-sm);
