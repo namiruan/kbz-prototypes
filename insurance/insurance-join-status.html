@@ -191,7 +191,7 @@ exits: report-acquire.html, report-change.html, report-leave.html, report-loss.h
             <div class="table-container">
               <div class="table__toolbar">
                 <div class="table__title-group">
-                  <span class="table__count" aria-live="polite">내 탐색 결과 <b class="table__count-value">5</b></span>
+                  <span class="table__count" aria-live="polite">내 탐색 결과 <b class="table__count-value">6</b></span>
                 </div>
                 <div class="table__toolbar-actions">
                   <span class="tooltip-wrapper" onmouseenter="this.querySelector('.tooltip-panel').classList.add('tooltip-panel--visible')" onmouseleave="this.querySelector('.tooltip-panel').classList.remove('tooltip-panel--visible')">
@@ -316,6 +316,41 @@ exits: report-acquire.html, report-change.html, report-leave.html, report-loss.h
                       <td class="table__cell table__cell--action">
                         <div class="dropdown dropdown--button dropdown--menu dropdown--sm" id="dd-report-r3">
                           <button class="dropdown__trigger" type="button" aria-haspopup="listbox" aria-expanded="false" aria-label="박진수 신고하기">
+                            <span class="dropdown__value dropdown__value--placeholder">신고하기</span>
+                            <span class="dropdown__chevron" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-chevron-down"/></svg></span>
+                          </button>
+                          <div class="dropdown__panel">
+                            <ul class="dropdown__list" role="listbox" aria-label="신고 유형">
+                              <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1" data-report="취득"><span class="dropdown__option-label">취득</span></li>
+                              <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1" data-report="상실"><span class="dropdown__option-label">상실</span></li>
+                              <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1" data-report="사업장 이동"><span class="dropdown__option-label">사업장 이동</span></li>
+                              <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1" data-report="보수변경"><span class="dropdown__option-label">보수변경</span></li>
+                              <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1" data-report="정정"><span class="dropdown__option-label">정정</span></li>
+                              <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1" data-report="휴직"><span class="dropdown__option-label">휴직</span></li>
+                              <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1" data-report="복직"><span class="dropdown__option-label">복직</span></li>
+                            </ul>
+                          </div>
+                        </div>
+                      </td>
+                    </tr>
+
+                    <!-- Step-3: 다른 유형 신고서가 접수된 상태 — 신고 클릭 시 안내 Alert(overlay-step3) -->
+                    <tr class="table__row">
+                      <td class="table__cell" data-overlay-open="overlay-insurance-detail">인사팀</td>
+                      <td class="table__cell" data-overlay-open="overlay-insurance-detail">정다은</td>
+                      <td class="table__cell" data-overlay-open="overlay-insurance-detail">950312-2233445</td>
+                      <td class="table__cell" data-overlay-open="overlay-insurance-detail">주식회사 테크노로직 본사</td>
+                      <td class="table__cell table__cell--fit" data-overlay-open="overlay-insurance-detail"><span class="badge badge--success badge--line">취득</span></td>
+                      <td class="table__cell cell-insurance" data-overlay-open="overlay-insurance-detail">
+                        <span class="badge badge--success">고용<span class="sr-only"> 취득</span></span>
+                        <span class="badge badge--success">산재<span class="sr-only"> 취득</span></span>
+                        <span class="badge badge--success">건강<span class="sr-only"> 취득</span></span>
+                        <span class="tooltip-wrapper" onmouseenter="this.querySelector('.tooltip-panel').classList.add('tooltip-panel--visible')" onmouseleave="this.querySelector('.tooltip-panel').classList.remove('tooltip-panel--visible')"><span class="badge badge--neutral" aria-describedby="tip-nojoin-5">연금<span class="sr-only"> 미가입 — 타 사업장 가입</span></span><div class="tooltip-panel elevation-tooltip tooltip-panel--left" id="tip-nojoin-5" role="tooltip"><span class="tip-grid"><span>미가입 사유</span><span>타 사업장 가입</span></span></div></span>
+                      </td>
+                      <td class="table__cell table__cell--number" data-overlay-open="overlay-insurance-detail">3,000,000</td>
+                      <td class="table__cell table__cell--action">
+                        <div class="dropdown dropdown--button dropdown--menu dropdown--sm" id="dd-report-r6">
+                          <button class="dropdown__trigger" type="button" aria-haspopup="listbox" aria-expanded="false" aria-label="정다은 신고하기">
                             <span class="dropdown__value dropdown__value--placeholder">신고하기</span>
                             <span class="dropdown__chevron" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-chevron-down"/></svg></span>
                           </button>
@@ -1413,7 +1448,7 @@ exits: report-acquire.html, report-change.html, report-leave.html, report-loss.h
   });
 
   /* 9~12. 신고 유형 선택 → Step-1~5 검증 분기 */
-  var MOCK = [{}, { step1: true }, { step2: true }, { step4: true }, { step5: true }];
+  var MOCK = [{}, { step1: true }, { step2: true }, { step3: true }, { step4: true }, { step5: true }];
   var STEP_OVERLAY = { step1: 'overlay-step1', step2: 'overlay-step2', step3: 'overlay-step3', step4: 'overlay-step4', step5: 'overlay-step5' };
 
   /* ── 11. 신고 유형 → 분리된 신고 프로토타입 파일로 이동 ──────────────
