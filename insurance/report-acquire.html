@@ -44,6 +44,11 @@
     .acq-form input[id$="-rrn"]   { max-width: 184px; }   /* 주민번호: 13자리 고정 */
     .acq-form input[id$="-hire"]  { max-width: 148px; }   /* 입사일: YYYY-MM-DD */
     .acq-form input[id$="-name"]  { max-width: 160px; }   /* 이름 */
+    /* 3-필드 그룹 가로 정렬 — DS form-field-group--horizontal은 라벨-옆 세로 스택이라
+       짧은 필드에서 우측 여백이 크게 남는다. 이 폼에선 라벨-위 + 가로 wrap으로 재정의해
+       컨텐츠 폭 필드가 왼쪽부터 채워지도록 한다(form.md 필드 너비·정렬 규칙). */
+    .acq-form .form-field-group--horizontal { display: flex; flex-wrap: wrap; align-items: flex-start; column-gap: var(--space-gap-lg); row-gap: var(--space-gap-md); }
+    .acq-form .form-field-group--horizontal > .form-field { display: block; flex: 0 1 auto; }
   </style>
 </head>
 <body>
