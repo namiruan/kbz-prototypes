@@ -26,6 +26,10 @@
     /* 피부양자 안내 배너 — 특정 필드가 아닌 신고서 전반 안내이므로 헤더 아래 전체폭에 배치.
        우측 배너는 관련 정보 '아래'에 붙을 때 효용이 있어, 전반 안내는 상단 전체폭이 맞다. */
     .acq-intro-banner { margin-bottom: var(--space-gap-xl); }
+    /* 상단 배너는 데이터가 아니라 '헤더 보조 설명' 역할 → 헤더에 밀착시킨다.
+       배너가 있는 모달에서만 content 상단 패딩을 제거(헤더 자체 하단 패딩만 남김).
+       배너 없는 시나리오(로딩·저장실패)는 :has로 배제되어 정상 간격 유지. */
+    .modal__content:has(> .acq-intro-banner) { padding-top: 0; }
     /* 폼 세로 스택 — form-field-group보다 섹션 간격을 넓게 */
     .acq-form { display: flex; flex-direction: column; gap: var(--space-gap-xl); }
     /* 가입보험 섹션 — 라벨 + 테이블 */
