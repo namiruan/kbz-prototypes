@@ -35,6 +35,13 @@
        (사업장 선택 Modal 설명은 디자인 시스템 modal__header-text·modal__description
         슬롯으로 이전 → 로컬 규칙 불필요) */
     #dt-desc { margin: 0 0 var(--space-stack-md); }
+    /* 신고하기 메뉴의 비활성 '취득' 옵션 hover 사유 툴팁 — DS는 옵션에 pointer-events:none,
+       패널/목록에 overflow 잠금이라 툴팁이 잘린다. 이 메뉴에 한해서만 해제(옵션 수가 적어 스크롤 불필요).
+       클릭은 aria-disabled + JS 가드로 여전히 차단된다. */
+    .table__cell--action .dropdown__panel,
+    .table__cell--action .dropdown__list { overflow: visible; }
+    .table__cell--action .dropdown__option--disabled { pointer-events: auto; cursor: not-allowed; }
+    .table__cell--action .dropdown__option--disabled .tooltip-wrapper { display: block; }
     #dt-list { margin: 0; padding-left: var(--space-gap-lg); display: flex; flex-direction: column; gap: var(--space-gap-xs); }
     .ws-banner { margin: var(--space-stack-md) 0 0; }
     /* 사업장 선택 Modal — 보험별 선택 항목을 박스로 분리 (UI 시안).
@@ -244,8 +251,8 @@ exits: report-acquire.html, report-change.html, report-leave.html, report-loss.h
                           </button>
                           <div class="dropdown__panel">
                             <ul class="dropdown__list" role="listbox" aria-label="신고 유형">
-                              <!-- 4대보험 모두 취득 상태 → '취득' 비활성(6 area 조건). 사유는 인라인 표시(비활성 옵션은 pointer-events:none이라 hover 툴팁 불가) -->
-                              <li class="dropdown__option dropdown__option--disabled" role="option" aria-selected="false" aria-disabled="true" data-report="취득"><span class="dropdown__option-label">취득 (모두 취득 완료)</span></li>
+                              <!-- 4대보험 모두 취득 상태 → '취득' 비활성(6 area 조건). 사유는 hover 툴팁으로 안내(.table__cell--action 한정 overflow·pointer-events 해제) -->
+                              <li class="dropdown__option dropdown__option--disabled" role="option" aria-selected="false" aria-disabled="true" data-report="취득"><span class="tooltip-wrapper" onmouseenter="this.querySelector('.tooltip-panel').classList.add('tooltip-panel--visible')" onmouseleave="this.querySelector('.tooltip-panel').classList.remove('tooltip-panel--visible')" aria-describedby="tip-acq-r1"><span class="dropdown__option-label">취득</span><div class="tooltip-panel elevation-tooltip tooltip-panel--left" id="tip-acq-r1" role="tooltip">4대보험이 모두 취득 상태예요</div></span></li>
                               <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1" data-report="상실"><span class="dropdown__option-label">상실</span></li>
                               <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1" data-report="사업장 이동"><span class="dropdown__option-label">사업장 이동</span></li>
                               <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1" data-report="보수변경"><span class="dropdown__option-label">보수변경</span></li>
@@ -279,8 +286,8 @@ exits: report-acquire.html, report-change.html, report-leave.html, report-loss.h
                           </button>
                           <div class="dropdown__panel">
                             <ul class="dropdown__list" role="listbox" aria-label="신고 유형">
-                              <!-- 4대보험 모두 취득 상태 → '취득' 비활성(6 area 조건). 사유는 인라인 표시(비활성 옵션은 pointer-events:none이라 hover 툴팁 불가) -->
-                              <li class="dropdown__option dropdown__option--disabled" role="option" aria-selected="false" aria-disabled="true" data-report="취득"><span class="dropdown__option-label">취득 (모두 취득 완료)</span></li>
+                              <!-- 4대보험 모두 취득 상태 → '취득' 비활성(6 area 조건). 사유는 hover 툴팁으로 안내(.table__cell--action 한정 overflow·pointer-events 해제) -->
+                              <li class="dropdown__option dropdown__option--disabled" role="option" aria-selected="false" aria-disabled="true" data-report="취득"><span class="tooltip-wrapper" onmouseenter="this.querySelector('.tooltip-panel').classList.add('tooltip-panel--visible')" onmouseleave="this.querySelector('.tooltip-panel').classList.remove('tooltip-panel--visible')" aria-describedby="tip-acq-r2"><span class="dropdown__option-label">취득</span><div class="tooltip-panel elevation-tooltip tooltip-panel--left" id="tip-acq-r2" role="tooltip">4대보험이 모두 취득 상태예요</div></span></li>
                               <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1" data-report="상실"><span class="dropdown__option-label">상실</span></li>
                               <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1" data-report="사업장 이동"><span class="dropdown__option-label">사업장 이동</span></li>
                               <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1" data-report="보수변경"><span class="dropdown__option-label">보수변경</span></li>
@@ -348,8 +355,8 @@ exits: report-acquire.html, report-change.html, report-leave.html, report-loss.h
                           </button>
                           <div class="dropdown__panel">
                             <ul class="dropdown__list" role="listbox" aria-label="신고 유형">
-                              <!-- 4대보험 모두 취득 상태 → '취득' 비활성(6 area 조건). 사유는 인라인 표시(비활성 옵션은 pointer-events:none이라 hover 툴팁 불가) -->
-                              <li class="dropdown__option dropdown__option--disabled" role="option" aria-selected="false" aria-disabled="true" data-report="취득"><span class="dropdown__option-label">취득 (모두 취득 완료)</span></li>
+                              <!-- 4대보험 모두 취득 상태 → '취득' 비활성(6 area 조건). 사유는 hover 툴팁으로 안내(.table__cell--action 한정 overflow·pointer-events 해제) -->
+                              <li class="dropdown__option dropdown__option--disabled" role="option" aria-selected="false" aria-disabled="true" data-report="취득"><span class="tooltip-wrapper" onmouseenter="this.querySelector('.tooltip-panel').classList.add('tooltip-panel--visible')" onmouseleave="this.querySelector('.tooltip-panel').classList.remove('tooltip-panel--visible')" aria-describedby="tip-acq-r4"><span class="dropdown__option-label">취득</span><div class="tooltip-panel elevation-tooltip tooltip-panel--left" id="tip-acq-r4" role="tooltip">4대보험이 모두 취득 상태예요</div></span></li>
                               <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1" data-report="상실"><span class="dropdown__option-label">상실</span></li>
                               <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1" data-report="사업장 이동"><span class="dropdown__option-label">사업장 이동</span></li>
                               <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1" data-report="보수변경"><span class="dropdown__option-label">보수변경</span></li>
