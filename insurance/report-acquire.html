@@ -19,6 +19,9 @@
        modal__aside는 "읽기 전용만" 규칙이라 인터랙티브한 FileUpload를 넣을 수 없어
        modal__content 안에서 그리드로 구성한다 (→ modal.md 소제목 모달 제약) */
     .acq-grid { display: grid; grid-template-columns: 314px 1fr; gap: var(--space-gap-2xl); align-items: start; }
+    /* 피부양자 안내 배너 — 특정 필드가 아닌 신고서 전반 안내이므로 헤더 아래 전체폭에 배치.
+       우측 배너는 관련 정보 '아래'에 붙을 때 효용이 있어, 전반 안내는 상단 전체폭이 맞다. */
+    .acq-intro-banner { margin-bottom: var(--space-gap-xl); }
     /* 폼 세로 스택 — form-field-group보다 섹션 간격을 넓게 */
     .acq-form { display: flex; flex-direction: column; gap: var(--space-gap-xl); }
     /* 가입보험 섹션 — 라벨 + 테이블 */
@@ -126,6 +129,15 @@ exits: index.html
 
           <div class="modal__body">
             <div class="modal__content">
+              <!-- 피부양자 안내 배너 — 헤더 아래 전체폭 (신고서 전반 안내) -->
+              <div class="banner acq-intro-banner" role="status">
+                <span class="icon--md banner__icon" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-info"/></svg></span>
+                <div class="text-description banner__body">
+                  <p class="banner__title">피부양자 취득 신고 안내</p>
+                  <p class="banner__message">피부양자 취득신고는 현재 지원하지 않아요. (추후 제공 예정) 피부양자 취득신고는 비즈씨를 통해 진행해주세요.</p>
+                </div>
+              </div>
+
               <div class="acq-grid">
 
                 <!-- ── 1 area: 첨부파일 ── -->
@@ -149,15 +161,6 @@ exits: index.html
 
                 <!-- ── 우측 폼 ── -->
                 <div class="acq-form">
-
-                  <!-- 피부양자 안내 배너 -->
-                  <div class="banner" role="status">
-                    <span class="icon--md banner__icon" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-info"/></svg></span>
-                    <div class="text-description banner__body">
-                      <p class="banner__title">피부양자 취득 신고 안내</p>
-                      <p class="banner__message">피부양자 취득신고는 현재 지원하지 않아요. (추후 제공 예정) 피부양자 취득신고는 비즈씨를 통해 진행해주세요.</p>
-                    </div>
-                  </div>
 
                   <!-- ── 2 area: 근로자 기본 정보 (수정 불가) ── -->
                   <div class="form-field-group--horizontal">
@@ -323,6 +326,15 @@ exits: index.html
 
           <div class="modal__body">
             <div class="modal__content">
+              <!-- 피부양자 안내 배너 — 헤더 아래 전체폭 (신고서 전반 안내) -->
+              <div class="banner acq-intro-banner" role="status">
+                <span class="icon--md banner__icon" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-info"/></svg></span>
+                <div class="text-description banner__body">
+                  <p class="banner__title">피부양자 취득 신고 안내</p>
+                  <p class="banner__message">피부양자 취득신고는 현재 지원하지 않아요. (추후 제공 예정) 피부양자 취득신고는 비즈씨를 통해 진행해주세요.</p>
+                </div>
+              </div>
+
               <div class="acq-grid">
 
                 <div class="file-upload" id="s2-upload" data-max-mb="200">
@@ -344,14 +356,6 @@ exits: index.html
                 </div>
 
                 <div class="acq-form">
-
-                  <div class="banner" role="status">
-                    <span class="icon--md banner__icon" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-info"/></svg></span>
-                    <div class="text-description banner__body">
-                      <p class="banner__title">피부양자 취득 신고 안내</p>
-                      <p class="banner__message">피부양자 취득신고는 현재 지원하지 않아요. (추후 제공 예정) 피부양자 취득신고는 비즈씨를 통해 진행해주세요.</p>
-                    </div>
-                  </div>
 
                   <div class="form-field-group--horizontal">
                     <div class="form-field">
@@ -590,6 +594,15 @@ exits: index.html
 
           <div class="modal__body">
             <div class="modal__content">
+              <!-- 피부양자 안내 배너 — 헤더 아래 전체폭 (신고서 전반 안내) -->
+              <div class="banner acq-intro-banner" role="status">
+                <span class="icon--md banner__icon" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-info"/></svg></span>
+                <div class="text-description banner__body">
+                  <p class="banner__title">피부양자 취득 신고 안내</p>
+                  <p class="banner__message">피부양자 취득신고는 현재 지원하지 않아요. (추후 제공 예정) 피부양자 취득신고는 비즈씨를 통해 진행해주세요.</p>
+                </div>
+              </div>
+
               <div class="acq-grid">
 
                 <div class="file-upload" id="s4-upload" data-max-mb="200">
@@ -611,14 +624,6 @@ exits: index.html
                 </div>
 
                 <div class="acq-form">
-
-                  <div class="banner" role="status">
-                    <span class="icon--md banner__icon" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-info"/></svg></span>
-                    <div class="text-description banner__body">
-                      <p class="banner__title">피부양자 취득 신고 안내</p>
-                      <p class="banner__message">피부양자 취득신고는 현재 지원하지 않아요. (추후 제공 예정) 피부양자 취득신고는 비즈씨를 통해 진행해주세요.</p>
-                    </div>
-                  </div>
 
                   <div class="form-field-group--horizontal">
                     <div class="form-field">
