@@ -51,8 +51,9 @@
     #dt-list { margin: 0; padding-left: var(--space-gap-lg); display: flex; flex-direction: column; gap: var(--space-gap-xs); }
     .ws-banner { margin: var(--space-stack-md) 0 0; }
     /* 사업장 선택 Modal — 유효성 피드백 (필드 에러 메시지 · 폼 레벨 '보험 미선택' 안내) */
-    .ws-field-error, .ws-form-error { margin: var(--space-stack-xs) 0 0; color: var(--color-text-error); font-size: var(--font-size-label); }
-    .ws-form-error { margin-top: var(--space-stack-md); }
+    .ws-field-error { margin: var(--space-stack-xs) 0 0; color: var(--color-text-error); font-size: var(--font-size-label); }
+    /* 폼 레벨 '보험 미선택' 안내 — 푸터 버튼 좌측, 조금 더 큰 글씨 */
+    .ws-form-error { margin: 0 auto 0 0; align-self: center; color: var(--color-text-error); font-size: var(--font-size-base); }
     /* 사업장 선택 Modal — 보험별 선택 항목을 박스로 분리 (UI 시안).
        시스템에 '선택 카드' 컴포넌트가 없어 페이지 레이아웃으로 구성. 토큰만 사용 */
     /* 항목 구분은 하단 라인으로. radius·배경 없음 */
@@ -1622,8 +1623,8 @@ exits: report-acquire.html, report-change.html, report-leave.html, report-loss.h
     var wsFormError = document.createElement('p');
     wsFormError.className = 'ws-form-error'; wsFormError.setAttribute('role', 'alert'); wsFormError.hidden = true;
     wsFormError.textContent = '취득할 보험을 하나 이상 선택해주세요.';
-    var wsContent = ws.querySelector('.modal__content');
-    if (wsContent) wsContent.appendChild(wsFormError);
+    var wsFooter = ws.querySelector('.modal__footer');
+    if (wsFooter) wsFooter.insertBefore(wsFormError, wsFooter.firstChild);   /* 버튼 좌측에 배치 */
     function clearWsError(dd) {   /* 사업장 선택/체크 해제 시 해당 필드 에러 제거 */
       if (!dd) return;
       dd.classList.remove('dropdown--error');
