@@ -76,19 +76,13 @@
     /* 예상보험료 요약 — 배너가 아니라 모달 푸터 좌측에 전체 노출(이미지 패턴).
        계산 결과라 액션(신고요청) 옆에 두어 제출 시점에 함께 보이게 한다. */
     .modal__footer { align-items: center; }   /* 좌측 요약(다줄)과 우측 버튼 세로 가운데 정렬 */
-    .acq-estimate-footer { margin-right: auto; display: flex; flex-direction: column; gap: var(--space-gap-sm); text-align: left; min-width: 0; }
+    .acq-estimate-footer { margin-right: auto; display: flex; flex-direction: column; gap: var(--space-gap-xs); text-align: left; min-width: 0; }
     .acq-estimate-footer[hidden] { display: none; }
-    /* 전치형 레이아웃: 좌측에 고지월·부과금액 라벨을 세로로, 우측으로 보험 뱃지를 열로 나열.
-       보험 수가 늘어도(최대 4개) 가로로 컴팩트하게 확장된다. */
-    .acq-estimate-footer__grid {
-      display: grid;
-      grid-auto-flow: column;
-      grid-template-rows: auto auto auto;   /* 뱃지 / 고지월 / 부과금액 */
-      align-items: center;
-      column-gap: var(--space-gap-lg);
-      row-gap: var(--space-gap-2xs);
-    }
-    .acq-estimate-footer__label { color: var(--color-text-subtle); font-size: var(--font-size-label); }        /* 라벨 12px */
+    /* 종류별(보험) 행 — 뱃지로 보험 구분 + 고지월·부과금액 라벨/값. */
+    .acq-estimate-footer__row { display: flex; align-items: center; gap: var(--space-gap-md); }
+    .acq-estimate-footer__badge { flex-shrink: 0; }
+    .acq-estimate-footer__fig { display: flex; align-items: baseline; gap: var(--space-gap-2xs); }
+    .acq-estimate-footer__label { color: var(--color-text-subtle); font-size: var(--font-size-label); }         /* 라벨 12px */
     .acq-estimate-footer__value { color: var(--color-text-body); font-size: var(--font-size-lg); font-weight: var(--font-weight-heading); }  /* 값 15px 강조 */
     .acq-estimate-footer__note { margin: 0; font-size: var(--font-size-label); color: var(--color-text-subtle); }
     /* 로딩 스켈레톤 행 */
@@ -319,16 +313,15 @@ exits: index.html
           <!-- ── 9·10·11 area: 예상보험료 요약(좌) · 취소 / 임시저장 / 신고요청(우) ── -->
           <div class="modal__footer">
             <div class="acq-estimate-footer" role="status">
-              <div class="acq-estimate-footer__grid">
-                <span aria-hidden="true"></span>
-                <span class="acq-estimate-footer__label">고지월</span>
-                <span class="acq-estimate-footer__label">부과금액</span>
-                <span class="badge badge--neutral">국민연금</span>
-                <span class="acq-estimate-footer__value">2026-01</span>
-                <span class="acq-estimate-footer__value">3,567원</span>
-                <span class="badge badge--neutral">건강보험</span>
-                <span class="acq-estimate-footer__value">2025-12</span>
-                <span class="acq-estimate-footer__value">12,500원</span>
+              <div class="acq-estimate-footer__row">
+                <span class="badge badge--neutral acq-estimate-footer__badge">국민연금</span>
+                <span class="acq-estimate-footer__fig"><span class="acq-estimate-footer__label">고지월</span><span class="acq-estimate-footer__value">2026-01</span></span>
+                <span class="acq-estimate-footer__fig"><span class="acq-estimate-footer__label">부과금액</span><span class="acq-estimate-footer__value">3,567원</span></span>
+              </div>
+              <div class="acq-estimate-footer__row">
+                <span class="badge badge--neutral acq-estimate-footer__badge">건강보험</span>
+                <span class="acq-estimate-footer__fig"><span class="acq-estimate-footer__label">고지월</span><span class="acq-estimate-footer__value">2025-12</span></span>
+                <span class="acq-estimate-footer__fig"><span class="acq-estimate-footer__label">부과금액</span><span class="acq-estimate-footer__value">12,500원</span></span>
               </div>
               <p class="acq-estimate-footer__note">※ 실제 부과금액 및 반영 시기는 신고일, 보수월액, 기관 처리 일정 등에 따라 달라질 수 있어요.</p>
             </div>
@@ -803,13 +796,10 @@ exits: index.html
 
           <div class="modal__footer">
             <div class="acq-estimate-footer" role="status">
-              <div class="acq-estimate-footer__grid">
-                <span aria-hidden="true"></span>
-                <span class="acq-estimate-footer__label">고지월</span>
-                <span class="acq-estimate-footer__label">부과금액</span>
-                <span class="badge badge--neutral">고용보험</span>
-                <span class="acq-estimate-footer__value">2026-01</span>
-                <span class="acq-estimate-footer__value">20,700원</span>
+              <div class="acq-estimate-footer__row">
+                <span class="badge badge--neutral acq-estimate-footer__badge">고용보험</span>
+                <span class="acq-estimate-footer__fig"><span class="acq-estimate-footer__label">고지월</span><span class="acq-estimate-footer__value">2026-01</span></span>
+                <span class="acq-estimate-footer__fig"><span class="acq-estimate-footer__label">부과금액</span><span class="acq-estimate-footer__value">20,700원</span></span>
               </div>
               <p class="acq-estimate-footer__note">※ 실제 부과금액 및 반영 시기는 신고일, 보수월액, 기관 처리 일정 등에 따라 달라질 수 있어요.</p>
             </div>
@@ -1027,16 +1017,15 @@ exits: index.html
 
           <div class="modal__footer">
             <div class="acq-estimate-footer" role="status">
-              <div class="acq-estimate-footer__grid">
-                <span aria-hidden="true"></span>
-                <span class="acq-estimate-footer__label">고지월</span>
-                <span class="acq-estimate-footer__label">부과금액</span>
-                <span class="badge badge--neutral">국민연금</span>
-                <span class="acq-estimate-footer__value">2026-01</span>
-                <span class="acq-estimate-footer__value">3,567원</span>
-                <span class="badge badge--neutral">건강보험</span>
-                <span class="acq-estimate-footer__value">2025-12</span>
-                <span class="acq-estimate-footer__value">12,500원</span>
+              <div class="acq-estimate-footer__row">
+                <span class="badge badge--neutral acq-estimate-footer__badge">국민연금</span>
+                <span class="acq-estimate-footer__fig"><span class="acq-estimate-footer__label">고지월</span><span class="acq-estimate-footer__value">2026-01</span></span>
+                <span class="acq-estimate-footer__fig"><span class="acq-estimate-footer__label">부과금액</span><span class="acq-estimate-footer__value">3,567원</span></span>
+              </div>
+              <div class="acq-estimate-footer__row">
+                <span class="badge badge--neutral acq-estimate-footer__badge">건강보험</span>
+                <span class="acq-estimate-footer__fig"><span class="acq-estimate-footer__label">고지월</span><span class="acq-estimate-footer__value">2025-12</span></span>
+                <span class="acq-estimate-footer__fig"><span class="acq-estimate-footer__label">부과금액</span><span class="acq-estimate-footer__value">12,500원</span></span>
               </div>
               <p class="acq-estimate-footer__note">※ 실제 부과금액 및 반영 시기는 신고일, 보수월액, 기관 처리 일정 등에 따라 달라질 수 있어요.</p>
             </div>
@@ -1358,23 +1347,19 @@ exits: index.html
     var wish = panel.querySelector('input[name$="-pension"]:checked');
     var wishYes = !!(wish && wish.parentElement.querySelector('.radio__label').textContent.trim() === '희망');
 
-    /* 전치 그리드: 보험별 열(뱃지 + 고지월값 + 부과금액값)을 우측으로 나열 */
-    var cols = names.map(function (n) {
+    /* 보험 종류별 행 — 뱃지(보험명) + 고지월·부과금액(라벨/값) */
+    var rows = names.map(function (n) {
       var notice = (n === '국민연금' && wishYes) ? NOTICE_PENSION_WISH : NOTICE_BASE[n];
       var amt = comma(Math.round(pay * RATE[n] / 10) * 10) + '원';
-      return '<span class="badge badge--neutral">' + n + '</span>' +
-        '<span class="acq-estimate-footer__value">' + notice + '</span>' +
-        '<span class="acq-estimate-footer__value">' + amt + '</span>';
+      return '<div class="acq-estimate-footer__row">' +
+        '<span class="badge badge--neutral acq-estimate-footer__badge">' + n + '</span>' +
+        '<span class="acq-estimate-footer__fig"><span class="acq-estimate-footer__label">고지월</span><span class="acq-estimate-footer__value">' + notice + '</span></span>' +
+        '<span class="acq-estimate-footer__fig"><span class="acq-estimate-footer__label">부과금액</span><span class="acq-estimate-footer__value">' + amt + '</span></span>' +
+      '</div>';
     }).join('');
 
     footer.hidden = false;
-    footer.innerHTML =
-      '<div class="acq-estimate-footer__grid">' +
-        '<span aria-hidden="true"></span>' +
-        '<span class="acq-estimate-footer__label">고지월</span>' +
-        '<span class="acq-estimate-footer__label">부과금액</span>' +
-        cols +
-      '</div>' +
+    footer.innerHTML = rows +
       '<p class="acq-estimate-footer__note">※ 실제 부과금액 및 반영 시기는 신고일, 보수월액, 기관 처리 일정 등에 따라 달라질 수 있어요.</p>';
   }
 
