@@ -54,10 +54,6 @@
     .ws-field-error { margin: var(--space-stack-xs) 0 0; color: var(--color-text-error); font-size: var(--font-size-label); }
     /* 폼 레벨 '보험 미선택' 안내 — 푸터 버튼 좌측, 조금 더 큰 글씨 */
     .ws-form-error { margin: 0 auto 0 0; align-self: center; color: var(--color-text-error); font-size: var(--font-size-base); }
-    /* 에러 강조 흔들림 — 저장 재시도마다 재생, 시선 유도 */
-    @keyframes ws-shake { 0%,100% { transform: translateX(0); } 20%,60% { transform: translateX(-5px); } 40%,80% { transform: translateX(5px); } }
-    .ws-shake { animation: ws-shake 0.4s ease; }
-    @media (prefers-reduced-motion: reduce) { .ws-shake { animation: none; } }
     /* 사업장 선택 Modal — 보험별 선택 항목을 박스로 분리 (UI 시안).
        시스템에 '선택 카드' 컴포넌트가 없어 페이지 레이아웃으로 구성. 토큰만 사용 */
     /* 항목 구분은 하단 라인으로. radius·배경 없음 */
@@ -1636,11 +1632,11 @@ exits: report-acquire.html, report-change.html, report-leave.html, report-loss.h
       var m = w && w.querySelector('.ws-field-error');
       if (m) m.hidden = true;
     }
-    function shake(el) {   /* 에러 강조 — 재시도마다 애니메이션 재시작(reflow 트릭) */
+    function shake(el) {   /* 에러 강조 — DS .motion-shake 사용, 재시도마다 reflow로 재시작(motion.md) */
       if (!el) return;
-      el.classList.remove('ws-shake');
+      el.classList.remove('motion-shake');
       void el.offsetWidth;
-      el.classList.add('ws-shake');
+      el.classList.add('motion-shake');
     }
     function syncBanner() {   /* 14b. 건강연금 + 건설현장 선택 시에만 배너 노출 */
       var row = ws.querySelector('.ws-row[data-ins="gungang"]');
