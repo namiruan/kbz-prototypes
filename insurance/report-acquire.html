@@ -274,15 +274,15 @@ exits: index.html
                   <!-- ── 5-1 area: 예상보험료 안내 배너 ── -->
                   <div class="banner banner--caution" role="status" id="s1-estimate">
                     <div class="text-description banner__body acq-estimate__body">
-                      <p class="acq-estimate__line">
+                      <p class="acq-estimate__line banner__message">
                         <span class="icon--sm banner__icon" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-triangle-alert"/></svg></span>
                         <span>예상 반영 고지월: 국민연금 2026-01 / 건강보험 2025-12</span>
                       </p>
-                      <p class="acq-estimate__line">
+                      <p class="acq-estimate__line banner__message">
                         <span class="icon--sm banner__icon" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-triangle-alert"/></svg></span>
                         <span>예상부과금액: 국민연금 3,567원 / 건강보험 12,500원</span>
                       </p>
-                      <p class="acq-estimate__note">※ 실제 부과금액 및 반영 시기는 신고일, 보수월액, 기관 처리 일정 등에 따라 달라질 수 있어요.</p>
+                      <p class="acq-estimate__note banner__message">※ 실제 부과금액 및 반영 시기는 신고일, 보수월액, 기관 처리 일정 등에 따라 달라질 수 있어요.</p>
                     </div>
                   </div>
 
@@ -761,15 +761,15 @@ exits: index.html
 
                   <div class="banner banner--caution" role="status">
                     <div class="text-description banner__body acq-estimate__body">
-                      <p class="acq-estimate__line">
+                      <p class="acq-estimate__line banner__message">
                         <span class="icon--sm banner__icon" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-triangle-alert"/></svg></span>
                         <span>예상 반영 고지월: 고용보험 2026-01</span>
                       </p>
-                      <p class="acq-estimate__line">
+                      <p class="acq-estimate__line banner__message">
                         <span class="icon--sm banner__icon" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-triangle-alert"/></svg></span>
                         <span>예상부과금액: 고용보험 20,700원</span>
                       </p>
-                      <p class="acq-estimate__note">※ 실제 부과금액 및 반영 시기는 신고일, 보수월액, 기관 처리 일정 등에 따라 달라질 수 있어요.</p>
+                      <p class="acq-estimate__note banner__message">※ 실제 부과금액 및 반영 시기는 신고일, 보수월액, 기관 처리 일정 등에 따라 달라질 수 있어요.</p>
                     </div>
                   </div>
 
@@ -988,15 +988,15 @@ exits: index.html
 
                   <div class="banner banner--caution" role="status">
                     <div class="text-description banner__body acq-estimate__body">
-                      <p class="acq-estimate__line">
+                      <p class="acq-estimate__line banner__message">
                         <span class="icon--sm banner__icon" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-triangle-alert"/></svg></span>
                         <span>예상 반영 고지월: 국민연금 2026-01 / 건강보험 2025-12</span>
                       </p>
-                      <p class="acq-estimate__line">
+                      <p class="acq-estimate__line banner__message">
                         <span class="icon--sm banner__icon" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-triangle-alert"/></svg></span>
                         <span>예상부과금액: 국민연금 3,567원 / 건강보험 12,500원</span>
                       </p>
-                      <p class="acq-estimate__note">※ 실제 부과금액 및 반영 시기는 신고일, 보수월액, 기관 처리 일정 등에 따라 달라질 수 있어요.</p>
+                      <p class="acq-estimate__note banner__message">※ 실제 부과금액 및 반영 시기는 신고일, 보수월액, 기관 처리 일정 등에 따라 달라질 수 있어요.</p>
                     </div>
                   </div>
 
@@ -1357,9 +1357,9 @@ exits: index.html
     var icon = '<span class="icon--sm banner__icon" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-triangle-alert"/></svg></span>';
     var html =
       '<div class="text-description banner__body acq-estimate__body">' +
-        '<p class="acq-estimate__line">' + icon + '<span>예상 반영 고지월: ' + notice + '</span></p>' +
-        '<p class="acq-estimate__line">' + icon + '<span>예상부과금액: ' + amount + '</span></p>' +
-        '<p class="acq-estimate__note">※ 실제 부과금액 및 반영 시기는 신고일, 보수월액, 기관 처리 일정 등에 따라 달라질 수 있어요.</p>' +
+        '<p class="acq-estimate__line banner__message">' + icon + '<span>예상 반영 고지월: ' + notice + '</span></p>' +
+        '<p class="acq-estimate__line banner__message">' + icon + '<span>예상부과금액: ' + amount + '</span></p>' +
+        '<p class="acq-estimate__note banner__message">※ 실제 부과금액 및 반영 시기는 신고일, 보수월액, 기관 처리 일정 등에 따라 달라질 수 있어요.</p>' +
       '</div>';
 
     if (existing) { existing.innerHTML = html; return; }
