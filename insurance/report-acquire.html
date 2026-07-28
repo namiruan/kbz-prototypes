@@ -72,14 +72,15 @@
     .acq-ins-item__detail { min-width: 0; color: var(--color-text-subtle); font-size: var(--font-size-sm); }
     /* 제외사유 드롭다운이 들어가는 detail 셀 — 드롭다운 자체 폭 유지 */
     .acq-ins-item__detail--control { justify-self: start; }
-    /* 예상보험료 배너 본문 — 줄 사이 간격 */
-    /* 예상보험료 배너 — 기획 레이아웃: 데이터 줄마다 아이콘, ※ 문구는 아이콘 없이 분리.
-       텍스트는 label-small(12px). caution 색/배경은 DS banner--caution 그대로 유지. */
-    .acq-estimate__body { gap: var(--space-gap-2xs); }
-    /* 폰트 크기·색은 DS banner__message가 담당(단일 소스). 여기선 줄 레이아웃만 정의. */
-    .acq-estimate__line { display: flex; align-items: flex-start; gap: var(--space-gap-xs); margin: 0; }
-    .acq-estimate__line .banner__icon { margin-top: 1px; }   /* 16px 아이콘을 텍스트 첫 줄에 맞춤 */
-    .acq-estimate__note { margin: var(--space-gap-sm) 0 0; }
+    /* 예상보험료 요약 — 배너가 아니라 모달 푸터 좌측에 전체 노출(이미지 패턴).
+       계산 결과라 액션(신고요청) 옆에 두어 제출 시점에 함께 보이게 한다. */
+    .modal__footer { align-items: center; }   /* 좌측 요약(다줄)과 우측 버튼 세로 가운데 정렬 */
+    .acq-estimate-footer { margin-right: auto; display: flex; flex-direction: column; gap: var(--space-gap-2xs); text-align: left; min-width: 0; }
+    .acq-estimate-footer[hidden] { display: none; }
+    .acq-estimate-footer__line { display: flex; gap: var(--space-gap-sm); margin: 0; font-size: var(--font-size-sm); line-height: var(--line-height-reading); }
+    .acq-estimate-footer__label { flex-shrink: 0; color: var(--color-text-subtle); }
+    .acq-estimate-footer__value { color: var(--color-text-body); font-weight: var(--font-weight-heading); }
+    .acq-estimate-footer__note { margin: 0; font-size: var(--font-size-label); color: var(--color-text-subtle); }
     /* 로딩 스켈레톤 행 */
     .acq-skeleton-row { display: flex; gap: var(--space-gap-md); }
     .acq-skeleton-row > * { flex: 1; }
@@ -276,21 +277,6 @@ exits: index.html
                     </div>
                   </div>
 
-                  <!-- ── 5-1 area: 예상보험료 안내 배너 ── -->
-                  <div class="banner banner--caution" role="status" id="s1-estimate">
-                    <div class="text-description banner__body acq-estimate__body">
-                      <p class="acq-estimate__line banner__message">
-                        <span class="icon--sm banner__icon" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-triangle-alert"/></svg></span>
-                        <span>예상 반영 고지월: 국민연금 2026-01 / 건강보험 2025-12</span>
-                      </p>
-                      <p class="acq-estimate__line banner__message">
-                        <span class="icon--sm banner__icon" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-triangle-alert"/></svg></span>
-                        <span>예상부과금액: 국민연금 3,567원 / 건강보험 12,500원</span>
-                      </p>
-                      <p class="acq-estimate__note banner__message">※ 실제 부과금액 및 반영 시기는 신고일, 보수월액, 기관 처리 일정 등에 따라 달라질 수 있어요.</p>
-                    </div>
-                  </div>
-
                   <!-- ── 7·7-1 area: 직종 선택 ── -->
                   <div class="form-field">
                     <label class="form-field__label text-form-label" for="s1-job">직종 선택 <span class="form-field__required" aria-hidden="true">(필수)</span></label>
@@ -320,8 +306,13 @@ exits: index.html
             </div>
           </div>
 
-          <!-- ── 9·10·11 area: 취소 / 임시저장 / 신고요청 ── -->
+          <!-- ── 9·10·11 area: 예상보험료 요약(좌) · 취소 / 임시저장 / 신고요청(우) ── -->
           <div class="modal__footer">
+            <div class="acq-estimate-footer" role="status">
+              <p class="acq-estimate-footer__line"><span class="acq-estimate-footer__label">예상 반영 고지월</span><span class="acq-estimate-footer__value">국민연금 2026-01 / 건강보험 2025-12</span></p>
+              <p class="acq-estimate-footer__line"><span class="acq-estimate-footer__label">예상 부과금액</span><span class="acq-estimate-footer__value">국민연금 3,567원 / 건강보험 12,500원</span></p>
+              <p class="acq-estimate-footer__note">※ 실제 부과금액 및 반영 시기는 신고일, 보수월액, 기관 처리 일정 등에 따라 달라질 수 있어요.</p>
+            </div>
             <button class="btn btn--ghost btn--md" type="button" data-overlay-open="overlay-cancel">취소</button>
             <button class="btn btn--secondary btn--solid btn--md" type="button" data-overlay-open="overlay-draft">임시저장</button>
             <button class="btn btn--primary btn--md" type="button" id="s1-submit">신고요청</button>
@@ -764,20 +755,6 @@ exits: index.html
                     </div>
                   </div>
 
-                  <div class="banner banner--caution" role="status">
-                    <div class="text-description banner__body acq-estimate__body">
-                      <p class="acq-estimate__line banner__message">
-                        <span class="icon--sm banner__icon" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-triangle-alert"/></svg></span>
-                        <span>예상 반영 고지월: 고용보험 2026-01</span>
-                      </p>
-                      <p class="acq-estimate__line banner__message">
-                        <span class="icon--sm banner__icon" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-triangle-alert"/></svg></span>
-                        <span>예상부과금액: 고용보험 20,700원</span>
-                      </p>
-                      <p class="acq-estimate__note banner__message">※ 실제 부과금액 및 반영 시기는 신고일, 보수월액, 기관 처리 일정 등에 따라 달라질 수 있어요.</p>
-                    </div>
-                  </div>
-
                   <div class="form-field">
                     <label class="form-field__label text-form-label" for="s4-job">직종 선택 <span class="form-field__required" aria-hidden="true">(필수)</span></label>
                     <div class="form-field__body">
@@ -806,6 +783,11 @@ exits: index.html
           </div>
 
           <div class="modal__footer">
+            <div class="acq-estimate-footer" role="status">
+              <p class="acq-estimate-footer__line"><span class="acq-estimate-footer__label">예상 반영 고지월</span><span class="acq-estimate-footer__value">고용보험 2026-01</span></p>
+              <p class="acq-estimate-footer__line"><span class="acq-estimate-footer__label">예상 부과금액</span><span class="acq-estimate-footer__value">고용보험 20,700원</span></p>
+              <p class="acq-estimate-footer__note">※ 실제 부과금액 및 반영 시기는 신고일, 보수월액, 기관 처리 일정 등에 따라 달라질 수 있어요.</p>
+            </div>
             <button class="btn btn--ghost btn--md" type="button" data-overlay-open="overlay-cancel">취소</button>
             <button class="btn btn--secondary btn--solid btn--md" type="button" data-overlay-open="overlay-draft">임시저장</button>
             <button class="btn btn--primary btn--md" type="button" id="s4-submit">신고요청</button>
@@ -991,20 +973,6 @@ exits: index.html
                     </div>
                   </div>
 
-                  <div class="banner banner--caution" role="status">
-                    <div class="text-description banner__body acq-estimate__body">
-                      <p class="acq-estimate__line banner__message">
-                        <span class="icon--sm banner__icon" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-triangle-alert"/></svg></span>
-                        <span>예상 반영 고지월: 국민연금 2026-01 / 건강보험 2025-12</span>
-                      </p>
-                      <p class="acq-estimate__line banner__message">
-                        <span class="icon--sm banner__icon" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-triangle-alert"/></svg></span>
-                        <span>예상부과금액: 국민연금 3,567원 / 건강보험 12,500원</span>
-                      </p>
-                      <p class="acq-estimate__note banner__message">※ 실제 부과금액 및 반영 시기는 신고일, 보수월액, 기관 처리 일정 등에 따라 달라질 수 있어요.</p>
-                    </div>
-                  </div>
-
                   <div class="form-field">
                     <label class="form-field__label text-form-label" for="s5-job">직종 선택 <span class="form-field__required" aria-hidden="true">(필수)</span></label>
                     <div class="form-field__body">
@@ -1033,6 +1001,11 @@ exits: index.html
           </div>
 
           <div class="modal__footer">
+            <div class="acq-estimate-footer" role="status">
+              <p class="acq-estimate-footer__line"><span class="acq-estimate-footer__label">예상 반영 고지월</span><span class="acq-estimate-footer__value">국민연금 2026-01 / 건강보험 2025-12</span></p>
+              <p class="acq-estimate-footer__line"><span class="acq-estimate-footer__label">예상 부과금액</span><span class="acq-estimate-footer__value">국민연금 3,567원 / 건강보험 12,500원</span></p>
+              <p class="acq-estimate-footer__note">※ 실제 부과금액 및 반영 시기는 신고일, 보수월액, 기관 처리 일정 등에 따라 달라질 수 있어요.</p>
+            </div>
             <button class="btn btn--ghost btn--md" type="button" data-overlay-open="overlay-cancel">취소</button>
             <button class="btn btn--secondary btn--solid btn--md" type="button" data-overlay-open="overlay-draft">임시저장</button>
             <button class="btn btn--primary btn--md" type="button" id="s5-submit">다시 시도</button>
@@ -1337,17 +1310,16 @@ exits: index.html
     }).map(rowName);
   }
 
-  /* ── 9. 예상보험료 배너 단일 렌더 함수 (3·5·7번 공유) ──
-     정적 패널과 동일한 클래스를 사용한다 — 새 클래스를 만들지 않는다. */
+  /* ── 9. 예상보험료 요약 렌더 — 모달 푸터 좌측(.acq-estimate-footer)에 전체 노출.
+     배너가 아니라 액션 옆 요약이라 계산 결과를 제출 시점에 함께 보여준다. */
   function renderEstimate(panel) {
-    var form = panel.querySelector('.acq-form');
-    if (!form) return;
-    var existing = form.querySelector('.banner--caution');
+    var footer = panel.querySelector('.acq-estimate-footer');
+    if (!footer) return;
     var payEl = q(panel, '-pay');
     var pay = payEl ? Number(digits(payEl.value)) : 0;
 
     var names = checkedInsurances(panel).filter(function (n) { return n !== '산재보험' && RATE[n]; });
-    if (!pay || !names.length) { if (existing) existing.remove(); return; }
+    if (!pay || !names.length) { footer.hidden = true; footer.innerHTML = ''; return; }
 
     var wish = panel.querySelector('input[name$="-pension"]:checked');
     var wishYes = !!(wish && wish.parentElement.querySelector('.radio__label').textContent.trim() === '희망');
@@ -1359,21 +1331,11 @@ exits: index.html
       return n + ' ' + comma(Math.round(pay * RATE[n] / 10) * 10) + '원';
     }).join(' / ');
 
-    var icon = '<span class="icon--sm banner__icon" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-triangle-alert"/></svg></span>';
-    var html =
-      '<div class="text-description banner__body acq-estimate__body">' +
-        '<p class="acq-estimate__line banner__message">' + icon + '<span>예상 반영 고지월: ' + notice + '</span></p>' +
-        '<p class="acq-estimate__line banner__message">' + icon + '<span>예상부과금액: ' + amount + '</span></p>' +
-        '<p class="acq-estimate__note banner__message">※ 실제 부과금액 및 반영 시기는 신고일, 보수월액, 기관 처리 일정 등에 따라 달라질 수 있어요.</p>' +
-      '</div>';
-
-    if (existing) { existing.innerHTML = html; return; }
-    var el = document.createElement('div');
-    el.className = 'banner banner--caution';
-    el.setAttribute('role', 'status');
-    el.innerHTML = html;
-    var jobField = form.querySelector(':scope > .form-field');   /* 직종 선택 바로 앞 = 정적 패널과 같은 위치 */
-    if (jobField) form.insertBefore(el, jobField); else form.appendChild(el);
+    footer.hidden = false;
+    footer.innerHTML =
+      '<p class="acq-estimate-footer__line"><span class="acq-estimate-footer__label">예상 반영 고지월</span><span class="acq-estimate-footer__value">' + notice + '</span></p>' +
+      '<p class="acq-estimate-footer__line"><span class="acq-estimate-footer__label">예상 부과금액</span><span class="acq-estimate-footer__value">' + amount + '</span></p>' +
+      '<p class="acq-estimate-footer__note">※ 실제 부과금액 및 반영 시기는 신고일, 보수월액, 기관 처리 일정 등에 따라 달라질 수 있어요.</p>';
   }
 
   /* ── 6. 연금 취득월납부(6 area) 노출 조건 ── */
