@@ -80,7 +80,7 @@
 <body>
 <!-- @flow
 title: 4대보험 가입현황
-exits: report-acquire.html, report-change.html, report-leave.html, report-loss.html, worker-insurance-tab.html, index.html
+exits: report-acquire.html, report-loss.html, report-transfer.html, report-change.html, report-correction.html, report-leave.html, report-return.html, worker-insurance-tab.html, index.html
 -->
 
 
@@ -1505,23 +1505,21 @@ exits: report-acquire.html, report-change.html, report-leave.html, report-loss.h
      파일 분리 구조. 아직 만들지 않은 파일로 보내면 404가 나므로,
      BUILT에 등록된 파일만 실제 이동하고 나머지는 안내 Alert을 띄운다.
      파일을 새로 만들면 BUILT에 한 줄 추가하는 것으로 전환된다. */
+  /* Figma 분류 — 신고 유형별 Layer Modal은 각각 별도 파일. 정정신고는 한 파일에서
+     자격상태(취득/상실)에 따라 항목만 달라지는 단일 모달이다. */
   var REPORT_FILE = {
     '취득':      'report-acquire.html',
     '상실':      'report-loss.html',
-    '사업장 이동': 'report-change.html',
+    '사업장 이동': 'report-transfer.html',
     '보수변경':   'report-change.html',
+    '정정':      'report-correction.html',
     '휴직':      'report-leave.html',
-    '복직':      'report-leave.html'
+    '복직':      'report-return.html'
   };
-  var BUILT = { 'report-acquire.html': true, 'report-loss.html': true, 'report-change.html': true };   /* 작성 완료된 신고 파일: 취득·상실·사업장 이동. */
+  /* 작성 완료된 신고 파일만 실제 이동. 나머지는 안내 Alert. */
+  var BUILT = { 'report-acquire.html': true, 'report-loss.html': true, 'report-transfer.html': true };
 
-  /* 정정은 드롭다운 값이 '정정' 하나뿐이라 행의 자격 상태로 대상 파일이 갈린다.
-     ⚠️ Figma에 정정신고(취득)·정정신고(상실)이 별도 프레임이라 이렇게 추정했다 — 확인 필요. */
   function reportFile(kind, row) {
-    if (kind === '정정') {
-      var st = row && row.querySelector('td.table__cell--fit .badge');
-      return (st && st.textContent.trim() === '상실') ? 'report-loss.html' : 'report-acquire.html';
-    }
     return REPORT_FILE[kind] || 'index.html';
   }
 
