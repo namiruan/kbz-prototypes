@@ -1103,10 +1103,10 @@ exits: index.html
       err.textContent = msg; err.removeAttribute('hidden');
     } else {
       field.classList.remove('form-field--error');
-      if (wrap) wrap.classList.add('input-wrap--icon-right');
-      if (input) { input.classList.remove('input--error','input--complete'); input.classList.add('input--success'); input.removeAttribute('aria-invalid'); }
-      if (iconUse) iconUse.setAttribute('href','#icon-check');
-      if (icon) icon.removeAttribute('hidden');
+      /* DS: 입력이 완료된(유효한) 필드는 complete 상태로 표시. success는 필요 시 선택적으로만 사용. */
+      if (input) { input.classList.remove('input--error','input--success'); input.classList.add('input--complete'); input.removeAttribute('aria-invalid'); input.removeAttribute('aria-describedby'); }
+      if (wrap) wrap.classList.remove('input-wrap--icon-right');
+      if (icon) icon.setAttribute('hidden','');
       err.setAttribute('hidden','');
     }
   }
