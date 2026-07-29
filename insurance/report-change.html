@@ -23,18 +23,18 @@
        좌측 아래 빈 여백 없이 드롭 대상이 커지도록 한다. */
     .acq-grid > .file-upload { height: 100%; }
     .acq-grid > .file-upload .file-upload__dropzone { flex: 1 1 auto; }
-    /* 헤더 설명문 강조 어절 — subtle 본문 안에서 보험명만 본문 톤 + heading 굵기로 구분 */
-    .modal__description b { color: var(--color-text-body); font-weight: var(--font-weight-heading); }
     /* 자격 안내 배너 — 헤더 아래 전체폭. 조건 목록이 있어 헤더 밀착(상단 패딩 제거). */
     .acq-intro-banner { margin-bottom: var(--space-gap-xl); }
     .modal:not(.modal--lg) .modal__content:has(> .acq-intro-banner) { padding-top: 0; }
+    /* 성격이 다른 두 안내(자진신고 제약 · 국민연금 조건)를 각각 타이틀 블록으로 구분 — 블록 간 간격을 넓게 */
+    .acq-elig-body { gap: var(--space-gap-lg); }
+    .acq-elig-block { display: flex; flex-direction: column; gap: var(--space-gap-xs); }
     /* 국민연금 변경신고 자격 조건 — a·b(알파벳) 순서 목록. 배너 본문 톤(brand) 상속 */
     .acq-elig-list { margin: 0; padding-left: var(--space-inset-xl); list-style: lower-alpha; display: flex; flex-direction: column; gap: var(--space-gap-2xs); font-size: var(--font-size-sm); line-height: var(--line-height-reading); }
     /* 조건 부연(적용 시점) — 한 톤 옅게 */
     .acq-elig-cond { opacity: 0.8; }
-    /* b 조건 종속 고지 — 20% 변동 시 선택·증빙. b 아래 들여쓰기 + 좌측 강조선으로 b에 속함을 표시.
-       배너 내부라 별도 채움 없이 좌측선·들여쓰기로만 구분(박스 중첩 방지). */
-    .acq-elig-note { margin: var(--space-gap-xs) 0 var(--space-gap-2xs); padding-left: var(--space-inset-md); border-left: var(--stroke-md) solid currentColor; }
+    /* b 조건 종속 고지 — 20% 변동 시 선택·증빙. b의 li 안에 위치해 자연 들여쓰기로 종속 표시 */
+    .acq-elig-note { margin: var(--space-gap-xs) 0 var(--space-gap-2xs); }
     .acq-elig-note b { font-weight: var(--font-weight-heading); }
     /* 폼 세로 스택 — form-field-group보다 섹션 간격을 넓게 */
     .acq-form { display: flex; flex-direction: column; gap: var(--space-gap-xl); }
@@ -255,30 +255,31 @@ exits: index.html
       <div class="page">
         <div class="modal" role="dialog" aria-modal="true" aria-labelledby="p1-title" style="width:958px;max-width:100%">
 
-          <!-- 1 area — 신고서 전반 자격 안내는 헤더 설명문(modal__description)으로.
-               자진신고 사업장 제약은 모달 전체에 걸린 조건이라 헤더에 상시 노출한다. -->
           <div class="modal__header">
-            <div class="modal__header-text">
-              <h2 class="modal__title text-modal-title-sm" id="p1-title">보수 변경신고</h2>
-              <p class="text-description modal__description">자진신고 사업장은 <b>고용보험</b> 및 <b>산재보험</b> 보수변경 신고를 할 수 없습니다.</p>
-            </div>
+            <h2 class="modal__title text-modal-title-sm" id="p1-title">보수 변경신고</h2>
             <button class="icon-on--lg" type="button" aria-label="닫기"><svg aria-hidden="true"><use href="#icon-close"/></svg></button>
           </div>
 
           <div class="modal__body">
             <div class="modal__content">
-              <!-- 국민연금 소득월액 변경신고 자격 — 조건(a·b)이 있는 별도 안내라 배너로 강조.
+              <!-- 1 area — 신고 자격 안내 배너. 성격이 다른 두 안내를 각각 타이틀로 구분한다:
+                   ① 자진신고 사업장의 고용·산재 신고 제약, ② 국민연금 변경신고 가능 조건(a·b).
                    20% 변동에 따른 선택·증빙 고지는 b 조건에 속하므로 b 아래에 종속 표기. -->
               <div class="banner acq-intro-banner" role="status">
                 <span class="icon--md banner__icon" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-info"/></svg></span>
-                <div class="text-description banner__body">
-                  <p class="banner__title">국민연금 소득월액 변경신고는 다음 경우에만 가능합니다</p>
-                  <ol class="acq-elig-list">
-                    <li>취득신고 시 보수를 잘못 신고한 경우 <span class="acq-elig-cond">(입사일 기준으로 적용)</span></li>
-                    <li>보수가 20% 이상 변동(인상·인하)된 경우 <span class="acq-elig-cond">(신고월 다음 달부터 적용)</span>
-                      <p class="acq-elig-note">※ 이 경우 국민연금 소득월액 변경신고는 의무가 아닌 <b>선택사항</b>이며, 신고 시 <b>증빙서류</b>를 반드시 첨부해야 합니다.</p>
-                    </li>
-                  </ol>
+                <div class="text-description banner__body acq-elig-body">
+                  <div class="acq-elig-block">
+                    <p class="banner__title">자진신고 사업장은 고용보험 및 산재보험 보수변경 신고를 할 수 없습니다</p>
+                  </div>
+                  <div class="acq-elig-block">
+                    <p class="banner__title">국민연금 소득월액 변경신고는 다음 경우에만 가능합니다</p>
+                    <ol class="acq-elig-list">
+                      <li>취득신고 시 보수를 잘못 신고한 경우 <span class="acq-elig-cond">(입사일 기준으로 적용)</span></li>
+                      <li>보수가 20% 이상 변동(인상·인하)된 경우 <span class="acq-elig-cond">(신고월 다음 달부터 적용)</span>
+                        <p class="acq-elig-note">※ 이 경우 국민연금 소득월액 변경신고는 의무가 아닌 <b>선택사항</b>이며, 신고 시 <b>증빙서류</b>를 반드시 첨부해야 합니다.</p>
+                      </li>
+                    </ol>
+                  </div>
                 </div>
               </div>
 
