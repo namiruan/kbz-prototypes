@@ -325,7 +325,7 @@ exits: index.html
                       <div class="form-field__body">
                         <div class="input-wrap input-wrap--suffix"><input class="input" type="text" id="s1-hours" placeholder="숫자 입력" inputmode="numeric" aria-required="true" aria-describedby="s1-hours-footer"><span class="input__suffix">시간</span></div>
                         <div class="form-field__footer" id="s1-hours-footer">
-                          <p class="form-field__error text-helper" id="s1-hours-err" role="alert">100 이하 숫자로 입력해 주세요.</p>
+                          <p class="form-field__error text-helper" id="s1-hours-err" role="alert">100시간 이하로 입력해 주세요.</p>
                         </div>
                       </div>
                     </div>
@@ -501,7 +501,7 @@ exits: index.html
                       <div class="form-field__body">
                         <div class="input-wrap input-wrap--suffix"><input class="input" type="text" id="s2-hours" placeholder="숫자 입력" inputmode="numeric" aria-required="true" aria-describedby="s2-hours-footer"><span class="input__suffix">시간</span></div>
                         <div class="form-field__footer" id="s2-hours-footer">
-                          <p class="form-field__error text-helper" id="s2-hours-err" role="alert">100 이하 숫자로 입력해 주세요.</p>
+                          <p class="form-field__error text-helper" id="s2-hours-err" role="alert">100시간 이하로 입력해 주세요.</p>
                         </div>
                       </div>
                     </div>
@@ -1171,6 +1171,12 @@ exits: index.html
     if (icon) icon.setAttribute('hidden','');
     if (err) { err.textContent = ''; err.setAttribute('hidden',''); }
   }
+  /* 값이 비어도 이미 에러(제출 필수 등)면 상태를 유지, 아니면 중립으로 정리 */
+  function clearIfNotError(field, err) {
+    if (!field) return;
+    if (field.classList.contains('form-field--error')) return;
+    clearFieldState(field.id, err && err.id);
+  }
   function setButtonLoading(btn, label) {
     var orig = btn.dataset.origLabel || btn.textContent.trim();
     btn.dataset.origLabel = orig;
@@ -1416,15 +1422,15 @@ exits: index.html
 
     if (/-hours$/.test(el.id)) {                                                    /* 1 */
       var raw = el.value.trim();
-      if (!raw) { clearFieldState(field.id, err.id); return; }
+      if (!raw) { clearIfNotError(field, err); return; }             /* 에러 상태면 유지(제출 필수 에러 보존) */
       if (!/^\d+$/.test(raw)) { setFieldError(field.id, err.id, '숫자만 입력해 주세요'); return; }
       var n = Number(raw);
-      setFieldError(field.id, err.id, (n < 1 || n > 100) ? '100 이하 숫자로 입력해 주세요' : '');
+      setFieldError(field.id, err.id, (n < 1 || n > 100) ? '100시간 이하로 입력해 주세요' : '');
     }
 
     if (/-pay$/.test(el.id)) {                                                      /* 2 */
       var v = el.value.trim();
-      if (!v) { clearFieldState(field.id, err.id); renderEstimate(panel); return; }
+      if (!v) { clearIfNotError(field, err); renderEstimate(panel); return; }
       if (!/^[0-9,]+$/.test(v)) { setFieldError(field.id, err.id, '숫자만 입력해 주세요'); renderEstimate(panel); return; }
       el.value = comma(digits(v));
       setFieldError(field.id, err.id, '');
@@ -1444,14 +1450,14 @@ exits: index.html
 
     if (/-hours$/.test(el.id)) {
       var v = el.value.trim();
-      if (!v) { clearFieldState(field.id, err.id); return; }
+      if (!v) { clearIfNotError(field, err); return; }
       if (!/^\d+$/.test(v)) { setFieldError(field.id, err.id, '숫자만 입력해 주세요'); return; }
       var n = Number(v);
-      if (n < 1 || n > 100) setFieldError(field.id, err.id, '100 이하 숫자로 입력해 주세요');
+      if (n < 1 || n > 100) setFieldError(field.id, err.id, '100시간 이하로 입력해 주세요');
       else clearFieldState(field.id, err.id);                 /* 유효 — 입력 중엔 중립, 확정(blur)에서 success */
     } else if (/-pay$/.test(el.id)) {
       var pv = el.value.trim();
-      if (!pv) { clearFieldState(field.id, err.id); renderEstimate(panel); return; }
+      if (!pv) { clearIfNotError(field, err); renderEstimate(panel); return; }
       if (!/^[0-9,]+$/.test(pv)) { setFieldError(field.id, err.id, '숫자만 입력해 주세요'); renderEstimate(panel); return; }
       /* 유효 — 천단위 콤마 라이브 적용(캐럿 보존) */
       var caret = el.selectionStart;
@@ -1529,9 +1535,9 @@ exits: index.html
       var v = el.value.trim(), msg = '';
       if (sfx === '-hours') {
         var n = Number(v);
-        if (!v) msg = '100 이하 숫자로 입력해 주세요';
+        if (!v) msg = '100시간 이하로 입력해 주세요';
         else if (!/^\d+$/.test(v)) msg = '숫자만 입력해 주세요';
-        else if (n < 1 || n > 100) msg = '100 이하 숫자로 입력해 주세요';
+        else if (n < 1 || n > 100) msg = '100시간 이하로 입력해 주세요';
       } else if (!v) {
         msg = '월급여액을 입력해 주세요';
       } else if (!/^[0-9,]+$/.test(v)) {
@@ -1559,9 +1565,17 @@ exits: index.html
       if (jobEmpty) { ok = false; firstBad = firstBad || jobTrigger || job; }
     }
 
+    /* 제외 사유 필수 — 활성 드롭다운이 미선택(placeholder)이면 에러 */
+    panel.querySelectorAll('.acq-ins-list .dropdown:not(.dropdown--disabled)').forEach(function (dd) {
+      var v = dd.querySelector('.dropdown__value');
+      var empty = !!(v && v.classList.contains('dropdown__value--placeholder'));
+      dd.classList.toggle('dropdown--error', empty);
+      if (empty) { ok = false; firstBad = firstBad || dd.querySelector('.dropdown__trigger') || dd; }
+    });
+
     if (!ok) {
       /* 재시도(신고요청) 시 놓친 에러로 시선 유도 — DS .motion-shake 유틸리티 사용 */
-      panel.querySelectorAll('.form-field--error').forEach(shake);
+      panel.querySelectorAll('.form-field--error, .acq-ins-list .dropdown--error').forEach(shake);
       if (firstBad && firstBad.focus) firstBad.focus();
     }
     return ok;
@@ -1574,6 +1588,14 @@ exits: index.html
     void el.offsetWidth;
     el.classList.add('motion-shake');
   }
+
+  /* 제외 사유 선택 시 에러 상태 해제 */
+  root.addEventListener('click', function (e) {
+    var opt = e.target.closest('.acq-ins-list .dropdown__option');
+    if (!opt || opt.classList.contains('dropdown__option--disabled')) return;
+    var dd = opt.closest('.dropdown');
+    if (dd) dd.classList.remove('dropdown--error');
+  });
 
   root.addEventListener('click', function (e) {
     var btn = e.target.closest('button');
