@@ -218,9 +218,10 @@
     /* 변경년월 드롭다운 — 당해년도 월 */
     .acq-change-dd, .acq-change-dd .dropdown__trigger { width: 104px; }
     .acq-change-dd .dropdown__value { overflow: hidden; text-overflow: ellipsis; }
-    /* 변경 전/후 보수월액 — 금액(콤마) + '원'. 값 폭에 맞춰 컴팩트하게 */
-    .acq-form .input-wrap--suffix:has(input[id$="prevpay"]),
-    .acq-form .input-wrap--suffix:has(input[id$="newpay"]) { max-width: 128px; }
+    /* 변경 전 보수월액 — 읽기 전용, 값 폭에 맞춰 컴팩트 */
+    .acq-form .input-wrap--suffix:has(input[id$="prevpay"]) { max-width: 128px; }
+    /* 변경 후 보수월액 — 천만원(8자리) 단위까지 여유롭게 입력 가능하도록 넓힘 */
+    .acq-form .input-wrap--suffix:has(input[id$="newpay"]) { max-width: 160px; }
     /* 변경 후 보수월액 에러는 한 줄 유지 — 필드가 에러 문구 폭만큼 늘어나되 2줄로 접히지 않게 */
     .acq-form .form-field:has(input[id$="-newpay"]) .form-field__error { white-space: nowrap; }
     /* 변동율 — 변경 후 보수월액 바로 오른쪽. 라벨은 옆 필드 라벨과 나란히, 배지는 입력 박스(height-base) 세로 중앙에 맞춘다 */
@@ -250,6 +251,8 @@
     .acq-doc-dl { display: inline-flex; vertical-align: middle; margin-left: var(--space-gap-2xs); color: var(--color-text-brand); }
     /* 보충 안내 — 목록 아래 불릿, 옅게 */
     .acq-doc-notes { margin: var(--space-gap-sm) 0 0; padding-left: var(--space-inset-lg); list-style: disc; display: flex; flex-direction: column; gap: var(--space-gap-2xs); color: var(--color-text-subtle); font-size: var(--font-size-sm); }
+    /* 신고요청 확인 — 기준보수 반영 위치 경로 안내(체크박스 라벨 아래, 옅게·들여쓰기) */
+    .acq-submit-path { margin: var(--space-gap-2xs) 0 0; padding-left: calc(var(--icon-md) + var(--space-gap-sm)); color: var(--color-text-subtle); font-size: var(--font-size-label); }
   </style>
 </head>
 <body>
@@ -1185,16 +1188,16 @@ exits: index.html
 <div id="overlay-submit" data-overlay>
   <div class="alert" role="alertdialog" aria-modal="true" aria-labelledby="submit-title" aria-describedby="submit-body">
     <div class="alert__header">
-      <p class="text-card-title alert__title" id="submit-title">4대보험 보수변경신고를 진행할까요?</p>
+      <p class="text-card-title alert__title" id="submit-title">4대보험 보수변경신고를 진행하시겠습니까?</p>
       <button class="icon-on--sm alert__close" type="button" aria-label="닫기" data-overlay-close><svg aria-hidden="true"><use href="#icon-close"/></svg></button>
     </div>
     <div class="alert__body" id="submit-body">
-      <p class="text-description alert__description">입력한 보수 변경 정보가 전산망으로 전송돼요.</p>
-      <label class="checkbox" style="margin-top:var(--space-gap-md)">
-        <input type="checkbox" id="submit-reflect" checked>
+      <label class="checkbox">
+        <input type="checkbox" id="submit-reflect">
         <span class="checkbox__control" aria-hidden="true"><span class="checkbox__icon-check"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span>
         <span class="checkbox__label">보수변경신고 처리완료 시 4대보험 기준보수 금액에 반영합니다. <span class="form-field__optional">(선택)</span></span>
       </label>
+      <p class="text-helper acq-submit-path">[근로자 관리 › 근로자 정보 › 급여 정보 › 4대보험]</p>
     </div>
     <div class="alert__footer">
       <button class="btn btn--ghost btn--md" type="button" data-overlay-close>취소</button>
@@ -1583,8 +1586,8 @@ exits: index.html
       if (dir && dir !== reason) {
         setSegReason(e.reason, dir); reason = dir;
         markNewpay(panel, 'error', dir === '보수인상'
-          ? '보수인하로 신고할 수 없어요.'
-          : '보수인상으로 신고할 수 없어요.');
+          ? '보수가 인상된 변경사유예요.'
+          : '보수가 인하된 변경사유예요.');
         shake(e.newpay.closest('.form-field'));
       } else {
         markNewpay(panel, e.newpay.value.trim() ? 'complete' : 'neutral');
