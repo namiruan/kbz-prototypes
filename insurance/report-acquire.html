@@ -39,7 +39,7 @@
        전체를 클릭하면 모달이 열린다(DatePicker·Dropdown의 '트리거로 패널 열기' 관례). */
     .acq-job-trigger {
       display: flex; align-items: center; justify-content: space-between; gap: var(--space-gap-sm);
-      width: 100%; max-width: 320px;
+      width: 100%;
       height: var(--height-base);
       padding: 0 var(--space-inset-lg);
       background: var(--color-surface-base);
@@ -52,7 +52,6 @@
     }
     /* 가로 그룹 안의 직종 선택: 남는 가로폭을 채우도록 확장 */
     .acq-form .form-field-group--horizontal > .form-field:has(.acq-job-trigger) { flex: 1 1 auto; }
-    .form-field-group--horizontal .acq-job-trigger { max-width: none; }
     .acq-job-trigger:hover { border-color: var(--color-border-brand); }
     .acq-job-trigger__value { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .acq-job-trigger--placeholder .acq-job-trigger__value { color: var(--color-text-subtle); }
@@ -129,7 +128,7 @@
        입력 형식이 유추되는(자릿수 고정·상한 있는) 필드에만 적용. */
     /* 근로시간·급여액은 suffix addon(시간·원) 래퍼를 쓰므로 폭을 래퍼에 지정 */
     .acq-form .input-wrap--suffix:has(input[id$="-hours"]) { max-width: 140px; }   /* 주소정근로시간: ≤100 + '시간' */
-    .acq-form .input-wrap--suffix:has(input[id$="-pay"])   { max-width: 210px; }   /* 월급여액: 금액 + '원' */
+    .acq-form .input-wrap--suffix:has(input[id$="-pay"])   { max-width: 178px; }   /* 월급여액: 금액 + '원' */
     /* error·success 상태 시 suffix 테두리도 동기화(DS는 complete·readonly만 처리) */
     .input-wrap--suffix:has(.input--error) .input__suffix { border-color: var(--color-border-error); }
     .input-wrap--suffix:has(.input--success) .input__suffix { border-color: var(--color-border-success); }
