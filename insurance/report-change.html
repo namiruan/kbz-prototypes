@@ -904,7 +904,9 @@ exits: index.html
     var newv = num(e.newpay && e.newpay.value);
     var isPayChange = reason === '보수인상' || reason === '보수인하';
     var rate = (isPayChange && haveNew && prev > 0) ? Math.round((newv - prev) / prev * 100) : null;
-    var over20 = rate != null && Math.abs(rate) >= 20;
+    /* 20% 트리거(국민연금 활성화·제출서류)는 선택한 사유 방향과 일치할 때만 —
+       인상은 +20% 이상, 인하는 -20% 이하. (인상인데 값이 낮아 음수가 되는 등 방향 불일치는 트리거 안 함) */
+    var over20 = rate != null && ((reason === '보수인상' && rate >= 20) || (reason === '보수인하' && rate <= -20));
 
     if (reason === '착오정정') {
       /* 착오정정: 고용·산재·국민연금 잠금 체크, 건강만 해제 가능(체크 여부는 사용자 값 보존) */
