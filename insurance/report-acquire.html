@@ -966,6 +966,39 @@ exits: index.html
 
 </div>
 
+<!-- ══════════════ 첨부 이미지 미리보기 라이트박스 (DS image-preview) ══════════════ -->
+<div class="image-preview" id="acq-image-preview" role="dialog" aria-modal="true" aria-label="이미지 미리보기">
+  <div class="image-preview__scrim" id="acq-ip-scrim" aria-hidden="true"></div>
+  <div class="image-preview__topbar">
+    <span class="text-body image-preview__filename" id="acq-ip-filename"></span>
+    <div class="image-preview__topbar-actions">
+      <button class="btn btn--secondary btn--sm btn--icon-left" type="button" id="acq-ip-download">
+        <span class="icon icon--sm" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-download"/></svg></span>다운로드
+      </button>
+      <button class="btn btn--secondary btn--sm btn--icon-left" type="button" id="acq-ip-delete">
+        <span class="icon icon--sm" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-delete"/></svg></span>삭제
+      </button>
+      <button class="btn btn--ghost-inverse btn--sm btn--icon-only" type="button" aria-label="닫기" id="acq-ip-close">
+        <span class="icon icon--sm" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-close"/></svg></span>
+      </button>
+    </div>
+  </div>
+  <div class="image-preview__card">
+    <div class="image-preview__body">
+      <img class="image-preview__img" id="acq-ip-img" src="" alt="확대 이미지">
+    </div>
+  </div>
+  <div class="image-preview__toolbar">
+    <button class="btn btn--ghost-inverse btn--sm btn--icon-only" type="button" aria-label="축소" id="acq-ip-zoom-out">
+      <span class="icon icon--sm" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-minus"/></svg></span>
+    </button>
+    <span class="text-body image-preview__zoom-label" id="acq-ip-zoom-label">100%</span>
+    <button class="btn btn--ghost-inverse btn--sm btn--icon-only" type="button" aria-label="확대" id="acq-ip-zoom-in">
+      <span class="icon icon--sm" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-plus"/></svg></span>
+    </button>
+  </div>
+</div>
+
 <!-- ══════════════ 9 area — 취소 확인 (Alert) ══════════════ -->
 <div id="overlay-cancel" data-overlay>
   <div class="alert" role="alertdialog" aria-modal="true" aria-labelledby="cancel-title" aria-describedby="cancel-body">
@@ -1095,6 +1128,7 @@ exits: index.html
     if (typeof initDropdown === 'function')   root.querySelectorAll('.dropdown').forEach(function(el) { initDropdown(el.parentElement); });
     if (typeof initSegment === 'function')    root.querySelectorAll('.segment').forEach(function(el) { initSegment(el.parentElement); });
     if (typeof initFileUpload === 'function') initFileUpload(root);   /* DS initFileUpload(container)는 컨테이너 안의 .file-upload를 탐색 — 요소가 아닌 root를 넘긴다 */
+    if (typeof initImagePreview === 'function') initImagePreview(root);   /* 첨부 이미지 라이트박스(미리보기) */
   }
   _initComponents();
 
@@ -1119,6 +1153,18 @@ exits: index.html
       if (icon) icon.removeAttribute('hidden');
       err.setAttribute('hidden','');
     }
+  }
+  /* 값이 비워지면 success·error·complete 상태를 모두 해제해 중립(기본)으로 되돌린다 */
+  function clearFieldState(fieldId, errId) {
+    var field = document.getElementById(fieldId), err = document.getElementById(errId);
+    if (!field) return;
+    var wrap = field.querySelector('.input-wrap'), input = field.querySelector('input,textarea,select');
+    var icon = field.querySelector('.input-icon');
+    field.classList.remove('form-field--error');
+    if (wrap) wrap.classList.remove('input-wrap--icon-right');
+    if (input) { input.classList.remove('input--error','input--success','input--complete'); input.removeAttribute('aria-invalid'); input.removeAttribute('aria-describedby'); }
+    if (icon) icon.setAttribute('hidden','');
+    if (err) { err.textContent = ''; err.setAttribute('hidden',''); }
   }
   function setButtonLoading(btn, label) {
     var orig = btn.dataset.origLabel || btn.textContent.trim();
@@ -1365,14 +1411,14 @@ exits: index.html
 
     if (/-hours$/.test(el.id)) {                                                    /* 1 */
       var raw = el.value.trim();
-      if (!raw) return;
+      if (!raw) { clearFieldState(field.id, err.id); return; }
       var n = Number(raw);
       setFieldError(field.id, err.id, (!/^\d+$/.test(raw) || n < 1 || n > 100) ? '100 이하 숫자로 입력해 주세요' : '');
     }
 
     if (/-pay$/.test(el.id)) {                                                      /* 2 */
       var v = el.value.trim();
-      if (!v) return;
+      if (!v) { clearFieldState(field.id, err.id); renderEstimate(panel); return; }
       var onlyNum = /^[0-9,]+$/.test(v);
       setFieldError(field.id, err.id, onlyNum ? '' : '숫자만 입력해 주세요');
       if (onlyNum) { el.value = comma(digits(v)); renderEstimate(panel); }
