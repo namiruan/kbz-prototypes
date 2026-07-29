@@ -56,6 +56,9 @@
     .acq-job-trigger__icon { flex-shrink: 0; color: var(--color-text-subtle); }
     /* 연금 취득월납부 라벨 — 텍스트 + 툴팁 트리거를 한 줄로 */
     .acq-label-row { display: flex; align-items: center; gap: var(--space-gap-2xs); }
+    /* 도움말 트리거(24px)가 라벨 높이를 키워 옆 필드보다 본문이 아래로 밀리는 문제 방지 —
+       음수 마진으로 버튼의 여분 높이를 흡수해 평문 라벨과 동일 높이 유지. */
+    .acq-label-row .tooltip-wrapper { margin-block: calc(var(--space-4) * -1); }
     /* 테이블 셀 안 드롭다운 — 셀 폭을 채운다 (.dropdown은 max-content) */
     .acq-cell-select .dropdown,
     .acq-cell-select .dropdown__trigger { width: 100%; }
