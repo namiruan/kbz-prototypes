@@ -236,8 +236,16 @@
     .acq-doc-disc .disclosure__header { display: flex; align-items: center; gap: var(--space-gap-sm); }
     .acq-doc-title { flex: 1 1 auto; min-width: 0; font-weight: var(--font-weight-heading); color: var(--color-text-body); }
     .acq-doc-disc.disclosure--expanded .disclosure__body { color: inherit; }
-    .acq-doc-note { margin: 0 0 var(--space-gap-sm); color: var(--color-text-subtle); }
-    .acq-doc-table .table__cell:last-child { width: 1%; white-space: nowrap; }
+    /* 항목/내용 2열 — 항목 열은 내용 폭에 맞춰 좁게, 세로 중앙 정렬 */
+    .acq-doc-table .table__cell.acq-doc-key,
+    .acq-doc-table .table__head-cell:first-child { width: 96px; white-space: nowrap; }
+    .acq-doc-table .table__cell.acq-doc-key { vertical-align: middle; color: var(--color-text-body); }
+    /* 필요서류 번호 목록 — 다운로드 아이콘은 항목 텍스트 옆 인라인 */
+    .acq-doc-list { margin: 0; padding-left: var(--space-inset-xl); list-style: decimal; display: flex; flex-direction: column; gap: var(--space-gap-2xs); }
+    .acq-doc-list li { color: var(--color-text-body); }
+    .acq-doc-dl { display: inline-flex; vertical-align: middle; margin-left: var(--space-gap-2xs); color: var(--color-text-brand); }
+    /* 보충 안내 — 목록 아래 불릿, 옅게 */
+    .acq-doc-notes { margin: var(--space-gap-sm) 0 0; padding-left: var(--space-inset-lg); list-style: disc; display: flex; flex-direction: column; gap: var(--space-gap-2xs); color: var(--color-text-subtle); font-size: var(--font-size-sm); }
   </style>
 </head>
 <body>
@@ -403,31 +411,36 @@ exits: index.html
                   <!-- 7 area — 국민연금 소득월액 변경신고 필요서류 (조건부).
                        기획서처럼 table로 노출하고, Disclosure(icon-only)로 테이블을 접을 수 있게 한다. -->
                   <div class="acq-pension-doc" hidden>
-                    <div class="disclosure disclosure--icon-only disclosure--expanded acq-doc-disc" data-label-expand="국민연금 소득월액 변경신고 필요서류 펼치기" data-label-collapse="국민연금 소득월액 변경신고 필요서류 접기">
+                    <div class="disclosure disclosure--icon-only disclosure--expanded acq-doc-disc" data-label-expand="국민연금 소득월액 변경신고 제출서류 안내 펼치기" data-label-collapse="국민연금 소득월액 변경신고 제출서류 안내 접기">
                       <span class="disclosure__header">
-                        <span class="text-form-label acq-doc-title">국민연금 소득월액 변경신고 필요서류</span>
-                        <button class="disclosure__trigger" type="button" aria-expanded="true" aria-controls="p1-doc-body" aria-label="국민연금 소득월액 변경신고 필요서류 접기">
+                        <span class="text-form-label acq-doc-title">국민연금 소득월액 변경신고 제출서류 안내</span>
+                        <button class="disclosure__trigger" type="button" aria-expanded="true" aria-controls="p1-doc-body" aria-label="국민연금 소득월액 변경신고 제출서류 안내 접기">
                           <span class="disclosure__label">접기</span><span class="icon-on--sm disclosure__icon" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-chevron-down"/></svg></span>
                         </button>
                       </span>
                       <div class="disclosure__body" id="p1-doc-body">
-                        <p class="text-helper acq-doc-note">보수 20% 이상 변동에 따른 국민연금 소득월액 변경신고는 선택 사항이에요. 신고하는 경우 아래 서류를 작성·첨부해 주세요.</p>
                         <div class="table-container acq-doc-table">
                           <table class="table table--info table--dense">
                             <thead class="table__head">
                               <tr>
-                                <th class="table__head-cell" scope="col">필요서류</th>
-                                <th class="table__head-cell" scope="col">서식</th>
+                                <th class="table__head-cell" scope="col">항목</th>
+                                <th class="table__head-cell" scope="col">내용</th>
                               </tr>
                             </thead>
                             <tbody class="table__body">
                               <tr class="table__row">
-                                <td class="table__cell">국민연금 기준소득월액 변경신청서</td>
-                                <td class="table__cell"><button class="btn btn--ghost btn--sm btn--icon-left" type="button"><span class="icon icon--sm" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-download"/></svg></span>양식 다운로드</button></td>
-                              </tr>
-                              <tr class="table__row">
-                                <td class="table__cell">국민연금 기준소득월액 변경신청 근로자 동의서</td>
-                                <td class="table__cell"><button class="btn btn--ghost btn--sm btn--icon-left" type="button"><span class="icon icon--sm" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-download"/></svg></span>양식 다운로드</button></td>
+                                <td class="table__cell acq-doc-key">필요서류</td>
+                                <td class="table__cell">
+                                  <ol class="acq-doc-list">
+                                    <li>국민연금 기준소득월액 변경신청서 <button class="icon-on--sm acq-doc-dl" type="button" aria-label="국민연금 기준소득월액 변경신청서 양식 다운로드"><svg aria-hidden="true"><use href="#icon-download"/></svg></button></li>
+                                    <li>국민연금 기준소득월액 변경신청 근로자 동의서 <button class="icon-on--sm acq-doc-dl" type="button" aria-label="국민연금 기준소득월액 변경신청 근로자 동의서 양식 다운로드"><svg aria-hidden="true"><use href="#icon-download"/></svg></button></li>
+                                    <li>소득변동을 확인할 수 있는 서류</li>
+                                  </ol>
+                                  <ul class="acq-doc-notes">
+                                    <li>20% 이상 보수 변동 시 연금 특례변경 신고가 가능합니다.</li>
+                                    <li>위 서류를 작성 후 근로자 서명을 받아 첨부해 주세요.</li>
+                                  </ul>
+                                </td>
                               </tr>
                             </tbody>
                           </table>
@@ -891,7 +904,8 @@ exits: index.html
       if (rate != null) {
         e.rateField.hidden = false;
         e.rateBadge.textContent = (rate > 0 ? '+' : '') + rate + '%';
-        e.rateBadge.className = 'badge acq-rate-badge ' + (over20 ? 'badge--caution' : 'badge--neutral');
+        /* 20% 미만 neutral / 이상 success(초록) — 기획 디자인 톤 + 미만·이상 색상 구분 */
+        e.rateBadge.className = 'badge acq-rate-badge ' + (over20 ? 'badge--success' : 'badge--neutral');
       } else if (e.rateField) { e.rateField.hidden = true; }
       /* 국민연금 소득월액 서류 안내 + 첨부 필수 — 20% 이상 & 국민연금 선택 시 */
       var pensionOn = over20 && e.pen.checked;
