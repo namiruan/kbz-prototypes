@@ -211,38 +211,32 @@
     /* ── 보수 변경신고 전용 ── */
     /* 변경사유 세그먼트 — 미선택 시작 허용(초기 슬라이더 숨김). 필수 검증 실패 시 에러 테두리 */
     .segment.segment--error { box-shadow: inset 0 0 0 var(--stroke-md) var(--color-border-error); }
-    /* 변경년월+변경 전/후 보수월액 3필드를 좁은 폼 폭(≈435px)에 한 줄로 — 열 간격을 좁힌다 */
-    .acq-form .form-field-group--horizontal:has(.acq-month) { column-gap: var(--space-gap-sm); }
+    /* 변경년월 + 변경 전/후 보수월액 + 변동율 4필드를 좁은 폼 폭(≈435px)에 한 줄로 — 열 간격을 좁힌다 */
+    .acq-form .form-field-group--horizontal:has(.acq-change-dd) { column-gap: var(--space-gap-2xs); }
+    /* 변경사유 세그먼트 — 가로 여백을 꽉 채운다(항목 균등 분할) */
+    .acq-reason-seg.segment--full { align-self: stretch; }
+    /* 변경년월 드롭다운 — 당해년도 월. 폭 축소 */
+    .acq-change-dd, .acq-change-dd .dropdown__trigger { width: 96px; }
+    .acq-change-dd .dropdown__value { overflow: hidden; text-overflow: ellipsis; }
     /* 변경 전/후 보수월액 — 금액(콤마) + '원'. 한 줄 배치 위해 폭 축소 */
     .acq-form .input-wrap--suffix:has(input[id$="prevpay"]),
-    .acq-form .input-wrap--suffix:has(input[id$="newpay"]) { max-width: 148px; }
-    /* 변동율 — 배지를 입력 행 높이에 맞춰 세로 중앙 정렬 */
+    .acq-form .input-wrap--suffix:has(input[id$="newpay"]) { max-width: 128px; }
+    /* 변동율 — 행 우측에 배치(margin-left:auto), 배지를 입력 행 높이에 맞춰 세로 중앙 정렬 */
+    .acq-rate-field { margin-left: auto; }
     .acq-rate-field .form-field__body { display: flex; align-items: center; min-height: var(--height-base); }
     .acq-rate-badge { font-variant-numeric: tabular-nums; }
-    /* ── 변경년월 — 년·월 단위 date picker (DS date-picker는 일 단위만 지원해 페이지 로컬 구현) ── */
-    .acq-month { position: relative; width: 108px; }
-    .acq-month__trigger { display: flex; align-items: center; justify-content: space-between; gap: var(--space-gap-sm); width: 100%; height: var(--height-base); padding: 0 var(--space-inset-lg); background: var(--color-surface-base); border: var(--stroke-sm) solid var(--color-border-default); border-radius: var(--radius-xs); color: var(--color-text-body); font-size: var(--font-size-base); text-align: left; cursor: pointer; transition: border-color var(--duration-fast) var(--easing-base); }
-    .acq-month__trigger:hover { border-color: var(--color-border-brand); }
-    .acq-month__value { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .acq-month__value--placeholder { color: var(--color-text-subtle); }
-    .acq-month__icon { flex-shrink: 0; color: var(--color-text-subtle); display: inline-flex; }
-    .acq-month--complete .acq-month__trigger { border-color: var(--color-border-complete); }
-    .acq-month--error .acq-month__trigger { border-color: var(--color-border-error); }
-    .acq-month--disabled .acq-month__trigger { background: var(--color-surface-subtle); color: var(--color-text-disabled); cursor: not-allowed; border-color: var(--color-border-default); }
-    .acq-month--disabled .acq-month__icon { color: var(--color-text-disabled); }
-    /* 패널 — 트리거 아래 절대 배치. 년 이동 + 12개월 그리드 */
-    .acq-month__panel { position: absolute; top: calc(100% + var(--space-gap-2xs)); left: 0; z-index: var(--z-dropdown); min-width: 232px; padding: var(--space-inset-md); background: var(--color-surface-base); border: var(--stroke-sm) solid var(--color-border-default); border-radius: var(--radius-md); box-shadow: var(--shadow-md); }
-    .acq-month__panel[hidden] { display: none; }
-    .acq-month__nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-gap-sm); }
-    .acq-month__year { font-weight: var(--font-weight-heading); color: var(--color-text-body); }
-    .acq-month__navbtn { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: var(--radius-xs); color: var(--color-text-body); background: transparent; cursor: pointer; }
-    .acq-month__navbtn:hover { background: var(--color-surface-subtle); }
-    .acq-month__grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-gap-2xs); }
-    .acq-month__cell { padding: var(--space-inset-squish-sm); border-radius: var(--radius-xs); background: transparent; color: var(--color-text-body); font-size: var(--font-size-sm); cursor: pointer; }
-    .acq-month__cell:hover { background: var(--color-surface-brand-subtle); }
-    .acq-month__cell--selected { box-shadow: inset 0 0 0 var(--stroke-md) var(--color-border-brand); color: var(--color-text-brand); font-weight: var(--font-weight-heading); }
-    /* 국민연금 서류 안내 — 배너 내 다운로드 버튼 줄바꿈 여유 */
-    .acq-pension-doc .banner__action { flex-wrap: wrap; }
+    /* 신고 대상 보험 — 취득 모달처럼 푸터 좌측에 상시 노출(스크롤 없이 신고 대상 확인) */
+    .acq-target-footer { margin-right: auto; display: flex; align-items: center; gap: var(--space-gap-md); min-width: 0; }
+    .acq-target-footer__label { flex-shrink: 0; font-weight: var(--font-weight-heading); }
+    .acq-target-checks { display: flex; flex-wrap: wrap; gap: var(--space-gap-md); }
+    /* 국민연금 필요서류 — 기획서처럼 table 노출 + Disclosure로 접기. 조건부 표시 래퍼 */
+    .acq-pension-doc[hidden] { display: none; }
+    .acq-doc-disc { display: flex; flex-direction: column; align-items: stretch; width: 100%; }
+    .acq-doc-disc .disclosure__header { display: flex; align-items: center; gap: var(--space-gap-sm); }
+    .acq-doc-title { flex: 1 1 auto; min-width: 0; font-weight: var(--font-weight-heading); color: var(--color-text-body); }
+    .acq-doc-disc.disclosure--expanded .disclosure__body { color: inherit; }
+    .acq-doc-note { margin: 0 0 var(--space-gap-sm); color: var(--color-text-subtle); }
+    .acq-doc-table .table__cell:last-child { width: 1%; white-space: nowrap; }
   </style>
 </head>
 <body>
@@ -354,7 +348,7 @@ exits: index.html
                   <div class="form-field">
                     <span class="form-field__label text-form-label" id="p1-reason-label">변경사유</span>
                     <div class="form-field__body">
-                      <div class="segment segment--lg acq-reason-seg" role="radiogroup" aria-labelledby="p1-reason-label" id="p1-reason">
+                      <div class="segment segment--lg segment--full acq-reason-seg" role="radiogroup" aria-labelledby="p1-reason-label" id="p1-reason">
                         <span class="segment__slider" aria-hidden="true"></span>
                         <button class="segment__item segment__item--selected" role="radio" aria-checked="true" type="button" data-reason="보수인상">보수인상</button>
                         <button class="segment__item" role="radio" aria-checked="false" type="button" data-reason="보수인하">보수인하</button>
@@ -364,38 +358,22 @@ exits: index.html
                   </div>
 
                   <!-- 4-2·4-3·4-4 area — 변경년월 + 변경 전/후 보수월액 한 줄.
-                       변경년월은 년·월 단위 date picker(DS는 일 단위만 지원 → 페이지 로컬 월 선택기).
-                       변경사유 선택 후 활성화되며, 착오정정은 취득월로 고정된다. -->
+                       변경년월은 당해년도 월만 노출하므로 드롭다운. 변경사유 선택 후 활성화, 착오정정은 취득월로 고정. -->
                   <div class="form-field-group--horizontal">
                     <div class="form-field">
                       <span class="form-field__label text-form-label" id="p1-month-label">변경년월 <span class="form-field__required" aria-hidden="true">(필수)</span></span>
                       <div class="form-field__body">
-                        <div class="acq-month acq-month--disabled" id="p1-month" data-year="2026">
-                          <button class="acq-month__trigger" type="button" aria-haspopup="dialog" aria-expanded="false" disabled aria-labelledby="p1-month-label" aria-describedby="p1-month-err">
-                            <span class="acq-month__value acq-month__value--placeholder">YYYY.MM</span>
-                            <span class="acq-month__icon" aria-hidden="true"><span class="icon icon--sm"><svg aria-hidden="true"><use href="#icon-calendar"/></svg></span></span>
-                          </button>
-                          <div class="acq-month__panel" role="dialog" aria-label="변경년월 선택" hidden>
-                            <div class="acq-month__nav">
-                              <button class="acq-month__navbtn" type="button" data-step="-1" aria-label="이전 해"><span class="icon icon--sm" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-chevron-left"/></svg></span></button>
-                              <span class="acq-month__year" aria-live="polite">2026</span>
-                              <button class="acq-month__navbtn" type="button" data-step="1" aria-label="다음 해"><span class="icon icon--sm" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-chevron-right"/></svg></span></button>
-                            </div>
-                            <div class="acq-month__grid" role="listbox" aria-label="월 선택">
-                              <button class="acq-month__cell" type="button" role="option" data-m="1">1월</button>
-                              <button class="acq-month__cell" type="button" role="option" data-m="2">2월</button>
-                              <button class="acq-month__cell" type="button" role="option" data-m="3">3월</button>
-                              <button class="acq-month__cell" type="button" role="option" data-m="4">4월</button>
-                              <button class="acq-month__cell" type="button" role="option" data-m="5">5월</button>
-                              <button class="acq-month__cell" type="button" role="option" data-m="6">6월</button>
-                              <button class="acq-month__cell" type="button" role="option" data-m="7">7월</button>
-                              <button class="acq-month__cell" type="button" role="option" data-m="8">8월</button>
-                              <button class="acq-month__cell" type="button" role="option" data-m="9">9월</button>
-                              <button class="acq-month__cell" type="button" role="option" data-m="10">10월</button>
-                              <button class="acq-month__cell" type="button" role="option" data-m="11">11월</button>
-                              <button class="acq-month__cell" type="button" role="option" data-m="12">12월</button>
-                            </div>
-                          </div>
+                        <div class="dropdown dropdown--button dropdown--menu acq-change-dd dropdown--disabled" id="p1-month">
+                          <button class="dropdown__trigger" type="button" aria-haspopup="listbox" aria-expanded="false" disabled aria-disabled="true" aria-labelledby="p1-month-label"><span class="dropdown__value dropdown__value--placeholder">선택</span><span class="dropdown__chevron" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-chevron-down"/></svg></span></button>
+                          <div class="dropdown__panel"><ul class="dropdown__list" role="listbox" aria-label="변경년월">
+                            <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">2026-01</span></li>
+                            <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">2026-02</span></li>
+                            <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">2026-03</span></li>
+                            <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">2026-04</span></li>
+                            <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">2026-05</span></li>
+                            <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">2026-06</span></li>
+                            <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">2026-07</span></li>
+                          </ul></div>
                         </div>
                       </div>
                       <div class="form-field__footer"><p class="form-field__error text-helper" id="p1-month-err" role="alert">변경년월을 선택해 주세요.</p></div>
@@ -409,37 +387,45 @@ exits: index.html
                       <div class="form-field__body"><div class="input-wrap input-wrap--suffix"><input class="input" type="text" id="p1-newpay" placeholder="숫자 입력" inputmode="numeric" aria-required="true"><span class="input__suffix">원</span></div></div>
                       <div class="form-field__footer"><p class="form-field__error text-helper" id="p1-newpay-err" role="alert">변경 후 보수월액을 입력해 주세요.</p></div>
                     </div>
-                  </div>
-
-                  <!-- 6 area — 변동율 (조건부). 보수인상·인하 + 금액 입력 시 자동 계산되어 노출 -->
-                  <div class="form-field-group--horizontal">
+                    <!-- 6 area — 변동율. 보수인상·인하 + 금액 입력 시 자동 계산되어 이 행 우측에 노출 -->
                     <div class="form-field acq-rate-field" hidden>
                       <span class="form-field__label text-form-label">변동율</span>
                       <div class="form-field__body"><span class="badge badge--neutral acq-rate-badge">0%</span></div>
                     </div>
                   </div>
 
-                  <!-- 신고 대상 보험 — 변경사유·변동율의 '결과'라 입력(사유→년월→보수월액) 뒤 결과 요약으로 배치 -->
-                  <div class="acq-section">
-                    <span class="text-form-label" id="p1-ins-label">신고 대상 보험</span>
-                    <div class="acq-ins-checks" role="group" aria-labelledby="p1-ins-label">
-                      <label class="checkbox checkbox--disabled"><input type="checkbox" id="p1-ins-emp" disabled><span class="checkbox__control" aria-hidden="true"><span class="checkbox__icon-check"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span><span class="checkbox__label">고용보험</span></label>
-                      <label class="checkbox checkbox--disabled"><input type="checkbox" id="p1-ins-acc" disabled><span class="checkbox__control" aria-hidden="true"><span class="checkbox__icon-check"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span><span class="checkbox__label">산재보험</span></label>
-                      <label class="checkbox checkbox--disabled"><input type="checkbox" id="p1-ins-pen" disabled><span class="checkbox__control" aria-hidden="true"><span class="checkbox__icon-check"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span><span class="checkbox__label">국민연금</span></label>
-                      <label class="checkbox checkbox--disabled"><input type="checkbox" id="p1-ins-hea" disabled><span class="checkbox__control" aria-hidden="true"><span class="checkbox__icon-check"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span><span class="checkbox__label">건강보험</span></label>
-                    </div>
-                    <p class="form-field__help text-helper">변경사유와 변동율에 따라 신고 대상 보험이 자동 선택돼요.</p>
-                  </div>
-
-                  <!-- 7 area — 국민연금 소득월액 변경신고 필요서류 안내 (조건부) -->
-                  <div class="banner banner--caution acq-pension-doc" role="status" hidden>
-                    <span class="icon--md banner__icon" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-triangle-alert"/></svg></span>
-                    <div class="text-description banner__body">
-                      <p class="banner__title">국민연금 소득월액 변경신고 필요서류</p>
-                      <p class="banner__message">보수 20% 이상 변동에 따른 국민연금 소득월액 변경신고는 선택 사항이에요. 신고하는 경우 아래 서류를 작성·첨부해 주세요.</p>
-                      <div class="banner__action">
-                        <button class="btn btn--ghost btn--sm btn--icon-left" type="button"><span class="icon icon--sm" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-download"/></svg></span>기준소득월액 변경신청서</button>
-                        <button class="btn btn--ghost btn--sm btn--icon-left" type="button"><span class="icon icon--sm" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-download"/></svg></span>근로자 동의서</button>
+                  <!-- 7 area — 국민연금 소득월액 변경신고 필요서류 (조건부).
+                       기획서처럼 table로 노출하고, Disclosure(icon-only)로 테이블을 접을 수 있게 한다. -->
+                  <div class="acq-pension-doc" hidden>
+                    <div class="disclosure disclosure--icon-only disclosure--expanded acq-doc-disc" data-label-expand="국민연금 소득월액 변경신고 필요서류 펼치기" data-label-collapse="국민연금 소득월액 변경신고 필요서류 접기">
+                      <span class="disclosure__header">
+                        <span class="text-form-label acq-doc-title">국민연금 소득월액 변경신고 필요서류</span>
+                        <button class="disclosure__trigger" type="button" aria-expanded="true" aria-controls="p1-doc-body" aria-label="국민연금 소득월액 변경신고 필요서류 접기">
+                          <span class="disclosure__label">접기</span><span class="icon-on--sm disclosure__icon" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-chevron-down"/></svg></span>
+                        </button>
+                      </span>
+                      <div class="disclosure__body" id="p1-doc-body">
+                        <p class="text-helper acq-doc-note">보수 20% 이상 변동에 따른 국민연금 소득월액 변경신고는 선택 사항이에요. 신고하는 경우 아래 서류를 작성·첨부해 주세요.</p>
+                        <div class="table-container acq-doc-table">
+                          <table class="table table--info table--dense">
+                            <thead class="table__head">
+                              <tr>
+                                <th class="table__head-cell" scope="col">필요서류</th>
+                                <th class="table__head-cell" scope="col">서식</th>
+                              </tr>
+                            </thead>
+                            <tbody class="table__body">
+                              <tr class="table__row">
+                                <td class="table__cell">기준소득월액 변경신청서</td>
+                                <td class="table__cell"><button class="btn btn--ghost btn--sm btn--icon-left" type="button"><span class="icon icon--sm" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-download"/></svg></span>다운로드</button></td>
+                              </tr>
+                              <tr class="table__row">
+                                <td class="table__cell">근로자 동의서</td>
+                                <td class="table__cell"><button class="btn btn--ghost btn--sm btn--icon-left" type="button"><span class="icon icon--sm" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-download"/></svg></span>다운로드</button></td>
+                              </tr>
+                            </tbody>
+                          </table>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -460,6 +446,16 @@ exits: index.html
           </div>
 
           <div class="modal__footer">
+            <!-- 신고 대상 보험 — 취득 모달처럼 푸터 좌측에 상시 노출. 변경사유·변동율에 따라 자동 선택되며 건강보험(및 20%↑ 국민연금)만 조정 가능 -->
+            <div class="acq-target-footer" role="group" aria-labelledby="p1-ins-label">
+              <span class="text-form-label acq-target-footer__label" id="p1-ins-label">신고 대상 보험</span>
+              <div class="acq-target-checks">
+                <label class="checkbox checkbox--sm checkbox--disabled"><input type="checkbox" id="p1-ins-emp" disabled><span class="checkbox__control" aria-hidden="true"><span class="checkbox__icon-check"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span><span class="checkbox__label">고용보험</span></label>
+                <label class="checkbox checkbox--sm checkbox--disabled"><input type="checkbox" id="p1-ins-acc" disabled><span class="checkbox__control" aria-hidden="true"><span class="checkbox__icon-check"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span><span class="checkbox__label">산재보험</span></label>
+                <label class="checkbox checkbox--sm checkbox--disabled"><input type="checkbox" id="p1-ins-pen" disabled><span class="checkbox__control" aria-hidden="true"><span class="checkbox__icon-check"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span><span class="checkbox__label">국민연금</span></label>
+                <label class="checkbox checkbox--sm checkbox--disabled"><input type="checkbox" id="p1-ins-hea" disabled><span class="checkbox__control" aria-hidden="true"><span class="checkbox__icon-check"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span><span class="checkbox__label">건강보험</span></label>
+              </div>
+            </div>
             <button class="btn btn--ghost btn--md" type="button" data-acq-cancel>취소</button>
             <button class="btn btn--secondary btn--solid btn--md" type="button" data-overlay-open="overlay-draft">임시저장</button>
             <button class="btn btn--primary btn--md" type="button" id="p1-submit">신고요청</button>
@@ -779,67 +775,42 @@ exits: index.html
     if (ff) ff.classList.toggle('form-field--error', on);
   }
 
-  /* ── 변경년월 — 년·월 단위 선택기 (data-year/data-month에 선택값, data-view-year에 패널 표시 연도) ── */
-  function mDisplay(el) { return el.querySelector('.acq-month__value'); }
-  function mValue(el) {
-    if (!el || !el.dataset.year || !el.dataset.month) return '';
-    return el.dataset.year + '-' + ('0' + el.dataset.month).slice(-2);
+  /* ── 변경년월 — 당해년도 월 드롭다운 (착오정정=취득월 고정 / 선택가능 / 비활성) ── */
+  function mdValue(dd) {
+    if (!dd) return '';
+    var sel = dd.querySelector('.dropdown__option--selected');
+    return sel ? sel.querySelector('.dropdown__option-label').textContent.trim() : '';
   }
-  function mSet(el, year, month) {
-    el.dataset.year = year; el.dataset.month = month;
-    var v = mDisplay(el);
-    if (v) { v.textContent = year + '.' + ('0' + month).slice(-2); v.classList.remove('acq-month__value--placeholder'); }
+  function mdSetError(dd, on) {
+    if (!dd) return;
+    dd.classList.toggle('dropdown--error', on);
+    var ff = dd.closest('.form-field'); if (ff) ff.classList.toggle('form-field--error', on);
   }
-  function mClear(el) {
-    if (!el) return;
-    delete el.dataset.year; delete el.dataset.month;
-    var v = mDisplay(el);
-    if (v) { v.textContent = 'YYYY.MM'; v.classList.add('acq-month__value--placeholder'); }
-    el.classList.remove('acq-month--complete');
-  }
-  function mEnable(el) {
-    if (!el) return;
-    el.classList.remove('acq-month--disabled');
-    var t = el.querySelector('.acq-month__trigger'); if (t) t.removeAttribute('disabled');
-  }
-  function mDisable(el) {
-    if (!el) return;
-    el.classList.add('acq-month--disabled');
-    el.classList.remove('acq-month--complete', 'acq-month--error');
-    monthClose(el);
-    var t = el.querySelector('.acq-month__trigger'); if (t) t.setAttribute('disabled', '');
-  }
-  function mLock(el, year, month) {   /* 착오정정 — 취득월로 고정(값 채운 채 비활성) */
-    if (!el) return;
-    mSet(el, year, month);
-    el.classList.remove('acq-month--error', 'acq-month--complete');
-    el.classList.add('acq-month--disabled');
-    monthClose(el);
-    var t = el.querySelector('.acq-month__trigger'); if (t) t.setAttribute('disabled', '');
-  }
-  function mSetError(el, on) {
-    if (!el) return;
-    el.classList.toggle('acq-month--error', on);
-    var ff = el.closest('.form-field'); if (ff) ff.classList.toggle('form-field--error', on);
-  }
-  function monthRenderYear(el) {
-    var vy = +el.dataset.viewYear;
-    var ye = el.querySelector('.acq-month__year'); if (ye) ye.textContent = vy;
-    var selY = el.dataset.year ? +el.dataset.year : null, selM = el.dataset.month ? +el.dataset.month : null;
-    el.querySelectorAll('.acq-month__cell').forEach(function (c) {
-      c.classList.toggle('acq-month__cell--selected', selY === vy && selM === +c.dataset.m);
+  function mdLock(dd, valueText) {   /* 착오정정 — 취득월 고정(값 채운 채 비활성) */
+    if (!dd) return;
+    dd.classList.add('dropdown--disabled');
+    var trg = dd.querySelector('.dropdown__trigger'); if (trg) { trg.setAttribute('disabled', ''); trg.setAttribute('aria-disabled', 'true'); }
+    var val = dd.querySelector('.dropdown__value');
+    dd.querySelectorAll('.dropdown__option').forEach(function (o) {
+      var on = o.querySelector('.dropdown__option-label').textContent.trim() === valueText;
+      o.classList.toggle('dropdown__option--selected', on); o.setAttribute('aria-selected', String(on));
     });
+    if (val) { val.textContent = valueText; val.classList.remove('dropdown__value--placeholder'); }
   }
-  function monthOpen(el) {
-    if (el.classList.contains('acq-month--disabled')) return;
-    el.dataset.viewYear = el.dataset.year || 2026;
-    monthRenderYear(el);
-    var p = el.querySelector('.acq-month__panel'); if (p) p.removeAttribute('hidden');
-    var t = el.querySelector('.acq-month__trigger'); if (t) t.setAttribute('aria-expanded', 'true');
+  function mdEnable(dd) {
+    if (!dd) return;
+    dd.classList.remove('dropdown--disabled');
+    var trg = dd.querySelector('.dropdown__trigger'); if (trg) { trg.removeAttribute('disabled'); trg.removeAttribute('aria-disabled'); }
   }
-  function monthClose(el) {
-    var p = el.querySelector('.acq-month__panel'); if (p) p.setAttribute('hidden', '');
-    var t = el.querySelector('.acq-month__trigger'); if (t) t.setAttribute('aria-expanded', 'false');
+  function mdDisable(dd) {
+    if (!dd) return;
+    dd.classList.add('dropdown--disabled');
+    var trg = dd.querySelector('.dropdown__trigger'); if (trg) { trg.setAttribute('disabled', ''); trg.setAttribute('aria-disabled', 'true'); }
+  }
+  function mdClear(dd) {
+    if (!dd) return;
+    dd.querySelectorAll('.dropdown__option').forEach(function (o) { o.classList.remove('dropdown__option--selected'); o.setAttribute('aria-selected', 'false'); });
+    var val = dd.querySelector('.dropdown__value'); if (val) { val.textContent = '선택'; val.classList.add('dropdown__value--placeholder'); }
   }
 
   /* 체크박스 상태 (checked + enabled) */
@@ -935,14 +906,13 @@ exits: index.html
     var reason = reasonValue(e.reason);
     var prev = panel.dataset.reasonState || '';
     segSetError(e.reason, false);
-    var am = ACQUIRE_MONTH.split('-');
     if (reason === '착오정정') {
-      mLock(e.month, +am[0], +am[1]);
+      mdLock(e.month, ACQUIRE_MONTH);
     } else if (reason === '보수인상' || reason === '보수인하') {
-      if (prev === '착오정정' || prev === '') mClear(e.month);   /* 잠금값 잔재 제거 */
-      mEnable(e.month);
+      if (prev === '착오정정' || prev === '') mdClear(e.month);   /* 잠금값 잔재 제거 */
+      mdEnable(e.month);
     } else {
-      mClear(e.month); mDisable(e.month);
+      mdClear(e.month); mdDisable(e.month);
     }
     panel.dataset.reasonState = reason;
     refresh(panel);
@@ -961,38 +931,13 @@ exits: index.html
     onSegActivity(e.target);
   });
 
-  /* 변경년월 월 선택기 — 트리거 토글 / 연도 이동 / 월 선택 */
+  /* 변경년월 드롭다운 옵션 클릭 — 선택 시 에러 해제 */
   root.addEventListener('click', function (e) {
-    var trg = e.target.closest('.acq-month__trigger');
-    if (trg) {
-      var el = trg.closest('.acq-month');
-      if (el.classList.contains('acq-month--disabled')) return;
-      var p = el.querySelector('.acq-month__panel');
-      if (p && p.hasAttribute('hidden')) monthOpen(el); else monthClose(el);
-      return;
-    }
-    var nav = e.target.closest('.acq-month__navbtn');
-    if (nav) {
-      var el2 = nav.closest('.acq-month');
-      el2.dataset.viewYear = (+el2.dataset.viewYear || 2026) + (+nav.dataset.step);
-      monthRenderYear(el2);
-      return;
-    }
-    var cell = e.target.closest('.acq-month__cell');
-    if (cell) {
-      var el3 = cell.closest('.acq-month');
-      mSet(el3, +el3.dataset.viewYear, +cell.dataset.m);
-      el3.classList.add('acq-month--complete');
-      mSetError(el3, false);
-      monthRenderYear(el3);
-      monthClose(el3);
-    }
-  });
-  /* 바깥 클릭 → 열린 월 선택기 닫기 */
-  document.addEventListener('click', function (e) {
-    document.querySelectorAll('#pane-panels .acq-month').forEach(function (el) {
-      if (!el.contains(e.target)) monthClose(el);
-    });
+    var opt = e.target.closest('.dropdown__option');
+    if (!opt) return;
+    var dd = opt.closest('.dropdown');
+    if (!dd) return;
+    setTimeout(function () { if (/-month$/.test(dd.id)) mdSetError(dd, false); }, 0);
   });
 
   /* 변경 후 보수월액 — 숫자만 허용(콤마 자동), 문자 입력 시 에러. 입력 시 변동율 재계산 */
@@ -1024,8 +969,8 @@ exits: index.html
 
     /* 변경년월 — 착오정정은 자동 고정이라 검증 제외, 그 외엔 필수 */
     if (reason && reason !== '착오정정') {
-      if (!mValue(e.month)) { mSetError(e.month, true); invalid.push(e.month.closest('.form-field')); firstBad = firstBad || e.month.querySelector('.acq-month__trigger'); }
-      else mSetError(e.month, false);
+      if (!mdValue(e.month)) { mdSetError(e.month, true); invalid.push(e.month.closest('.form-field')); firstBad = firstBad || e.month.querySelector('.dropdown__trigger'); }
+      else mdSetError(e.month, false);
     }
 
     /* 변경 후 보수월액 필수 */
@@ -1078,7 +1023,7 @@ exits: index.html
   function panelHasInput(panel) {
     if (!panel) return false;
     var e = els(panel);
-    if (mValue(e.month)) return true;
+    if (mdValue(e.month)) return true;
     if (e.newpay && e.newpay.value.trim()) return true;
     var memo = panel.querySelector('textarea');
     if (memo && memo.value.trim()) return true;
