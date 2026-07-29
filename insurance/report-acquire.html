@@ -138,8 +138,9 @@
     /* 좌측 타이틀 — 뱃지 대신 브랜드 컬러 텍스트, 헤더보다 한 단계 작게(15px). 2행 세로 중앙. */
     .acq-estimate-footer__title { grid-row: 1 / span 2; align-self: center; display: inline-flex; align-items: center; gap: var(--space-gap-2xs); color: var(--color-text-brand); font-size: var(--font-size-lg); font-weight: var(--font-weight-heading); line-height: var(--line-height-ui); white-space: nowrap; }
     .acq-estimate-footer__title-text { white-space: nowrap; }
-    /* 안내(※ 실제 부과금액…)는 타이틀 옆 물음표 툴팁으로 이동 — 상시 노출 대신 필요할 때만. sm 트리거를 타이틀 폰트에 맞춤 */
-    .acq-estimate-footer__title .tooltip-trigger--sm { flex-shrink: 0; color: var(--color-text-subtle); }
+    /* 안내(※ 실제 부과금액…)는 타이틀 옆 물음표 버튼(테이블 툴바와 동일한 micro primary 아이콘)의 pinned 툴팁으로.
+       최초 강제 노출 → X(또는 Esc)로 닫으면 hover/focus 기본 툴팁으로 전환 */
+    .acq-estimate-footer__title .tooltip-wrapper { flex-shrink: 0; }
     /* 값 한 줄: 날짜(고지월)와 금액(부과금액)을 세로 구분선 + 서로 다른 스타일로 확실히 구분 */
     .acq-estimate-footer__values { display: inline-flex; align-items: center; gap: var(--space-gap-sm); white-space: nowrap; }
     .acq-estimate-footer__date { color: var(--color-text-subtle); font-size: var(--font-size-lg); }             /* 날짜: 옅게 */
@@ -384,7 +385,7 @@ exits: index.html
           <div class="modal__footer">
             <div class="acq-estimate-footer" role="status">
               <div class="acq-estimate-footer__table">
-                <span class="acq-estimate-footer__title"><span class="acq-estimate-footer__title-text">예상 반영<br>고지월 · 부과금액</span><span class="tooltip-wrapper" onmouseenter="this.querySelector('.tooltip-panel').classList.add('tooltip-panel--visible')" onmouseleave="this.querySelector('.tooltip-panel').classList.remove('tooltip-panel--visible')"><button class="tooltip-trigger tooltip-trigger--sm" type="button" aria-label="예상 반영 고지월·부과금액 안내" aria-describedby="s1-estimate-tip" onfocus="this.closest('.tooltip-wrapper').querySelector('.tooltip-panel').classList.add('tooltip-panel--visible')" onblur="this.closest('.tooltip-wrapper').querySelector('.tooltip-panel').classList.remove('tooltip-panel--visible')"><svg aria-hidden="true"><use href="#icon-help"/></svg></button><div class="tooltip-panel elevation-tooltip tooltip-panel--top" id="s1-estimate-tip" role="tooltip">실제 부과금액 및 반영 시기는 신고일, 보수월액, 기관 처리 일정 등에 따라 달라질 수 있어요.</div></span></span>
+                <span class="acq-estimate-footer__title"><span class="acq-estimate-footer__title-text">예상 반영<br>고지월 · 부과금액</span><span class="tooltip-wrapper"><button class="btn btn--primary btn--solid btn--micro btn--icon-only" type="button" aria-label="예상 반영 고지월·부과금액 안내" aria-describedby="s1-estimate-tip"><span class="icon icon--badge" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-help"/></svg></span></button><div class="tooltip-panel elevation-tooltip tooltip-panel--top tooltip-panel--pinned tooltip-panel--visible" id="s1-estimate-tip" role="tooltip"><span class="tooltip-panel-text">실제 부과금액 및 반영 시기는 신고일, 보수월액, 기관 처리 일정 등에 따라 달라질 수 있어요.</span><button class="tooltip-dismiss" aria-label="툴팁 닫기"><svg aria-hidden="true"><use href="#icon-close"/></svg></button></div></span></span>
                 <span class="badge badge--neutral badge--line acq-estimate-footer__badge">국민연금</span>
                 <span class="acq-estimate-footer__values"><span class="acq-estimate-footer__date">2026-01</span><span class="acq-estimate-footer__sep" aria-hidden="true"></span><span class="acq-estimate-footer__amount">3,567원</span></span>
                 <span class="badge badge--neutral badge--line acq-estimate-footer__badge">건강보험</span>
@@ -743,7 +744,7 @@ exits: index.html
           <div class="modal__footer">
             <div class="acq-estimate-footer" role="status">
               <div class="acq-estimate-footer__table">
-                <span class="acq-estimate-footer__title"><span class="acq-estimate-footer__title-text">예상 반영<br>고지월 · 부과금액</span><span class="tooltip-wrapper" onmouseenter="this.querySelector('.tooltip-panel').classList.add('tooltip-panel--visible')" onmouseleave="this.querySelector('.tooltip-panel').classList.remove('tooltip-panel--visible')"><button class="tooltip-trigger tooltip-trigger--sm" type="button" aria-label="예상 반영 고지월·부과금액 안내" aria-describedby="s4-estimate-tip" onfocus="this.closest('.tooltip-wrapper').querySelector('.tooltip-panel').classList.add('tooltip-panel--visible')" onblur="this.closest('.tooltip-wrapper').querySelector('.tooltip-panel').classList.remove('tooltip-panel--visible')"><svg aria-hidden="true"><use href="#icon-help"/></svg></button><div class="tooltip-panel elevation-tooltip tooltip-panel--top" id="s4-estimate-tip" role="tooltip">실제 부과금액 및 반영 시기는 신고일, 보수월액, 기관 처리 일정 등에 따라 달라질 수 있어요.</div></span></span>
+                <span class="acq-estimate-footer__title"><span class="acq-estimate-footer__title-text">예상 반영<br>고지월 · 부과금액</span><span class="tooltip-wrapper"><button class="btn btn--primary btn--solid btn--micro btn--icon-only" type="button" aria-label="예상 반영 고지월·부과금액 안내" aria-describedby="s4-estimate-tip"><span class="icon icon--badge" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-help"/></svg></span></button><div class="tooltip-panel elevation-tooltip tooltip-panel--top tooltip-panel--pinned tooltip-panel--visible" id="s4-estimate-tip" role="tooltip"><span class="tooltip-panel-text">실제 부과금액 및 반영 시기는 신고일, 보수월액, 기관 처리 일정 등에 따라 달라질 수 있어요.</span><button class="tooltip-dismiss" aria-label="툴팁 닫기"><svg aria-hidden="true"><use href="#icon-close"/></svg></button></div></span></span>
                 <span class="badge badge--neutral badge--line acq-estimate-footer__badge">고용보험</span>
                 <span class="acq-estimate-footer__values"><span class="acq-estimate-footer__date">2026-01</span><span class="acq-estimate-footer__sep" aria-hidden="true"></span><span class="acq-estimate-footer__amount">20,700원</span></span>
               </div>
@@ -904,7 +905,7 @@ exits: index.html
           <div class="modal__footer">
             <div class="acq-estimate-footer" role="status">
               <div class="acq-estimate-footer__table">
-                <span class="acq-estimate-footer__title"><span class="acq-estimate-footer__title-text">예상 반영<br>고지월 · 부과금액</span><span class="tooltip-wrapper" onmouseenter="this.querySelector('.tooltip-panel').classList.add('tooltip-panel--visible')" onmouseleave="this.querySelector('.tooltip-panel').classList.remove('tooltip-panel--visible')"><button class="tooltip-trigger tooltip-trigger--sm" type="button" aria-label="예상 반영 고지월·부과금액 안내" aria-describedby="s5-estimate-tip" onfocus="this.closest('.tooltip-wrapper').querySelector('.tooltip-panel').classList.add('tooltip-panel--visible')" onblur="this.closest('.tooltip-wrapper').querySelector('.tooltip-panel').classList.remove('tooltip-panel--visible')"><svg aria-hidden="true"><use href="#icon-help"/></svg></button><div class="tooltip-panel elevation-tooltip tooltip-panel--top" id="s5-estimate-tip" role="tooltip">실제 부과금액 및 반영 시기는 신고일, 보수월액, 기관 처리 일정 등에 따라 달라질 수 있어요.</div></span></span>
+                <span class="acq-estimate-footer__title"><span class="acq-estimate-footer__title-text">예상 반영<br>고지월 · 부과금액</span><span class="tooltip-wrapper"><button class="btn btn--primary btn--solid btn--micro btn--icon-only" type="button" aria-label="예상 반영 고지월·부과금액 안내" aria-describedby="s5-estimate-tip"><span class="icon icon--badge" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-help"/></svg></span></button><div class="tooltip-panel elevation-tooltip tooltip-panel--top tooltip-panel--pinned tooltip-panel--visible" id="s5-estimate-tip" role="tooltip"><span class="tooltip-panel-text">실제 부과금액 및 반영 시기는 신고일, 보수월액, 기관 처리 일정 등에 따라 달라질 수 있어요.</span><button class="tooltip-dismiss" aria-label="툴팁 닫기"><svg aria-hidden="true"><use href="#icon-close"/></svg></button></div></span></span>
                 <span class="badge badge--neutral badge--line acq-estimate-footer__badge">국민연금</span>
                 <span class="acq-estimate-footer__values"><span class="acq-estimate-footer__date">2026-01</span><span class="acq-estimate-footer__sep" aria-hidden="true"></span><span class="acq-estimate-footer__amount">3,567원</span></span>
                 <span class="badge badge--neutral badge--line acq-estimate-footer__badge">건강보험</span>
@@ -1302,6 +1303,44 @@ exits: index.html
     }).map(rowName);
   }
 
+  /* ── 예상 반영 고지월·부과금액 안내 툴팁(pinned) ──
+     테이블 툴바와 동일한 물음표 버튼(btn--primary micro icon-only + icon--badge)에 pinned 툴팁을 얹는다.
+     최초에는 강제 노출(--pinned --visible), X(또는 Esc)로 닫으면 hover/focus 기본 툴팁으로 전환.
+     닫힘 상태는 tipId 기준으로 기억 — renderEstimate가 재렌더해도 다시 pin되지 않게 한다. */
+  var ESTIMATE_TIP_TEXT = '실제 부과금액 및 반영 시기는 신고일, 보수월액, 기관 처리 일정 등에 따라 달라질 수 있어요.';
+  var estimateTipDismissed = {};
+  function estimateTipMarkup(tipId) {
+    var pinned = !estimateTipDismissed[tipId];
+    return '<span class="tooltip-wrapper">' +
+      '<button class="btn btn--primary btn--solid btn--micro btn--icon-only" type="button" aria-label="예상 반영 고지월·부과금액 안내" aria-describedby="' + tipId + '"><span class="icon icon--badge" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-help"/></svg></span></button>' +
+      '<div class="tooltip-panel elevation-tooltip tooltip-panel--top' + (pinned ? ' tooltip-panel--pinned tooltip-panel--visible' : '') + '" id="' + tipId + '" role="tooltip"><span class="tooltip-panel-text">' + ESTIMATE_TIP_TEXT + '</span><button class="tooltip-dismiss" aria-label="툴팁 닫기"><svg aria-hidden="true"><use href="#icon-close"/></svg></button></div>' +
+    '</span>';
+  }
+  function estimateTipToDefault(wrapper) {
+    var panel = wrapper.querySelector('.tooltip-panel');
+    if (!panel) return;
+    var textEl = panel.querySelector('.tooltip-panel-text');
+    if (textEl) panel.textContent = textEl.textContent;   /* span·dismiss 제거 → 기본 툴팁 구조로 */
+    panel.classList.remove('tooltip-panel--pinned', 'tooltip-panel--visible');
+  }
+  function initEstimateTip(wrapper) {
+    if (!wrapper || wrapper._estTipInit) return;
+    var panel = wrapper.querySelector('.tooltip-panel');
+    var trigger = wrapper.querySelector('[aria-describedby]');
+    if (!panel || !trigger) return;
+    wrapper._estTipInit = true;
+    var tipId = panel.id;
+    function isPinned() { return panel.classList.contains('tooltip-panel--pinned'); }
+    /* pinned 중에는 hover/leave로 사라지지 않게 하고, 닫힌 뒤에는 기본 hover/focus 툴팁으로 동작 */
+    wrapper.addEventListener('mouseenter', function () { panel.classList.add('tooltip-panel--visible'); });
+    wrapper.addEventListener('mouseleave', function () { if (!isPinned()) panel.classList.remove('tooltip-panel--visible'); });
+    trigger.addEventListener('focus', function () { panel.classList.add('tooltip-panel--visible'); });
+    trigger.addEventListener('blur', function () { if (!isPinned()) panel.classList.remove('tooltip-panel--visible'); });
+    var dismiss = panel.querySelector('.tooltip-dismiss');
+    if (dismiss) dismiss.addEventListener('click', function () { estimateTipDismissed[tipId] = true; estimateTipToDefault(wrapper); });
+    trigger.addEventListener('keydown', function (e) { if (e.key === 'Escape') { estimateTipDismissed[tipId] = true; estimateTipToDefault(wrapper); } });
+  }
+
   /* ── 9. 예상보험료 요약 렌더 — 모달 푸터 좌측(.acq-estimate-footer)에 전체 노출.
      배너가 아니라 액션 옆 요약이라 계산 결과를 제출 시점에 함께 보여준다. */
   function renderEstimate(panel) {
@@ -1325,18 +1364,15 @@ exits: index.html
     }).join('');
 
     footer.hidden = false;
-    /* ※ 안내문은 타이틀 옆 물음표 툴팁으로 이동 — 상시 노출 대신 hover/focus 시에만 */
     var tipId = ((payEl && payEl.id) || 'acq').replace(/-pay$/, '') + '-estimate-tip';
     footer.innerHTML =
       '<div class="acq-estimate-footer__table">' +
         '<span class="acq-estimate-footer__title"><span class="acq-estimate-footer__title-text">예상 반영<br>고지월 · 부과금액</span>' +
-          '<span class="tooltip-wrapper" onmouseenter="this.querySelector(\'.tooltip-panel\').classList.add(\'tooltip-panel--visible\')" onmouseleave="this.querySelector(\'.tooltip-panel\').classList.remove(\'tooltip-panel--visible\')">' +
-            '<button class="tooltip-trigger tooltip-trigger--sm" type="button" aria-label="예상 반영 고지월·부과금액 안내" aria-describedby="' + tipId + '" onfocus="this.closest(\'.tooltip-wrapper\').querySelector(\'.tooltip-panel\').classList.add(\'tooltip-panel--visible\')" onblur="this.closest(\'.tooltip-wrapper\').querySelector(\'.tooltip-panel\').classList.remove(\'tooltip-panel--visible\')"><svg aria-hidden="true"><use href="#icon-help"/></svg></button>' +
-            '<div class="tooltip-panel elevation-tooltip tooltip-panel--top" id="' + tipId + '" role="tooltip">실제 부과금액 및 반영 시기는 신고일, 보수월액, 기관 처리 일정 등에 따라 달라질 수 있어요.</div>' +
-          '</span>' +
+          estimateTipMarkup(tipId) +
         '</span>' +
         cols +
       '</div>';
+    initEstimateTip(footer.querySelector('.tooltip-wrapper'));
   }
 
   /* ── 6. 연금 취득월납부(6 area) 노출 조건 ── */
@@ -1482,6 +1518,9 @@ exits: index.html
   Array.prototype.forEach.call(document.querySelectorAll('.acq-form input.input:not([readonly]):not(.dp__value-part)'), function (el) {
     if (String(el.value).trim()) el.classList.add('input--complete');
   });
+
+  /* 정적 마크업의 예상 반영 안내 pinned 툴팁 초기화 (동적 렌더는 renderEstimate에서 처리) */
+  document.querySelectorAll('.acq-estimate-footer .tooltip-wrapper').forEach(initEstimateTip);
 
   /* ── 10·14. 신고요청 / 다시 시도 → 검증 후 확인 Alert ── */
   function validate(panel) {
