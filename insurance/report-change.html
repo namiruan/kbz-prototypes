@@ -191,8 +191,13 @@
     .acq-info-card__item + .acq-info-card__item { border-left: var(--stroke-sm) solid var(--color-border-default); }
     .acq-info-card__label { font-size: var(--font-size-sm); color: var(--color-text-subtle); }
     .acq-info-card__value { font-size: var(--font-size-base); font-weight: var(--font-weight-heading); color: var(--color-text-body); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    /* 신고 사업장 정보 테이블 */
-    .chg-worksite-table { width: 100%; }
+    /* 신고 사업장 정보 — 취득신고 가입보험 리스트와 일관된 상태 리스트 스타일.
+       각 항목: 보험명 + '변경 전 → 변경 후' 사업장 플로우. */
+    .acq-move-item { grid-template-columns: minmax(120px, max-content) minmax(0, 1fr); background: var(--color-surface-subtle); }
+    .acq-move-item__flow { display: inline-flex; align-items: center; gap: var(--space-gap-sm); min-width: 0; }
+    .acq-move-item__from { color: var(--color-text-subtle); font-size: var(--font-size-sm); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .acq-move-item__arrow { flex-shrink: 0; color: var(--color-text-subtle); }
+    .acq-move-item__to { color: var(--color-text-body); font-weight: var(--font-weight-heading); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   </style>
 </head>
 <body>
@@ -268,19 +273,16 @@ exits: index.html
                   <!-- 2 area — 신고 사업장 정보 -->
                   <div class="acq-section">
                     <span class="text-form-label" id="c1-ws-label">신고 사업장 정보</span>
-                    <table class="table table--dense chg-worksite-table" aria-labelledby="c1-ws-label">
-                      <thead class="table__head">
-                        <tr>
-                          <th class="table__head-cell" scope="col">보험</th>
-                          <th class="table__head-cell" scope="col">변경 전 사업장</th>
-                          <th class="table__head-cell" scope="col">변경 후 사업장</th>
-                        </tr>
-                      </thead>
-                      <tbody class="table__body">
-                        <tr class="table__row"><td class="table__cell">건강보험·국민연금</td><td class="table__cell">(주)한성산업</td><td class="table__cell">(주)한성산업-제조</td></tr>
-                        <tr class="table__row"><td class="table__cell">산재보험</td><td class="table__cell">(주)한성산업</td><td class="table__cell">(주)한성산업-제조</td></tr>
-                      </tbody>
-                    </table>
+                    <ul class="acq-ins-list acq-move-list" aria-labelledby="c1-ws-label">
+                      <li class="acq-ins-item acq-move-item">
+                        <span class="acq-ins-item__name">건강보험·국민연금</span>
+                        <span class="acq-move-item__flow"><span class="acq-move-item__from">(주)한성산업</span><span class="sr-only">에서</span><span class="acq-move-item__arrow" aria-hidden="true">→</span><span class="acq-move-item__to">(주)한성산업-제조</span><span class="sr-only">(으)로 변경</span></span>
+                      </li>
+                      <li class="acq-ins-item acq-move-item">
+                        <span class="acq-ins-item__name">산재보험</span>
+                        <span class="acq-move-item__flow"><span class="acq-move-item__from">(주)한성산업</span><span class="sr-only">에서</span><span class="acq-move-item__arrow" aria-hidden="true">→</span><span class="acq-move-item__to">(주)한성산업-제조</span><span class="sr-only">(으)로 변경</span></span>
+                      </li>
+                    </ul>
                   </div>
 
                   <!-- 3·4 area — 전입일 + 연금 취득월납부여부 -->
