@@ -795,6 +795,15 @@ exits: index.html
     var ff = seg.closest('.form-field');
     if (ff) ff.classList.toggle('form-field--error', on);
   }
+  /* 세그먼트 슬라이더 재정렬 — 리플로우(스크롤바 토글 등)로 폭이 바뀌면 DS가 자동 갱신하지 않아
+     슬라이더가 선택 항목과 어긋난다. 현재 선택 항목 크기·위치로 다시 맞춘다. */
+  function resyncSeg(seg) {
+    if (!seg) return;
+    var sl = seg.querySelector('.segment__slider'), sel = seg.querySelector('.segment__item--selected');
+    if (!sl || !sel) return;
+    sl.style.width = sel.offsetWidth + 'px';
+    sl.style.transform = 'translateX(' + sel.offsetLeft + 'px)';
+  }
 
   /* ── 변경년월 — 당해년도 월 드롭다운 (착오정정=취득월 고정 / 선택가능 / 비활성) ── */
   function mdValue(dd) {
@@ -910,9 +919,10 @@ exits: index.html
         var rateTone = !over20 ? 'badge--neutral' : (rate > 0 ? 'badge--success' : 'badge--caution');
         e.rateBadge.className = 'badge acq-rate-badge ' + rateTone;
       } else if (e.rateField) { e.rateField.hidden = true; }
-      /* 국민연금 소득월액 서류 안내 + 첨부 필수 — 20% 이상 & 국민연금 선택 시 */
+      /* 제출서류 안내 — 20% 이상이면 국민연금 특례 대상이라 변동율만으로 바로 노출(체크와 무관) */
+      if (e.pensionDoc) e.pensionDoc.hidden = !over20;
+      /* 첨부 필수 — 20% 이상 & 국민연금 선택(opt-in) 시에만 */
       var pensionOn = over20 && e.pen.checked;
-      if (e.pensionDoc) e.pensionDoc.hidden = !pensionOn;
       if (e.fileReq) e.fileReq.hidden = !pensionOn;
     } else {
       /* 변경사유 미선택 */
@@ -939,6 +949,8 @@ exits: index.html
     }
     panel.dataset.reasonState = reason;
     refresh(panel);
+    /* 필드 노출/숨김으로 폭이 바뀔 수 있어 슬라이더를 리플로우 후 재정렬 */
+    if (window.requestAnimationFrame) requestAnimationFrame(function () { resyncSeg(panel.querySelector('.acq-reason-seg')); });
   }
 
   /* 변경사유 세그먼트 선택 — DS initSegment가 selected 갱신한 뒤(setTimeout) 반응. 클릭·방향키 모두 처리 */
@@ -1070,6 +1082,13 @@ exits: index.html
     panel.dataset.reasonState = '';
     onReasonSelected(panel);
   });
+
+  /* 세그먼트 폭 변화(스크롤바 토글 등 리플로우) 시 슬라이더 재정렬 — DS는 선택 시점에만 계산 */
+  if (window.ResizeObserver) {
+    document.querySelectorAll('#pane-panels .acq-reason-seg').forEach(function (seg) {
+      new ResizeObserver(function () { resyncSeg(seg); }).observe(seg);
+    });
+  }
 })();
 </script>
 
