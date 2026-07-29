@@ -332,16 +332,15 @@ exits: index.html
                   <!-- 3 area — 변경사유 (필수). 나머지 입력의 상태를 결정하는 트리거라 최상단에 배치.
                        선택지가 3개뿐인 상호배타 항목이라 세그먼트로 한눈에 노출한다. -->
                   <div class="form-field">
-                    <span class="form-field__label text-form-label" id="p1-reason-label">변경사유 <span class="form-field__required" aria-hidden="true">(필수)</span></span>
+                    <span class="form-field__label text-form-label" id="p1-reason-label">변경사유</span>
                     <div class="form-field__body">
                       <div class="segment segment--md acq-reason-seg" role="radiogroup" aria-labelledby="p1-reason-label" id="p1-reason">
                         <span class="segment__slider" aria-hidden="true"></span>
-                        <button class="segment__item" role="radio" aria-checked="false" type="button" data-reason="보수인상">보수인상</button>
+                        <button class="segment__item segment__item--selected" role="radio" aria-checked="true" type="button" data-reason="보수인상">보수인상</button>
                         <button class="segment__item" role="radio" aria-checked="false" type="button" data-reason="보수인하">보수인하</button>
                         <button class="segment__item" role="radio" aria-checked="false" type="button" data-reason="착오정정">착오정정</button>
                       </div>
                     </div>
-                    <div class="form-field__footer"><p class="form-field__error text-helper" id="p1-reason-err" role="alert">변경사유를 선택해 주세요.</p></div>
                   </div>
 
                   <!-- 4-2 area — 변경년월 (필수). 변경사유 선택 후 활성화되며, 착오정정은 취득월로 고정. -->
@@ -1013,10 +1012,10 @@ exits: index.html
     if (cancelBtn) cancelBtn.addEventListener('click', function () { location.href = 'insurance-join-status.html'; });
   }
 
-  /* 초기 동기화 — 변경사유 미선택 기본 상태 반영 */
+  /* 초기 동기화 — 변경사유 기본 선택(보수인상) 기준으로 변경년월 활성화·보험 자동선택까지 반영 */
   Array.prototype.forEach.call(document.querySelectorAll('#pane-panels > .scenario-panel'), function (panel) {
     panel.dataset.reasonState = '';
-    refresh(panel);
+    onReasonSelected(panel);
   });
 })();
 </script>
