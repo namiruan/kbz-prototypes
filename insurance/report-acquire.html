@@ -52,6 +52,8 @@
     }
     /* 가로 그룹 안의 직종 선택: 남는 가로폭을 채우도록 확장 */
     .acq-form .form-field-group--horizontal > .form-field:has(.acq-job-trigger) { flex: 1 1 auto; }
+    /* 직종 선택 완료 — 값이 채워지면 input--complete와 동일한 테두리로 표시 */
+    .acq-job-trigger--complete { border-color: var(--color-border-complete); }
     .acq-job-trigger:hover { border-color: var(--color-border-brand); }
     .acq-job-trigger__value { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .acq-job-trigger--placeholder .acq-job-trigger__value { color: var(--color-text-subtle); }
@@ -1574,6 +1576,12 @@ exits: index.html
     var jobInput = document.getElementById('job-search-input');
     var jobEmpty = jobModal.querySelector('.acq-job-table__empty');
 
+    /* 이미 값이 채워진 직종 트리거(예: 이미 가입·저장 실패)는 로드 시 complete 상태로 */
+    document.querySelectorAll('.acq-job-trigger:not(.acq-job-trigger--placeholder)').forEach(function (trg) {
+      var hid = trg.parentElement.querySelector('input[type="hidden"][id$="-job"]');
+      if (hid && hid.value.trim()) trg.classList.add('acq-job-trigger--complete');
+    });
+
     /* 선택 → 값 반영 + 모달 종료 */
     jobModal.addEventListener('click', function (e) {
       var pick = e.target.closest('.acq-job-pick');
@@ -1582,6 +1590,7 @@ exits: index.html
       var valEl = jobOpener.querySelector('.acq-job-trigger__value');
       if (valEl) valEl.textContent = job;
       jobOpener.classList.remove('acq-job-trigger--placeholder');
+      jobOpener.classList.add('acq-job-trigger--complete');
       var hidden = jobOpener.parentElement.querySelector('input[type="hidden"][id$="-job"]');
       if (hidden) hidden.value = job;
       closeOverlay(jobModal);
