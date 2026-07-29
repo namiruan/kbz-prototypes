@@ -56,6 +56,24 @@
     .acq-job-trigger__value { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .acq-job-trigger--placeholder .acq-job-trigger__value { color: var(--color-text-subtle); }
     .acq-job-trigger__icon { flex-shrink: 0; color: var(--color-text-subtle); }
+    /* ── 직종 검색 Layer Modal (Figma 14878-5873) ── */
+    .acq-job-modal { width: 520px; max-width: calc(100% - var(--space-inset-2xl)); }
+    /* 헤더: 타이틀 중앙 정렬(브랜드 컬러), 닫기는 우상단 고정 */
+    .acq-job-modal__header { position: relative; justify-content: center; text-align: center; }
+    .acq-job-modal__title { color: var(--color-text-brand); }
+    .acq-job-modal__close { position: absolute; top: var(--space-inset-xl); right: var(--space-inset-xl); }
+    /* 검색: 인풋 + 검색 버튼 한 줄 */
+    .acq-job-search { display: flex; gap: var(--space-gap-sm); margin-bottom: var(--space-gap-lg); }
+    .acq-job-search .input { flex: 1 1 auto; min-width: 0; }
+    .acq-job-search .btn { flex-shrink: 0; }
+    /* 테이블: 선택 열은 내용 폭, 버튼 가운데 */
+    .acq-job-table { width: 100%; }
+    .acq-job-table .acq-job-table__pick-cell { text-align: center; }
+    .acq-job-table .table__body { display: table-row-group; }
+    /* 검색 결과 없음 행 */
+    .acq-job-table__empty td { text-align: center; color: var(--color-text-subtle); padding: var(--space-inset-xl); }
+    /* 페이지네이션 가운데 */
+    .acq-job-pagination { justify-content: center; margin-top: var(--space-gap-lg); }
     /* 연금 취득월납부 라벨 — 텍스트 + 툴팁 트리거를 한 줄로 */
     .acq-label-row { display: flex; align-items: center; gap: var(--space-gap-2xs); }
     /* 도움말 트리거(24px)가 라벨 높이를 키워 옆 필드보다 본문이 아래로 밀리는 문제 방지 —
@@ -1002,20 +1020,58 @@ exits: index.html
   </div>
 </div>
 
-<!-- ══════════════ 7-1 area — 직종 검색 Layer Modal (미작성 안내) ══════════════ -->
-<!-- Figma 「직종 검색 Layer Modal」(Group 49)은 아직 마크업하지 않았다.
-     중첩 모달이므로 이 파일에 함께 담길 예정 — 지금은 안내 Alert으로 대체한다. -->
+<!-- ══════════════ 7-1 area — 직종 검색 Layer Modal (Figma 14878-5873) ══════════════ -->
+<!-- 검색·선택하여 직종 설정. 선택 버튼 클릭 시 모달 종료 + 선택 직종을 여는 필드에 반영. -->
 <div id="overlay-job-search" data-overlay>
-  <div class="alert" role="alertdialog" aria-modal="true" aria-labelledby="job-title" aria-describedby="job-body">
-    <div class="alert__header">
-      <p class="text-card-title alert__title" id="job-title">아직 작성하지 않은 화면입니다</p>
-      <button class="icon-on--sm alert__close" type="button" aria-label="닫기" data-overlay-close><svg aria-hidden="true"><use href="#icon-close"/></svg></button>
+  <div class="modal acq-job-modal" role="dialog" aria-modal="true" aria-labelledby="job-search-title">
+    <div class="modal__header acq-job-modal__header">
+      <h2 class="modal__title text-modal-title-sm acq-job-modal__title" id="job-search-title">직종 검색</h2>
+      <button class="icon-on--lg acq-job-modal__close" type="button" aria-label="닫기" data-overlay-close><svg aria-hidden="true"><use href="#icon-close"/></svg></button>
     </div>
-    <div class="alert__body" id="job-body">
-      <p class="text-description alert__description">직종 검색 화면은 이 파일에 중첩 모달로 추가될 예정이에요.</p>
-    </div>
-    <div class="alert__footer">
-      <button class="btn btn--secondary btn--md" type="button" data-overlay-close>확인</button>
+    <div class="modal__body">
+      <div class="modal__content">
+        <!-- 1 area — 검색 -->
+        <div class="acq-job-search">
+          <input class="input" type="text" id="job-search-input" placeholder="검색할 단어를 입력해 주세요." aria-label="직종 검색어">
+          <button class="btn btn--secondary btn--md btn--icon-left" type="button" id="job-search-btn">
+            <span class="icon icon--sm" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-search"/></svg></span>검색
+          </button>
+        </div>
+        <!-- 직종 목록 (비즈씨와 동일) -->
+        <table class="table table--dense acq-job-table" aria-label="직종 목록">
+          <thead class="table__head">
+            <tr>
+              <th class="table__head-cell table__cell--fit" scope="col">연번</th>
+              <th class="table__head-cell table__cell--fit" scope="col">코드</th>
+              <th class="table__head-cell" scope="col">직종</th>
+              <th class="table__head-cell table__cell--fit" scope="col">선택</th>
+            </tr>
+          </thead>
+          <tbody class="table__body" id="job-table-body">
+            <tr class="table__row"><td class="table__cell">1</td><td class="table__cell">001</td><td class="table__cell">대표자</td><td class="table__cell acq-job-table__pick-cell"><button class="btn btn--secondary btn--solid btn--sm acq-job-pick" type="button" data-job="대표자">선택</button></td></tr>
+            <tr class="table__row"><td class="table__cell">2</td><td class="table__cell">011</td><td class="table__cell">의회의원·고위공무원 및 기업 고위임원</td><td class="table__cell acq-job-table__pick-cell"><button class="btn btn--secondary btn--solid btn--sm acq-job-pick" type="button" data-job="의회의원·고위공무원 및 기업 고위임원">선택</button></td></tr>
+            <tr class="table__row"><td class="table__cell">3</td><td class="table__cell">012</td><td class="table__cell">행정·경영·금융·보험 관리자</td><td class="table__cell acq-job-table__pick-cell"><button class="btn btn--secondary btn--solid btn--sm acq-job-pick" type="button" data-job="행정·경영·금융·보험 관리자">선택</button></td></tr>
+            <tr class="table__row"><td class="table__cell">4</td><td class="table__cell">013</td><td class="table__cell">전문서비스 관리자</td><td class="table__cell acq-job-table__pick-cell"><button class="btn btn--secondary btn--solid btn--sm acq-job-pick" type="button" data-job="전문서비스 관리자">선택</button></td></tr>
+            <tr class="table__row"><td class="table__cell">5</td><td class="table__cell">014</td><td class="table__cell">미용·여행·숙박·음식·경비·청소 관리자</td><td class="table__cell acq-job-table__pick-cell"><button class="btn btn--secondary btn--solid btn--sm acq-job-pick" type="button" data-job="미용·여행·숙박·음식·경비·청소 관리자">선택</button></td></tr>
+            <tr class="table__row"><td class="table__cell">6</td><td class="table__cell">015</td><td class="table__cell">영업·판매·운송 관리자</td><td class="table__cell acq-job-table__pick-cell"><button class="btn btn--secondary btn--solid btn--sm acq-job-pick" type="button" data-job="영업·판매·운송 관리자">선택</button></td></tr>
+            <tr class="table__row"><td class="table__cell">7</td><td class="table__cell">016</td><td class="table__cell">건설·채굴·제조·생산 관리자</td><td class="table__cell acq-job-table__pick-cell"><button class="btn btn--secondary btn--solid btn--sm acq-job-pick" type="button" data-job="건설·채굴·제조·생산 관리자">선택</button></td></tr>
+            <tr class="table__row"><td class="table__cell">8</td><td class="table__cell">021</td><td class="table__cell">정부·공공행정 전문가</td><td class="table__cell acq-job-table__pick-cell"><button class="btn btn--secondary btn--solid btn--sm acq-job-pick" type="button" data-job="정부·공공행정 전문가">선택</button></td></tr>
+            <tr class="table__row"><td class="table__cell">9</td><td class="table__cell">022</td><td class="table__cell">경영·인사 전문가</td><td class="table__cell acq-job-table__pick-cell"><button class="btn btn--secondary btn--solid btn--sm acq-job-pick" type="button" data-job="경영·인사 전문가">선택</button></td></tr>
+            <tr class="table__row"><td class="table__cell">10</td><td class="table__cell">023</td><td class="table__cell">회계·세무·감정 전문가</td><td class="table__cell acq-job-table__pick-cell"><button class="btn btn--secondary btn--solid btn--sm acq-job-pick" type="button" data-job="회계·세무·감정 전문가">선택</button></td></tr>
+            <tr class="table__row acq-job-table__empty" hidden><td class="table__cell" colspan="4">검색 결과가 없습니다</td></tr>
+          </tbody>
+        </table>
+        <!-- 2 area — 페이지네이션 -->
+        <nav class="pagination acq-job-pagination" aria-label="직종 목록 페이지 탐색">
+          <button class="pagination__page pagination__page--current" type="button" aria-current="page">1</button>
+          <button class="pagination__page" type="button">2</button>
+          <button class="pagination__page" type="button">3</button>
+          <button class="pagination__page" type="button">4</button>
+          <button class="pagination__page" type="button">5</button>
+          <button class="pagination__arrow" type="button" aria-label="다음 페이지"><svg aria-hidden="true" style="width:var(--icon-sm);height:var(--icon-sm)"><use href="#icon-chevron-right"/></svg></button>
+          <button class="pagination__arrow" type="button" aria-label="마지막 페이지"><svg aria-hidden="true" style="width:var(--icon-sm);height:var(--icon-sm)"><use href="#icon-chevron-double-right"/></svg></button>
+        </nav>
+      </div>
     </div>
   </div>
 </div>
@@ -1442,6 +1498,63 @@ exits: index.html
     var cancelBtn = cancelOv.querySelector('.btn--secondary');
     if (cancelBtn) cancelBtn.addEventListener('click', function () {
       location.href = 'insurance-join-status.html';
+    });
+  }
+
+  /* ── 7-1. 직종 검색 Layer Modal — 검색·선택 → 여는 필드에 반영 후 종료 ── */
+  var jobModal = document.getElementById('overlay-job-search');
+  if (jobModal) {
+    var jobOpener = null;
+    /* 어느 직종 필드에서 열었는지 기억 (여러 시나리오가 같은 모달을 공유) */
+    document.addEventListener('click', function (e) {
+      var trg = e.target.closest('.acq-job-trigger');
+      if (trg) jobOpener = trg;
+    }, true);
+
+    var jobBody = document.getElementById('job-table-body');
+    var jobInput = document.getElementById('job-search-input');
+    var jobEmpty = jobModal.querySelector('.acq-job-table__empty');
+
+    /* 선택 → 값 반영 + 모달 종료 */
+    jobModal.addEventListener('click', function (e) {
+      var pick = e.target.closest('.acq-job-pick');
+      if (!pick || !jobOpener) return;
+      var job = pick.dataset.job;
+      var valEl = jobOpener.querySelector('.acq-job-trigger__value');
+      if (valEl) valEl.textContent = job;
+      jobOpener.classList.remove('acq-job-trigger--placeholder');
+      var hidden = jobOpener.parentElement.querySelector('input[type="hidden"][id$="-job"]');
+      if (hidden) hidden.value = job;
+      closeOverlay(jobModal);
+    });
+
+    /* 검색 — 코드·직종명 부분일치 필터 */
+    function jobFilter() {
+      var term = (jobInput.value || '').trim().toLowerCase();
+      var shown = 0;
+      jobBody.querySelectorAll('.table__row:not(.acq-job-table__empty)').forEach(function (row) {
+        var code = row.children[1].textContent.toLowerCase();
+        var name = row.children[2].textContent.toLowerCase();
+        var hit = !term || code.indexOf(term) > -1 || name.indexOf(term) > -1;
+        row.hidden = !hit;
+        if (hit) shown++;
+      });
+      if (jobEmpty) jobEmpty.hidden = shown !== 0;
+    }
+    var jobBtn = document.getElementById('job-search-btn');
+    if (jobBtn) jobBtn.addEventListener('click', jobFilter);
+    if (jobInput) jobInput.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') { e.preventDefault(); jobFilter(); }
+    });
+
+    /* 페이지네이션(프로토타입: 현재 페이지 표시 전환) */
+    jobModal.querySelectorAll('.acq-job-pagination .pagination__page').forEach(function (pg) {
+      pg.addEventListener('click', function () {
+        jobModal.querySelectorAll('.acq-job-pagination .pagination__page').forEach(function (p) {
+          p.classList.remove('pagination__page--current'); p.removeAttribute('aria-current');
+        });
+        pg.classList.add('pagination__page--current'); pg.setAttribute('aria-current', 'page');
+      });
     });
   }
 })();
