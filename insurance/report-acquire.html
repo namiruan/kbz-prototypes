@@ -1038,7 +1038,7 @@ exits: index.html
     if (typeof initTextareaContainer === 'function') root.querySelectorAll('.textarea-wrap').forEach(function(el) { initTextareaContainer(el); });
     if (typeof initDropdown === 'function')   root.querySelectorAll('.dropdown').forEach(function(el) { initDropdown(el.parentElement); });
     if (typeof initSegment === 'function')    root.querySelectorAll('.segment').forEach(function(el) { initSegment(el.parentElement); });
-    if (typeof initFileUpload === 'function') root.querySelectorAll('.file-upload').forEach(function(el) { initFileUpload(el); });
+    if (typeof initFileUpload === 'function') initFileUpload(root);   /* DS initFileUpload(container)는 컨테이너 안의 .file-upload를 탐색 — 요소가 아닌 root를 넘긴다 */
   }
   _initComponents();
 
