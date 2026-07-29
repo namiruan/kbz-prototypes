@@ -54,6 +54,8 @@
     .acq-form .form-field-group--horizontal > .form-field:has(.acq-job-trigger) { flex: 1 1 auto; }
     /* 직종 선택 완료 — 값이 채워지면 input--complete와 동일한 테두리로 표시 */
     .acq-job-trigger--complete { border-color: var(--color-border-complete); }
+    /* 직종 미선택 에러 — input--error와 동일한 테두리 */
+    .acq-job-trigger--error { border-color: var(--color-border-error); }
     .acq-job-trigger:hover { border-color: var(--color-border-brand); }
     .acq-job-trigger__value { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .acq-job-trigger--placeholder .acq-job-trigger__value { color: var(--color-text-subtle); }
@@ -332,7 +334,7 @@ exits: index.html
                       <div class="form-field__body">
                         <div class="input-wrap input-wrap--suffix"><input class="input" type="text" id="s1-pay" value="2,300,000" inputmode="numeric" aria-required="true" aria-describedby="s1-pay-footer"><span class="input__suffix">원</span></div>
                         <div class="form-field__footer" id="s1-pay-footer">
-                          <p class="form-field__error text-helper" id="s1-pay-err" role="alert">숫자만 입력해 주세요.</p>
+                          <p class="form-field__error text-helper" id="s1-pay-err" role="alert">월급여액을 입력해 주세요.</p>
                         </div>
                       </div>
                     </div>
@@ -362,6 +364,7 @@ exits: index.html
                         <span class="acq-job-trigger__icon icon icon--sm" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-search"/></svg></span>
                       </button>
                       <input type="hidden" id="s1-job" value="">
+                      <div class="form-field__footer"><p class="form-field__error text-helper" id="s1-job-err" role="alert">직종을 선택해 주세요.</p></div>
                     </div>
                   </div>
 
@@ -507,7 +510,7 @@ exits: index.html
                       <div class="form-field__body">
                         <div class="input-wrap input-wrap--suffix"><input class="input" type="text" id="s2-pay" placeholder="월급여액 입력" inputmode="numeric" aria-required="true" aria-describedby="s2-pay-footer"><span class="input__suffix">원</span></div>
                         <div class="form-field__footer" id="s2-pay-footer">
-                          <p class="form-field__error text-helper" id="s2-pay-err" role="alert">숫자만 입력해 주세요.</p>
+                          <p class="form-field__error text-helper" id="s2-pay-err" role="alert">월급여액을 입력해 주세요.</p>
                         </div>
                       </div>
                     </div>
@@ -538,6 +541,7 @@ exits: index.html
                         <span class="acq-job-trigger__icon icon icon--sm" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-search"/></svg></span>
                       </button>
                       <input type="hidden" id="s2-job" value="">
+                      <div class="form-field__footer"><p class="form-field__error text-helper" id="s2-job-err" role="alert">직종을 선택해 주세요.</p></div>
                     </div>
                   </div>
 
@@ -749,6 +753,7 @@ exits: index.html
                           <span class="acq-job-trigger__icon icon icon--sm" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-search"/></svg></span>
                         </button>
                         <input type="hidden" id="s4-job" value="철근공">
+                        <div class="form-field__footer"><p class="form-field__error text-helper" id="s4-job-err" role="alert">직종을 선택해 주세요.</p></div>
                       </div>
                     </div>
                   </div>
@@ -925,6 +930,7 @@ exits: index.html
                         <span class="acq-job-trigger__icon icon icon--sm" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-search"/></svg></span>
                       </button>
                       <input type="hidden" id="s5-job" value="철근공">
+                      <div class="form-field__footer"><p class="form-field__error text-helper" id="s5-job-err" role="alert">직종을 선택해 주세요.</p></div>
                     </div>
                   </div>
 
@@ -1418,16 +1424,35 @@ exits: index.html
     if (/-pay$/.test(el.id)) {                                                      /* 2 */
       var v = el.value.trim();
       if (!v) { clearFieldState(field.id, err.id); renderEstimate(panel); return; }
-      var onlyNum = /^[0-9,]+$/.test(v);
-      setFieldError(field.id, err.id, onlyNum ? '' : '숫자만 입력해 주세요');
-      if (onlyNum) { el.value = comma(digits(v)); renderEstimate(panel); }
+      el.value = comma(digits(v));               /* 숫자만 입력이 강제되므로 항상 유효 */
+      setFieldError(field.id, err.id, '');
+      renderEstimate(panel);
     }
   }, true);
 
-  /* ── 3. 월급여액 input → 예상보험료 재계산 ── */
+  /* ── 3. 근로시간·월급여액 — 숫자만 입력 강제(라이브) + 급여액 재계산 ── */
   root.addEventListener('input', function (e) {
-    if (!e.target.id || !/-pay$/.test(e.target.id)) return;
-    renderEstimate(e.target.closest('.scenario-panel'));
+    var el = e.target;
+    if (!el.id) return;
+    if (/-hours$/.test(el.id)) {                                                   /* 시간: 숫자만 */
+      var d = el.value.replace(/\D/g, '');
+      if (d !== el.value) el.value = d;
+    } else if (/-pay$/.test(el.id)) {                                              /* 급여액: 숫자만 + 천단위 콤마(캐럿 보존) */
+      var caret = el.selectionStart;
+      var leftDigits = el.value.slice(0, caret).replace(/\D/g, '').length;
+      var raw = el.value.replace(/\D/g, '');
+      var formatted = raw ? Number(raw).toLocaleString('ko-KR') : '';
+      if (formatted !== el.value) {
+        el.value = formatted;
+        var pos = 0, seen = 0;
+        while (pos < formatted.length && seen < leftDigits) {
+          if (formatted.charCodeAt(pos) >= 48 && formatted.charCodeAt(pos) <= 57) seen++;
+          pos++;
+        }
+        try { el.setSelectionRange(pos, pos); } catch (e2) {}
+      }
+      renderEstimate(el.closest('.scenario-panel'));
+    }
   });
 
   root.addEventListener('change', function (e) {
@@ -1487,9 +1512,9 @@ exits: index.html
       var v = el.value.trim(), msg = '';
       if (sfx === '-hours') {
         var n = Number(v);
-        if (!v || !/^\d+$/.test(v) || n < 1 || n > 100) msg = '100 이하 숫자로 입력해 주세요';
-      } else if (!v || !/^[0-9,]+$/.test(v)) {
-        msg = '숫자만 입력해 주세요';
+        if (!v || n < 1 || n > 100) msg = '100 이하 숫자로 입력해 주세요';
+      } else if (!v) {
+        msg = '월급여액을 입력해 주세요';
       }
       setFieldError(field.id, err.id, msg);
       if (msg) { ok = false; firstBad = firstBad || el; }
@@ -1500,7 +1525,18 @@ exits: index.html
       firstBad = firstBad || panel.querySelector('.acq-section input[type="checkbox"]:not([disabled])');
     }
     var job = q(panel, '-job');
-    if (job && !job.value.trim()) { ok = false; firstBad = firstBad || job; }
+    if (job) {
+      var jobTrigger = panel.querySelector('.acq-job-trigger');
+      var jobField = jobTrigger && jobTrigger.closest('.form-field');
+      var jobEmpty = !job.value.trim();
+      if (jobTrigger) {
+        jobTrigger.classList.toggle('acq-job-trigger--error', jobEmpty);
+        if (jobEmpty) jobTrigger.setAttribute('aria-invalid', 'true');
+        else jobTrigger.removeAttribute('aria-invalid');
+      }
+      if (jobField) jobField.classList.toggle('form-field--error', jobEmpty);
+      if (jobEmpty) { ok = false; firstBad = firstBad || jobTrigger || job; }
+    }
 
     if (!ok && firstBad && firstBad.focus) firstBad.focus();
     return ok;
@@ -1589,8 +1625,11 @@ exits: index.html
       var job = pick.dataset.job;
       var valEl = jobOpener.querySelector('.acq-job-trigger__value');
       if (valEl) valEl.textContent = job;
-      jobOpener.classList.remove('acq-job-trigger--placeholder');
+      jobOpener.classList.remove('acq-job-trigger--placeholder', 'acq-job-trigger--error');
       jobOpener.classList.add('acq-job-trigger--complete');
+      jobOpener.removeAttribute('aria-invalid');
+      var jobField = jobOpener.closest('.form-field');
+      if (jobField) jobField.classList.remove('form-field--error');
       var hidden = jobOpener.parentElement.querySelector('input[type="hidden"][id$="-job"]');
       if (hidden) hidden.value = job;
       closeOverlay(jobModal);
