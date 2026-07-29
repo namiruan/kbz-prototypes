@@ -102,8 +102,11 @@
     .acq-skeleton-row > * { flex: 1; }
     /* 입력 길이가 정해진 필드는 컨텐츠에 맞는 폭만 유지 — 불필요하게 전체폭으로 늘리지 않는다.
        입력 형식이 유추되는(자릿수 고정·상한 있는) 필드에만 적용. */
-    .acq-form input[id$="-hours"] { max-width: 120px; }   /* 주소정근로시간: ≤100 (3자리) */
-    .acq-form input[id$="-pay"]   { max-width: 184px; }   /* 월급여액: 금액 */
+    /* 근로시간·급여액은 suffix addon(시간·원) 래퍼를 쓰므로 폭을 래퍼에 지정 */
+    .acq-form .input-wrap--suffix:has(input[id$="-hours"]) { max-width: 140px; }   /* 주소정근로시간: ≤100 + '시간' */
+    .acq-form .input-wrap--suffix:has(input[id$="-pay"])   { max-width: 210px; }   /* 월급여액: 금액 + '원' */
+    /* error 상태 시 suffix 테두리도 동기화(DS는 complete·readonly만 처리) */
+    .input-wrap--suffix:has(.input--error) .input__suffix { border-color: var(--color-border-error); }
     .acq-form input[id$="-rrn"]   { max-width: 184px; }   /* 주민번호: 13자리 고정 */
     .acq-form input[id$="-hire"]  { max-width: 148px; }   /* 입사일: YYYY-MM-DD */
     .acq-form input[id$="-name"]  { max-width: 160px; }   /* 이름 */
@@ -261,7 +264,7 @@ exits: index.html
                     <div class="form-field">
                       <label class="form-field__label text-form-label" for="s1-hours">주소정근로시간 <span class="form-field__required" aria-hidden="true">(필수)</span></label>
                       <div class="form-field__body">
-                        <input class="input" type="text" id="s1-hours" placeholder="숫자 입력" inputmode="numeric" aria-required="true" aria-describedby="s1-hours-footer">
+                        <div class="input-wrap input-wrap--suffix"><input class="input" type="text" id="s1-hours" placeholder="숫자 입력" inputmode="numeric" aria-required="true" aria-describedby="s1-hours-footer"><span class="input__suffix">시간</span></div>
                         <div class="form-field__footer" id="s1-hours-footer">
                           <p class="form-field__error text-helper" id="s1-hours-err" role="alert">100 이하 숫자로 입력해 주세요.</p>
                         </div>
@@ -270,7 +273,7 @@ exits: index.html
                     <div class="form-field">
                       <label class="form-field__label text-form-label" for="s1-pay">월급여액 <span class="form-field__required" aria-hidden="true">(필수)</span></label>
                       <div class="form-field__body">
-                        <input class="input input--complete" type="text" id="s1-pay" value="2,300,000" inputmode="numeric" aria-required="true" aria-describedby="s1-pay-footer">
+                        <div class="input-wrap input-wrap--suffix"><input class="input input--complete" type="text" id="s1-pay" value="2,300,000" inputmode="numeric" aria-required="true" aria-describedby="s1-pay-footer"><span class="input__suffix">원</span></div>
                         <div class="form-field__footer" id="s1-pay-footer">
                           <p class="form-field__error text-helper" id="s1-pay-err" role="alert">숫자만 입력해 주세요.</p>
                         </div>
@@ -493,7 +496,7 @@ exits: index.html
                     <div class="form-field">
                       <label class="form-field__label text-form-label" for="s2-hours">주소정근로시간 <span class="form-field__required" aria-hidden="true">(필수)</span></label>
                       <div class="form-field__body">
-                        <input class="input" type="text" id="s2-hours" placeholder="숫자 입력" inputmode="numeric" aria-required="true" aria-describedby="s2-hours-footer">
+                        <div class="input-wrap input-wrap--suffix"><input class="input" type="text" id="s2-hours" placeholder="숫자 입력" inputmode="numeric" aria-required="true" aria-describedby="s2-hours-footer"><span class="input__suffix">시간</span></div>
                         <div class="form-field__footer" id="s2-hours-footer">
                           <p class="form-field__error text-helper" id="s2-hours-err" role="alert">100 이하 숫자로 입력해 주세요.</p>
                         </div>
@@ -502,7 +505,7 @@ exits: index.html
                     <div class="form-field">
                       <label class="form-field__label text-form-label" for="s2-pay">월급여액 <span class="form-field__required" aria-hidden="true">(필수)</span></label>
                       <div class="form-field__body">
-                        <input class="input" type="text" id="s2-pay" placeholder="월급여액 입력" inputmode="numeric" aria-required="true" aria-describedby="s2-pay-footer">
+                        <div class="input-wrap input-wrap--suffix"><input class="input" type="text" id="s2-pay" placeholder="월급여액 입력" inputmode="numeric" aria-required="true" aria-describedby="s2-pay-footer"><span class="input__suffix">원</span></div>
                         <div class="form-field__footer" id="s2-pay-footer">
                           <p class="form-field__error text-helper" id="s2-pay-err" role="alert">숫자만 입력해 주세요.</p>
                         </div>
@@ -749,13 +752,13 @@ exits: index.html
                     <div class="form-field">
                       <label class="form-field__label text-form-label" for="s4-hours">주소정근로시간 <span class="form-field__required" aria-hidden="true">(필수)</span></label>
                       <div class="form-field__body">
-                        <input class="input input--complete" type="text" id="s4-hours" value="40" inputmode="numeric" aria-required="true">
+                        <div class="input-wrap input-wrap--suffix"><input class="input input--complete" type="text" id="s4-hours" value="40" inputmode="numeric" aria-required="true"><span class="input__suffix">시간</span></div>
                       </div>
                     </div>
                     <div class="form-field">
                       <label class="form-field__label text-form-label" for="s4-pay">월급여액 <span class="form-field__required" aria-hidden="true">(필수)</span></label>
                       <div class="form-field__body">
-                        <input class="input input--complete" type="text" id="s4-pay" value="2,300,000" inputmode="numeric" aria-required="true">
+                        <div class="input-wrap input-wrap--suffix"><input class="input input--complete" type="text" id="s4-pay" value="2,300,000" inputmode="numeric" aria-required="true"><span class="input__suffix">원</span></div>
                       </div>
                     </div>
                     <div class="form-field">
@@ -971,13 +974,13 @@ exits: index.html
                     <div class="form-field">
                       <label class="form-field__label text-form-label" for="s5-hours">주소정근로시간 <span class="form-field__required" aria-hidden="true">(필수)</span></label>
                       <div class="form-field__body">
-                        <input class="input input--complete" type="text" id="s5-hours" value="40" inputmode="numeric" aria-required="true">
+                        <div class="input-wrap input-wrap--suffix"><input class="input input--complete" type="text" id="s5-hours" value="40" inputmode="numeric" aria-required="true"><span class="input__suffix">시간</span></div>
                       </div>
                     </div>
                     <div class="form-field">
                       <label class="form-field__label text-form-label" for="s5-pay">월급여액 <span class="form-field__required" aria-hidden="true">(필수)</span></label>
                       <div class="form-field__body">
-                        <input class="input input--complete" type="text" id="s5-pay" value="2,300,000" inputmode="numeric" aria-required="true">
+                        <div class="input-wrap input-wrap--suffix"><input class="input input--complete" type="text" id="s5-pay" value="2,300,000" inputmode="numeric" aria-required="true"><span class="input__suffix">원</span></div>
                       </div>
                     </div>
                     <div class="form-field">
