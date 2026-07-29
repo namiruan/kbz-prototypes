@@ -193,12 +193,13 @@
     .acq-info-card__value { font-size: var(--font-size-base); font-weight: var(--font-weight-heading); color: var(--color-text-body); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     /* 신고 사업장 정보 — 취득신고 가입보험 리스트와 일관된 상태 리스트 스타일.
        각 항목: 보험명 + '변경 전 → 변경 후' 사업장 플로우. */
-    /* 실제 변경되는 대상이므로 취득신고의 '취득'(선택) 상태와 동일하게 초록 라인으로 강조 */
-    .acq-move-item { grid-template-columns: 76px minmax(0, 1fr); background: var(--color-surface-base); box-shadow: inset 0 0 0 var(--stroke-md) var(--color-border-success); }
+    /* 새로 취득하는 게 아니라 이미 가입된 보험을 변경하는 것이므로,
+       취득신고의 '취득완료' 상태와 동일한 연한 초록 채움 배경을 쓴다. */
+    .acq-move-item { grid-template-columns: 76px minmax(0, 1fr); background: var(--color-surface-success-subtle); }
     .acq-move-item__flow { display: inline-flex; align-items: center; gap: var(--space-gap-sm); min-width: 0; }
     .acq-move-item__from { color: var(--color-text-subtle); font-size: var(--font-size-sm); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .acq-move-item__arrow { flex-shrink: 0; color: var(--color-text-subtle); }
-    .acq-move-item__to { color: var(--color-text-body); font-weight: var(--font-weight-heading); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .acq-move-item__to { color: var(--color-text-success); font-weight: var(--font-weight-heading); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   </style>
 </head>
 <body>
