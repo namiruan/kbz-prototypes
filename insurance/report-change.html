@@ -1544,8 +1544,8 @@ exits: index.html
       if (rate != null) {
         e.rateField.hidden = false;
         e.rateBadge.textContent = (rate > 0 ? '+' : '') + rate + '%';
-        /* 인상 20% 이상만 success(초록) 강조. 인하(하락)·20% 미만은 모두 neutral */
-        var rateTone = (over20 && rate > 0) ? 'badge--success' : 'badge--neutral';
+        /* 20% 미만 neutral / 이상은 방향 구분 — 인상 success(초록), 인하 caution(앰버) */
+        var rateTone = !over20 ? 'badge--neutral' : (rate > 0 ? 'badge--success' : 'badge--caution');
         e.rateBadge.className = 'badge acq-rate-badge ' + rateTone;
       } else if (e.rateField) { e.rateField.hidden = true; }
       /* 제출서류 안내 — 20% 이상이면 국민연금 특례 대상이라 변동율만으로 바로 노출(체크와 무관) */
