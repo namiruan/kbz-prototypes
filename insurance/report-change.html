@@ -950,7 +950,7 @@ exits: index.html
     if (reason === '착오정정') {
       mdLock(e.month, ACQUIRE_MONTH);
     } else if (reason === '보수인상' || reason === '보수인하') {
-      if (prev === '착오정정' || prev === '') mdClear(e.month);   /* 잠금값 잔재 제거 */
+      if (prev === '착오정정') mdClear(e.month);   /* 착오정정 잠금값 잔재 제거(초기 프리셋·인상↔인하 전환은 유지) */
       mdEnable(e.month);
     } else {
       mdClear(e.month); mdDisable(e.month);
@@ -987,7 +987,26 @@ exits: index.html
     setTimeout(function () { if (/-month$/.test(dd.id)) mdSetError(dd, false); }, 0);
   });
 
-  /* 변경 후 보수월액 — 숫자만 허용(콤마 자동), 문자 입력 시 에러. 입력 시 변동율 재계산 */
+  /* 변경 후 보수월액 방향에 맞춰 변경사유 세그먼트 자동 전환 — 양수=보수인상, 음수=보수인하(착오정정 제외).
+     방향이 정해지면 |변동율| 20% 이상일 때 국민연금·제출서류가 뜬다. */
+  function autoSyncReason(panel) {
+    var e = els(panel);
+    var reason = reasonValue(e.reason);
+    if (reason !== '보수인상' && reason !== '보수인하') return;
+    var prev = num(e.prevpay && e.prevpay.value), newv = num(e.newpay && e.newpay.value);
+    if (!e.newpay || !e.newpay.value.trim() || prev <= 0) return;
+    var desired = (newv - prev) < 0 ? '보수인하' : '보수인상';
+    if (desired === reason) return;
+    e.reason.querySelectorAll('.segment__item').forEach(function (it) {
+      var on = it.dataset.reason === desired;
+      it.classList.toggle('segment__item--selected', on);
+      it.setAttribute('aria-checked', on ? 'true' : 'false');
+    });
+    resyncSeg(e.reason);
+    panel.dataset.reasonState = desired;
+  }
+
+  /* 변경 후 보수월액 — 숫자만 허용(콤마 자동), 문자 입력 시 에러. 입력 시 방향 동기화 후 변동율 재계산 */
   root.addEventListener('input', function (ev) {
     var t = ev.target;
     if (!t.id || !/-newpay$/.test(t.id)) return;
@@ -996,6 +1015,7 @@ exits: index.html
     var d = t.value.replace(/,/g, '');
     t.value = d ? Number(d).toLocaleString('en-US') : '';
     markNewpay(panel, t.value ? 'complete' : 'neutral');
+    autoSyncReason(panel);
     refresh(panel);
   });
 
