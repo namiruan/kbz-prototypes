@@ -18,7 +18,7 @@
     /* 모달 본문 2열 — 좌 첨부파일(Figma 314px) + 우 폼.
        modal__aside는 "읽기 전용만" 규칙이라 인터랙티브한 FileUpload를 넣을 수 없어
        modal__content 안에서 그리드로 구성한다 (→ modal.md 소제목 모달 제약) */
-    .acq-grid { display: grid; grid-template-columns: 314px 1fr; gap: var(--space-gap-2xl); align-items: stretch; }
+    .acq-grid { display: grid; grid-template-columns: 290px 1fr; gap: var(--space-gap-2xl); align-items: stretch; }
     /* 첨부파일 열을 우측 폼 높이에 맞춰 늘리고, 드롭존이 남는 세로 공간을 채워
        좌측 아래 빈 여백 없이 드롭 대상이 커지도록 한다. */
     .acq-grid > .file-upload { height: 100%; }
@@ -211,19 +211,19 @@
     /* ── 보수 변경신고 전용 ── */
     /* 변경사유 세그먼트 — 미선택 시작 허용(초기 슬라이더 숨김). 필수 검증 실패 시 에러 테두리 */
     .segment.segment--error { box-shadow: inset 0 0 0 var(--stroke-md) var(--color-border-error); }
-    /* 변경년월 + 변경 전/후 보수월액 + 변동율 4필드를 좁은 폼 폭(≈435px)에 한 줄로 — 열 간격을 좁힌다 */
-    .acq-form .form-field-group--horizontal:has(.acq-change-dd) { column-gap: var(--space-gap-2xs); }
+    /* 변경년월 + 변경 전/후 보수월액 + 변동율 한 줄 — 필드 간격은 DS gap-md로 통일 */
+    .acq-form .form-field-group--horizontal:has(.acq-change-dd) { column-gap: var(--space-gap-md); }
     /* 변경사유 세그먼트 — 가로 여백을 꽉 채운다(항목 균등 분할) */
     .acq-reason-seg.segment--full { align-self: stretch; }
-    /* 변경년월 드롭다운 — 당해년도 월. 폭 축소 */
-    .acq-change-dd, .acq-change-dd .dropdown__trigger { width: 96px; }
+    /* 변경년월 드롭다운 — 당해년도 월 */
+    .acq-change-dd, .acq-change-dd .dropdown__trigger { width: 104px; }
     .acq-change-dd .dropdown__value { overflow: hidden; text-overflow: ellipsis; }
-    /* 변경 전/후 보수월액 — 금액(콤마) + '원'. 한 줄 배치 위해 폭 축소 */
+    /* 변경 전/후 보수월액 — 금액(콤마) + '원'. 값 폭에 맞춰 컴팩트하게 */
     .acq-form .input-wrap--suffix:has(input[id$="prevpay"]),
     .acq-form .input-wrap--suffix:has(input[id$="newpay"]) { max-width: 128px; }
-    /* 변동율 — 행 우측에 배치(margin-left:auto), 배지를 입력 행 높이에 맞춰 세로 중앙 정렬 */
-    .acq-rate-field { margin-left: auto; }
-    .acq-rate-field .form-field__body { display: flex; align-items: center; min-height: var(--height-base); }
+    /* 변동율 — 변경 후 보수월액 바로 오른쪽. 라벨+배지 묶음을 옆 입력 필드 세로 중앙에 맞춘다 */
+    .acq-rate-field { align-self: stretch; justify-content: center; }
+    .acq-rate-field .form-field__body { display: flex; align-items: center; }
     .acq-rate-badge { font-variant-numeric: tabular-nums; }
     /* 신고 대상 보험 — 취득 모달처럼 푸터 좌측에 상시 노출(스크롤 없이 신고 대상 확인) */
     .acq-target-footer { margin-right: auto; display: flex; align-items: center; gap: var(--space-gap-md); min-width: 0; }
@@ -373,6 +373,11 @@ exits: index.html
                             <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">2026-05</span></li>
                             <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">2026-06</span></li>
                             <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">2026-07</span></li>
+                            <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">2026-08</span></li>
+                            <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">2026-09</span></li>
+                            <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">2026-10</span></li>
+                            <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">2026-11</span></li>
+                            <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">2026-12</span></li>
                           </ul></div>
                         </div>
                       </div>
@@ -416,12 +421,12 @@ exits: index.html
                             </thead>
                             <tbody class="table__body">
                               <tr class="table__row">
-                                <td class="table__cell">기준소득월액 변경신청서</td>
-                                <td class="table__cell"><button class="btn btn--ghost btn--sm btn--icon-left" type="button"><span class="icon icon--sm" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-download"/></svg></span>다운로드</button></td>
+                                <td class="table__cell">국민연금 기준소득월액 변경신청서</td>
+                                <td class="table__cell"><button class="btn btn--ghost btn--sm btn--icon-left" type="button"><span class="icon icon--sm" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-download"/></svg></span>양식 다운로드</button></td>
                               </tr>
                               <tr class="table__row">
-                                <td class="table__cell">근로자 동의서</td>
-                                <td class="table__cell"><button class="btn btn--ghost btn--sm btn--icon-left" type="button"><span class="icon icon--sm" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-download"/></svg></span>다운로드</button></td>
+                                <td class="table__cell">국민연금 기준소득월액 변경신청 근로자 동의서</td>
+                                <td class="table__cell"><button class="btn btn--ghost btn--sm btn--icon-left" type="button"><span class="icon icon--sm" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-download"/></svg></span>양식 다운로드</button></td>
                               </tr>
                             </tbody>
                           </table>
@@ -450,10 +455,10 @@ exits: index.html
             <div class="acq-target-footer" role="group" aria-labelledby="p1-ins-label">
               <span class="text-form-label acq-target-footer__label" id="p1-ins-label">신고 대상 보험</span>
               <div class="acq-target-checks">
-                <label class="checkbox checkbox--sm checkbox--disabled"><input type="checkbox" id="p1-ins-emp" disabled><span class="checkbox__control" aria-hidden="true"><span class="checkbox__icon-check"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span><span class="checkbox__label">고용보험</span></label>
-                <label class="checkbox checkbox--sm checkbox--disabled"><input type="checkbox" id="p1-ins-acc" disabled><span class="checkbox__control" aria-hidden="true"><span class="checkbox__icon-check"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span><span class="checkbox__label">산재보험</span></label>
-                <label class="checkbox checkbox--sm checkbox--disabled"><input type="checkbox" id="p1-ins-pen" disabled><span class="checkbox__control" aria-hidden="true"><span class="checkbox__icon-check"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span><span class="checkbox__label">국민연금</span></label>
-                <label class="checkbox checkbox--sm checkbox--disabled"><input type="checkbox" id="p1-ins-hea" disabled><span class="checkbox__control" aria-hidden="true"><span class="checkbox__icon-check"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span><span class="checkbox__label">건강보험</span></label>
+                <label class="checkbox checkbox--disabled"><input type="checkbox" id="p1-ins-emp" disabled><span class="checkbox__control" aria-hidden="true"><span class="checkbox__icon-check"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span><span class="checkbox__label">고용보험</span></label>
+                <label class="checkbox checkbox--disabled"><input type="checkbox" id="p1-ins-acc" disabled><span class="checkbox__control" aria-hidden="true"><span class="checkbox__icon-check"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span><span class="checkbox__label">산재보험</span></label>
+                <label class="checkbox checkbox--disabled"><input type="checkbox" id="p1-ins-pen" disabled><span class="checkbox__control" aria-hidden="true"><span class="checkbox__icon-check"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span><span class="checkbox__label">국민연금</span></label>
+                <label class="checkbox checkbox--disabled"><input type="checkbox" id="p1-ins-hea" disabled><span class="checkbox__control" aria-hidden="true"><span class="checkbox__icon-check"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span><span class="checkbox__label">건강보험</span></label>
               </div>
             </div>
             <button class="btn btn--ghost btn--md" type="button" data-acq-cancel>취소</button>
