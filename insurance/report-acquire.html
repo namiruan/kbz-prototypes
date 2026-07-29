@@ -103,6 +103,7 @@
        좌측 라벨(예상 고지월·부과금액)은 1회, 값은 고지월·부과금액을 한 줄에 합쳐 노출. */
     .acq-estimate-footer__table {
       display: grid;
+      align-self: start;   /* ※ 안내문(긴 줄)이 폭을 넓혀도 테이블은 내용 크기 유지 — 열 벌어짐 방지 */
       grid-auto-flow: column;
       grid-template-rows: auto auto;   /* 뱃지 / 예상 고지월·부과금액(한 줄) */
       align-items: center;
