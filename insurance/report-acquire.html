@@ -1417,27 +1417,43 @@ exits: index.html
     if (/-hours$/.test(el.id)) {                                                    /* 1 */
       var raw = el.value.trim();
       if (!raw) { clearFieldState(field.id, err.id); return; }
+      if (!/^\d+$/.test(raw)) { setFieldError(field.id, err.id, '숫자만 입력해 주세요'); return; }
       var n = Number(raw);
-      setFieldError(field.id, err.id, (!/^\d+$/.test(raw) || n < 1 || n > 100) ? '100 이하 숫자로 입력해 주세요' : '');
+      setFieldError(field.id, err.id, (n < 1 || n > 100) ? '100 이하 숫자로 입력해 주세요' : '');
     }
 
     if (/-pay$/.test(el.id)) {                                                      /* 2 */
       var v = el.value.trim();
       if (!v) { clearFieldState(field.id, err.id); renderEstimate(panel); return; }
-      el.value = comma(digits(v));               /* 숫자만 입력이 강제되므로 항상 유효 */
+      if (!/^[0-9,]+$/.test(v)) { setFieldError(field.id, err.id, '숫자만 입력해 주세요'); renderEstimate(panel); return; }
+      el.value = comma(digits(v));
       setFieldError(field.id, err.id, '');
       renderEstimate(panel);
     }
   }, true);
 
-  /* ── 3. 근로시간·월급여액 — 숫자만 입력 강제(라이브) + 급여액 재계산 ── */
+  /* ── 3. 근로시간·월급여액 — 숫자 외 문자 입력 시 에러 노출(라이브) + 급여액 재계산 ── */
   root.addEventListener('input', function (e) {
     var el = e.target;
     if (!el.id) return;
-    if (/-hours$/.test(el.id)) {                                                   /* 시간: 숫자만 */
-      var d = el.value.replace(/\D/g, '');
-      if (d !== el.value) el.value = d;
-    } else if (/-pay$/.test(el.id)) {                                              /* 급여액: 숫자만 + 천단위 콤마(캐럿 보존) */
+    var field = el.closest('.form-field');
+    var err = field && field.querySelector('.form-field__error');
+    if (!field || !err) return;
+    if (!field.id) field.id = el.id + '-field';
+    var panel = el.closest('.scenario-panel');
+
+    if (/-hours$/.test(el.id)) {
+      var v = el.value.trim();
+      if (!v) { clearFieldState(field.id, err.id); return; }
+      if (!/^\d+$/.test(v)) { setFieldError(field.id, err.id, '숫자만 입력해 주세요'); return; }
+      var n = Number(v);
+      if (n < 1 || n > 100) setFieldError(field.id, err.id, '100 이하 숫자로 입력해 주세요');
+      else clearFieldState(field.id, err.id);                 /* 유효 — 입력 중엔 중립, 확정(blur)에서 success */
+    } else if (/-pay$/.test(el.id)) {
+      var pv = el.value.trim();
+      if (!pv) { clearFieldState(field.id, err.id); renderEstimate(panel); return; }
+      if (!/^[0-9,]+$/.test(pv)) { setFieldError(field.id, err.id, '숫자만 입력해 주세요'); renderEstimate(panel); return; }
+      /* 유효 — 천단위 콤마 라이브 적용(캐럿 보존) */
       var caret = el.selectionStart;
       var leftDigits = el.value.slice(0, caret).replace(/\D/g, '').length;
       var raw = el.value.replace(/\D/g, '');
@@ -1451,7 +1467,8 @@ exits: index.html
         }
         try { el.setSelectionRange(pos, pos); } catch (e2) {}
       }
-      renderEstimate(el.closest('.scenario-panel'));
+      clearFieldState(field.id, err.id);
+      renderEstimate(panel);
     }
   });
 
@@ -1512,9 +1529,13 @@ exits: index.html
       var v = el.value.trim(), msg = '';
       if (sfx === '-hours') {
         var n = Number(v);
-        if (!v || n < 1 || n > 100) msg = '100 이하 숫자로 입력해 주세요';
+        if (!v) msg = '100 이하 숫자로 입력해 주세요';
+        else if (!/^\d+$/.test(v)) msg = '숫자만 입력해 주세요';
+        else if (n < 1 || n > 100) msg = '100 이하 숫자로 입력해 주세요';
       } else if (!v) {
         msg = '월급여액을 입력해 주세요';
+      } else if (!/^[0-9,]+$/.test(v)) {
+        msg = '숫자만 입력해 주세요';
       }
       setFieldError(field.id, err.id, msg);
       if (msg) { ok = false; firstBad = firstBad || el; }
