@@ -193,7 +193,7 @@
     .acq-info-card__value { font-size: var(--font-size-base); font-weight: var(--font-weight-heading); color: var(--color-text-body); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     /* 신고 사업장 정보 — 취득신고 가입보험 리스트와 일관된 상태 리스트 스타일.
        각 항목: 보험명 + '변경 전 → 변경 후' 사업장 플로우. */
-    .acq-move-item { grid-template-columns: minmax(120px, max-content) minmax(0, 1fr); background: var(--color-surface-subtle); }
+    .acq-move-item { grid-template-columns: 76px minmax(0, 1fr); background: var(--color-surface-subtle); }
     .acq-move-item__flow { display: inline-flex; align-items: center; gap: var(--space-gap-sm); min-width: 0; }
     .acq-move-item__from { color: var(--color-text-subtle); font-size: var(--font-size-sm); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .acq-move-item__arrow { flex-shrink: 0; color: var(--color-text-subtle); }
@@ -275,7 +275,11 @@ exits: index.html
                     <span class="text-form-label" id="c1-ws-label">신고 사업장 정보</span>
                     <ul class="acq-ins-list acq-move-list" aria-labelledby="c1-ws-label">
                       <li class="acq-ins-item acq-move-item">
-                        <span class="acq-ins-item__name">건강보험·국민연금</span>
+                        <span class="acq-ins-item__name">국민연금</span>
+                        <span class="acq-move-item__flow"><span class="acq-move-item__from">(주)한성산업</span><span class="sr-only">에서</span><span class="acq-move-item__arrow" aria-hidden="true">→</span><span class="acq-move-item__to">(주)한성산업-제조</span><span class="sr-only">(으)로 변경</span></span>
+                      </li>
+                      <li class="acq-ins-item acq-move-item">
+                        <span class="acq-ins-item__name">건강보험</span>
                         <span class="acq-move-item__flow"><span class="acq-move-item__from">(주)한성산업</span><span class="sr-only">에서</span><span class="acq-move-item__arrow" aria-hidden="true">→</span><span class="acq-move-item__to">(주)한성산업-제조</span><span class="sr-only">(으)로 변경</span></span>
                       </li>
                       <li class="acq-ins-item acq-move-item">
