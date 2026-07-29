@@ -1575,10 +1575,20 @@ exits: index.html
     var e = els(panel);
     var reason = reasonValue(e.reason);
     /* 금액이 입력돼 방향이 정해진 경우, 인상/인하 중 실제 방향과 어긋나는 수동 선택은 막고 실제 방향으로 되돌린다.
-       (착오정정은 방향과 무관하므로 언제든 허용) */
+       (착오정정은 방향과 무관하므로 언제든 허용). 막힐 때는 보수월액 필드에 사유를 에러로 안내. */
     if (reason === '보수인상' || reason === '보수인하') {
       var dir = amountDir(e);
-      if (dir && dir !== reason) { setSegReason(e.reason, dir); reason = dir; }
+      if (dir && dir !== reason) {
+        setSegReason(e.reason, dir); reason = dir;
+        markNewpay(panel, 'error', dir === '보수인상'
+          ? '변경 후 보수월액이 인상되어 보수인하로 신고할 수 없어요.'
+          : '변경 후 보수월액이 인하되어 보수인상으로 신고할 수 없어요.');
+        shake(e.newpay.closest('.form-field'));
+      } else {
+        markNewpay(panel, e.newpay.value.trim() ? 'complete' : 'neutral');
+      }
+    } else {
+      markNewpay(panel, e.newpay.value.trim() ? 'complete' : 'neutral');
     }
     var prev = panel.dataset.reasonState || '';
     segSetError(e.reason, false);
