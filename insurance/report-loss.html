@@ -181,7 +181,9 @@
     /* 필드 폭 — 보수총액/산정월수/날짜 */
     .acq-form .input-wrap--suffix:has(input[id$="-amt"]) { max-width: 210px; }   /* 보수총액: 금액 + '원' */
     .acq-form .input-wrap--suffix:has(input[id$="-mon"]) { max-width: 128px; }   /* 산정월수: ≤2자리 + '개월' */
-    .acq-form input[id$="-date"] { max-width: 180px; }                           /* 상실일·퇴사일: YYYY-MM-DD */
+    .acq-form input[id$="-date"] { max-width: 180px; }                           /* (구) 텍스트 날짜 */
+    .acq-form .acq-date-dp { max-width: 200px; }                                 /* 날짜 선택 캘린더 */
+    .acq-form input[id$="-loss-auto"] { max-width: 180px; }                      /* 자동 상실일(전체 퇴사) */
     /* ── 조회 정보 카드 — 이름·주민번호·취득일(입사일)은 입력이 아니라 조회 정보이므로
        입력 필드와 확실히 구분되도록 카드형(라벨 위 · 값 아래)으로 노출한다. ── */
     .acq-info-card { display: flex; border: var(--stroke-sm) solid var(--color-border-default); border-radius: var(--radius-md); background: var(--color-surface-subtle); overflow: hidden; }
@@ -290,14 +292,19 @@ exits: index.html
 
                   <div class="form-field-group--horizontal">
                     <div class="form-field acq-leave-date-field" hidden>
-                      <label class="form-field__label text-form-label" for="s1-leave-date">퇴사일(마지막근무일) <span class="form-field__required" aria-hidden="true">(필수)</span></label>
-                      <div class="form-field__body"><input class="input" type="text" id="s1-leave-date" placeholder="YYYY-MM-DD" inputmode="numeric"></div>
-                      <div class="form-field__footer"><p class="form-field__error text-helper" id="s1-leave-date-err" role="alert">퇴사일을 입력해 주세요.</p></div>
+                      <label class="form-field__label text-form-label" for="s1-leave-yr">퇴사일(마지막근무일) <span class="form-field__required" aria-hidden="true">(필수)</span></label>
+                      <div class="form-field__body"><div class="dp acq-date-dp" id="s1-leave-dp"><div class="dp__trigger" aria-haspopup="dialog" aria-label="퇴사일 선택"><div class="dp__value-group"><input class="dp__value-part dp__value-part--year" id="s1-leave-yr" type="text" inputmode="numeric" placeholder="YYYY" maxlength="4" aria-label="연도" autocomplete="off" value=""><span class="dp__value-sep" aria-hidden="true">.</span><input class="dp__value-part dp__value-part--md" id="s1-leave-mo" type="text" inputmode="numeric" placeholder="MM" maxlength="2" aria-label="월" autocomplete="off" value=""><span class="dp__value-sep" aria-hidden="true">.</span><input class="dp__value-part dp__value-part--md" id="s1-leave-dy" type="text" inputmode="numeric" placeholder="DD" maxlength="2" aria-label="일" autocomplete="off" value=""></div><span class="dp__chevron" aria-hidden="true"><span class="icon icon--sm"><svg aria-hidden="true"><use href="#icon-calendar"/></svg></span></span></div></div></div>
+                      <div class="form-field__footer"><p class="form-field__error text-helper" id="s1-leave-date-err" role="alert">퇴사일을 선택해 주세요.</p></div>
                     </div>
-                    <div class="form-field">
-                      <label class="form-field__label text-form-label" for="s1-loss-date">상실일 <span class="form-field__required" aria-hidden="true">(필수)</span></label>
-                      <div class="form-field__body"><input class="input" type="text" id="s1-loss-date" value="2026-07-01" placeholder="YYYY-MM-DD" inputmode="numeric"></div>
-                      <div class="form-field__footer"><p class="form-field__error text-helper" id="s1-loss-date-err" role="alert">상실일을 입력해 주세요.</p></div>
+                    <div class="form-field acq-loss-dp-field">
+                      <label class="form-field__label text-form-label" for="s1-loss-yr">상실일 <span class="form-field__required" aria-hidden="true">(필수)</span></label>
+                      <div class="form-field__body"><div class="dp acq-date-dp dp--has-value" id="s1-loss-dp"><div class="dp__trigger" aria-haspopup="dialog" aria-label="상실일 선택"><div class="dp__value-group"><input class="dp__value-part dp__value-part--year" id="s1-loss-yr" type="text" inputmode="numeric" placeholder="YYYY" maxlength="4" aria-label="연도" autocomplete="off" value="2026"><span class="dp__value-sep" aria-hidden="true">.</span><input class="dp__value-part dp__value-part--md" id="s1-loss-mo" type="text" inputmode="numeric" placeholder="MM" maxlength="2" aria-label="월" autocomplete="off" value="07"><span class="dp__value-sep" aria-hidden="true">.</span><input class="dp__value-part dp__value-part--md" id="s1-loss-dy" type="text" inputmode="numeric" placeholder="DD" maxlength="2" aria-label="일" autocomplete="off" value="01"></div><span class="dp__chevron" aria-hidden="true"><span class="icon icon--sm"><svg aria-hidden="true"><use href="#icon-calendar"/></svg></span></span></div></div></div>
+                      <div class="form-field__footer"><p class="form-field__error text-helper" id="s1-loss-date-err" role="alert">상실일을 선택해 주세요.</p></div>
+                    </div>
+                    <div class="form-field acq-loss-auto-field" hidden>
+                      <div class="form-field__label text-form-label acq-label-row" id="s1-loss-auto-label">상실일<span class="tooltip-wrapper" onmouseenter="this.querySelector('.tooltip-panel').classList.add('tooltip-panel--visible')" onmouseleave="this.querySelector('.tooltip-panel').classList.remove('tooltip-panel--visible')"><button class="tooltip-trigger tooltip-trigger--sm" type="button" aria-label="상실일 안내" aria-describedby="s1-loss-tip" onfocus="this.closest('.tooltip-wrapper').querySelector('.tooltip-panel').classList.add('tooltip-panel--visible')" onblur="this.closest('.tooltip-wrapper').querySelector('.tooltip-panel').classList.remove('tooltip-panel--visible')"><svg aria-hidden="true"><use href="#icon-help"/></svg></button><div class="tooltip-panel elevation-tooltip tooltip-panel--bottom" id="s1-loss-tip" role="tooltip">전체 퇴사 시 상실일은 퇴사일 다음 날로 자동 입력돼요.</div></span></div>
+                      <div class="form-field__body"><input class="input input--readonly" type="text" id="s1-loss-auto" aria-labelledby="s1-loss-auto-label" value="" readonly></div>
+                      
                     </div>
                   </div>
 
@@ -446,14 +453,19 @@ exits: index.html
 
                   <div class="form-field-group--horizontal">
                     <div class="form-field acq-leave-date-field">
-                      <label class="form-field__label text-form-label" for="s2-leave-date">퇴사일(마지막근무일) <span class="form-field__required" aria-hidden="true">(필수)</span></label>
-                      <div class="form-field__body"><input class="input" type="text" id="s2-leave-date" value="2026-06-30" placeholder="YYYY-MM-DD" inputmode="numeric"></div>
-                      <div class="form-field__footer"><p class="form-field__error text-helper" id="s2-leave-date-err" role="alert">퇴사일을 입력해 주세요.</p></div>
+                      <label class="form-field__label text-form-label" for="s2-leave-yr">퇴사일(마지막근무일) <span class="form-field__required" aria-hidden="true">(필수)</span></label>
+                      <div class="form-field__body"><div class="dp acq-date-dp dp--has-value" id="s2-leave-dp"><div class="dp__trigger" aria-haspopup="dialog" aria-label="퇴사일 선택"><div class="dp__value-group"><input class="dp__value-part dp__value-part--year" id="s2-leave-yr" type="text" inputmode="numeric" placeholder="YYYY" maxlength="4" aria-label="연도" autocomplete="off" value="2026"><span class="dp__value-sep" aria-hidden="true">.</span><input class="dp__value-part dp__value-part--md" id="s2-leave-mo" type="text" inputmode="numeric" placeholder="MM" maxlength="2" aria-label="월" autocomplete="off" value="06"><span class="dp__value-sep" aria-hidden="true">.</span><input class="dp__value-part dp__value-part--md" id="s2-leave-dy" type="text" inputmode="numeric" placeholder="DD" maxlength="2" aria-label="일" autocomplete="off" value="30"></div><span class="dp__chevron" aria-hidden="true"><span class="icon icon--sm"><svg aria-hidden="true"><use href="#icon-calendar"/></svg></span></span></div></div></div>
+                      <div class="form-field__footer"><p class="form-field__error text-helper" id="s2-leave-date-err" role="alert">퇴사일을 선택해 주세요.</p></div>
                     </div>
-                    <div class="form-field">
-                      <label class="form-field__label text-form-label" for="s2-loss-date">상실일 <span class="form-field__required" aria-hidden="true">(필수)</span></label>
-                      <div class="form-field__body"><input class="input input--readonly" type="text" id="s2-loss-date" value="2026-07-01" placeholder="YYYY-MM-DD" readonly></div>
-                      <div class="form-field__footer"><p class="form-field__help text-helper">퇴사일 다음 날로 자동 입력돼요.</p></div>
+                    <div class="form-field acq-loss-dp-field" hidden>
+                      <label class="form-field__label text-form-label" for="s2-loss-yr">상실일 <span class="form-field__required" aria-hidden="true">(필수)</span></label>
+                      <div class="form-field__body"><div class="dp acq-date-dp" id="s2-loss-dp"><div class="dp__trigger" aria-haspopup="dialog" aria-label="상실일 선택"><div class="dp__value-group"><input class="dp__value-part dp__value-part--year" id="s2-loss-yr" type="text" inputmode="numeric" placeholder="YYYY" maxlength="4" aria-label="연도" autocomplete="off" value=""><span class="dp__value-sep" aria-hidden="true">.</span><input class="dp__value-part dp__value-part--md" id="s2-loss-mo" type="text" inputmode="numeric" placeholder="MM" maxlength="2" aria-label="월" autocomplete="off" value=""><span class="dp__value-sep" aria-hidden="true">.</span><input class="dp__value-part dp__value-part--md" id="s2-loss-dy" type="text" inputmode="numeric" placeholder="DD" maxlength="2" aria-label="일" autocomplete="off" value=""></div><span class="dp__chevron" aria-hidden="true"><span class="icon icon--sm"><svg aria-hidden="true"><use href="#icon-calendar"/></svg></span></span></div></div></div>
+                      <div class="form-field__footer"><p class="form-field__error text-helper" id="s2-loss-date-err" role="alert">상실일을 선택해 주세요.</p></div>
+                    </div>
+                    <div class="form-field acq-loss-auto-field">
+                      <div class="form-field__label text-form-label acq-label-row" id="s2-loss-auto-label">상실일<span class="tooltip-wrapper" onmouseenter="this.querySelector('.tooltip-panel').classList.add('tooltip-panel--visible')" onmouseleave="this.querySelector('.tooltip-panel').classList.remove('tooltip-panel--visible')"><button class="tooltip-trigger tooltip-trigger--sm" type="button" aria-label="상실일 안내" aria-describedby="s2-loss-tip" onfocus="this.closest('.tooltip-wrapper').querySelector('.tooltip-panel').classList.add('tooltip-panel--visible')" onblur="this.closest('.tooltip-wrapper').querySelector('.tooltip-panel').classList.remove('tooltip-panel--visible')"><svg aria-hidden="true"><use href="#icon-help"/></svg></button><div class="tooltip-panel elevation-tooltip tooltip-panel--bottom" id="s2-loss-tip" role="tooltip">전체 퇴사 시 상실일은 퇴사일 다음 날로 자동 입력돼요.</div></span></div>
+                      <div class="form-field__body"><input class="input input--readonly" type="text" id="s2-loss-auto" aria-labelledby="s2-loss-auto-label" value="2026-07-01" readonly></div>
+                      
                     </div>
                   </div>
 
@@ -644,6 +656,7 @@ exits: index.html
     if (typeof initSegment === 'function')    root.querySelectorAll('.segment').forEach(function(el) { initSegment(el.parentElement); });
     if (typeof initFileUpload === 'function') initFileUpload(root);   /* DS initFileUpload(container)는 컨테이너 안의 .file-upload를 탐색 — 요소가 아닌 root를 넘긴다 */
     if (typeof initImagePreview === 'function') initImagePreview(root);   /* 첨부 이미지 라이트박스(미리보기) */
+    if (typeof initDatePicker === 'function') initDatePicker(root);   /* 날짜 선택 캘린더 */
   }
   _initComponents();
 
@@ -836,32 +849,59 @@ exits: index.html
     d.setDate(d.getDate() + n);
     return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2);
   }
-  function autoLossDate(panel) {
-    var leave = q(panel, '-leave-date'), loss = q(panel, '-loss-date');
-    if (leave && loss) { var v = addDay(leave.value, 1); if (v) loss.value = v; }
+  /* date-picker 값 읽기/쓰기 (yr/mo/dy 파트) */
+  function dpVal(dp) {
+    if (!dp) return '';
+    var y = dp.querySelector('.dp__value-part--year');
+    var md = dp.querySelectorAll('.dp__value-part--md');
+    if (!y || md.length < 2) return '';
+    var yy = y.value.trim(), mm = md[0].value.trim(), dd = md[1].value.trim();
+    if (yy.length === 4 && mm && dd) return yy + '-' + ('0' + mm).slice(-2) + '-' + ('0' + dd).slice(-2);
+    return '';
   }
 
-  /* 상실 보험 선택 상태 → 배너·퇴사일·상실일 모드 동기화 */
+  function autoLossDate(panel) {
+    var leaveDp = panel.querySelector('.acq-leave-date-field .dp');
+    var autoEl = panel.querySelector('[id$="-loss-auto"]');
+    if (!leaveDp || !autoEl) return;
+    var v = dpVal(leaveDp);
+    autoEl.value = v ? addDay(v, 1) : '';
+  }
+
+  /* 상실 보험 선택 상태 → 배너·퇴사일(캘린더)·상실일 모드 동기화 */
   function syncLossMode(panel) {
     var all = allChecked(panel);
     var partial = panel.querySelector('.acq-partial-banner');
     var leaveB = panel.querySelector('.acq-leave-banner');
     var leaveF = panel.querySelector('.acq-leave-date-field');
-    var loss = q(panel, '-loss-date');
+    var lossDpF = panel.querySelector('.acq-loss-dp-field');
+    var lossAutoF = panel.querySelector('.acq-loss-auto-field');
     var anyChecked = boxes(panel).some(function (b) { return b.checked; });
     if (all) {
       if (leaveB) leaveB.hidden = false;
       if (partial) partial.hidden = true;
       if (leaveF) leaveF.hidden = false;
-      if (loss) { loss.readOnly = true; loss.classList.add('input--readonly'); }
+      if (lossDpF) lossDpF.hidden = true;
+      if (lossAutoF) lossAutoF.hidden = false;
       autoLossDate(panel);
     } else {
       if (leaveB) leaveB.hidden = true;
       if (partial) partial.hidden = !anyChecked;
       if (leaveF) leaveF.hidden = true;
-      if (loss) { loss.readOnly = false; loss.classList.remove('input--readonly'); }
+      if (lossDpF) lossDpF.hidden = false;
+      if (lossAutoF) lossAutoF.hidden = true;
     }
   }
+
+  /* 캘린더 선택·입력 시 상실일 자동일 갱신 + 날짜 에러 해제 */
+  function onDateActivity() {
+    document.querySelectorAll('#pane-panels .acq-date-dp').forEach(function (dp) {
+      if (dpVal(dp)) { dp.classList.remove('dp--error'); var ff = dp.closest('.form-field'); if (ff) ff.classList.remove('form-field--error'); }
+    });
+    Array.prototype.forEach.call(document.querySelectorAll('#pane-panels > .scenario-panel'), function (panel) { if (allChecked(panel)) autoLossDate(panel); });
+  }
+  document.addEventListener('click', function () { setTimeout(onDateActivity, 0); }, true);   /* capture — 캘린더 날짜 클릭이 stopPropagation해도 확실히 실행 */
+  document.addEventListener('input', function (e) { if (e.target.classList && e.target.classList.contains('dp__value-part')) setTimeout(onDateActivity, 0); });
 
   /* ── 숫자 입력(보수총액·산정월수) — 숫자 외 문자 시 에러, 유효 시 정리(보수총액은 콤마) ── */
   function isAmt(id) { return /-amt$/.test(id); }
@@ -920,13 +960,6 @@ exits: index.html
     }
   });
 
-  /* 퇴사일 입력 → 전체 모드에서 상실일 자동(+1) */
-  root.addEventListener('input', function (e) {
-    if (!e.target.id || !/-leave-date$/.test(e.target.id)) return;
-    var panel = e.target.closest('.scenario-panel');
-    if (allChecked(panel)) autoLossDate(panel);
-  });
-
   /* 상실 사유 드롭다운 선택 → 에러 해제 */
   root.addEventListener('click', function (e) {
     var opt = e.target.closest('.acq-reason-dd .dropdown__option');
@@ -952,16 +985,19 @@ exits: index.html
       invalid.push(sec); firstBad = firstBad || panel.querySelector('.acq-ins-checks input:not([disabled])');
     } else if (sec) sec.classList.remove('acq-section--error');
 
-    /* 2) 날짜 — 전체=퇴사일, 일부=상실일 */
-    var dSfx = mode ? '-leave-date' : '-loss-date';
-    var dEl = q(panel, dSfx), dField = dEl && dEl.closest('.form-field'), dErr = dField && dField.querySelector('.form-field__error');
-    if (dEl && dErr) {
-      if (!dField.id) dField.id = dEl.id + '-field';
-      var dv = dEl.value.trim();
-      if (!/^\d{4}-\d{2}-\d{2}$/.test(dv)) {
-        setFieldError(dField.id, dErr.id, mode ? '퇴사일을 입력해 주세요' : '상실일을 입력해 주세요');
-        invalid.push(dField); firstBad = firstBad || dEl;
-      } else setFieldError(dField.id, dErr.id, '');
+    /* 2) 날짜(캘린더) — 전체=퇴사일, 일부=상실일 */
+    var dField = mode ? panel.querySelector('.acq-leave-date-field') : panel.querySelector('.acq-loss-dp-field');
+    if (dField) {
+      var dp = dField.querySelector('.dp');
+      var dv = dpVal(dp);
+      if (!dv) {
+        if (dp) dp.classList.add('dp--error');
+        dField.classList.add('form-field--error');
+        invalid.push(dField); firstBad = firstBad || (dp && dp.querySelector('.dp__value-part--year'));
+      } else {
+        if (dp) dp.classList.remove('dp--error');
+        dField.classList.remove('form-field--error');
+      }
     }
 
     /* 3·4) 당해년도(필수) · 전년도(선택) 보수총액·산정월수 */
@@ -1057,6 +1093,11 @@ exits: index.html
 
   /* 초기 모드 동기화 */
   Array.prototype.forEach.call(document.querySelectorAll('#pane-panels > .scenario-panel'), syncLossMode);
+
+  /* 진입 시 이미 값이 있는 입력 필드는 complete 상태로 표시 */
+  Array.prototype.forEach.call(document.querySelectorAll('.acq-form input.input:not([readonly]):not(.dp__value-part)'), function (el) {
+    if (String(el.value).trim()) el.classList.add('input--complete');
+  });
 })();
 </script>
 

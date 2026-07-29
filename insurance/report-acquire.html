@@ -1472,6 +1472,11 @@ exits: index.html
     syncPensionField(panel);
   });
 
+  /* 진입 시 이미 값이 있는 입력 필드는 complete 상태로 표시 */
+  Array.prototype.forEach.call(document.querySelectorAll('.acq-form input.input:not([readonly]):not(.dp__value-part)'), function (el) {
+    if (String(el.value).trim()) el.classList.add('input--complete');
+  });
+
   /* ── 10·14. 신고요청 / 다시 시도 → 검증 후 확인 Alert ── */
   function validate(panel) {
     var ok = true, firstBad = null;
