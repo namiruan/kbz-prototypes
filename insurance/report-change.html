@@ -23,14 +23,6 @@
        좌측 아래 빈 여백 없이 드롭 대상이 커지도록 한다. */
     .acq-grid > .file-upload { height: 100%; }
     .acq-grid > .file-upload .file-upload__dropzone { flex: 1 1 auto; }
-    /* 피부양자 안내 배너 — 특정 필드가 아닌 신고서 전반 안내이므로 헤더 아래 전체폭에 배치.
-       우측 배너는 관련 정보 '아래'에 붙을 때 효용이 있어, 전반 안내는 상단 전체폭이 맞다. */
-    .acq-intro-banner { margin-bottom: var(--space-gap-xl); }
-    /* 상단 배너는 데이터가 아니라 '헤더 보조 설명' 역할 → 헤더에 밀착시킨다.
-       배너가 있는 모달에서만 content 상단 패딩을 제거(헤더 자체 하단 패딩만 남김).
-       배너 없는 시나리오(로딩·저장실패)는 :has로 배제되어 정상 간격 유지. */
-    /* 특정도를 DS .modal:not(.modal--lg) .modal__content(0,3,0)보다 높여(0,4,0) 덮이지 않게 한다. */
-    .modal:not(.modal--lg) .modal__content:has(> .acq-intro-banner) { padding-top: 0; }
     /* 폼 세로 스택 — form-field-group보다 섹션 간격을 넓게 */
     .acq-form { display: flex; flex-direction: column; gap: var(--space-gap-xl); }
     /* 가입보험 섹션 — 라벨 + 테이블 */
@@ -250,22 +242,18 @@ exits: index.html
       <div class="page">
         <div class="modal" role="dialog" aria-modal="true" aria-labelledby="p1-title" style="width:958px;max-width:100%">
 
+          <!-- 1 area — 신고서 전반 안내는 특정 정보를 강조하는 배너가 아니라
+               모달 전체에 대한 보조 설명이므로 헤더 설명문(modal__description)으로 둔다. -->
           <div class="modal__header">
-            <h2 class="modal__title text-modal-title-sm" id="p1-title">보수 변경신고</h2>
+            <div class="modal__header-text">
+              <h2 class="modal__title text-modal-title-sm" id="p1-title">보수 변경신고</h2>
+              <p class="text-description modal__description">변경사유와 변경 후 보수월액을 입력하면 변동율이 자동 계산되고, 변동율에 따라 신고 대상 보험이 달라져요.</p>
+            </div>
             <button class="icon-on--lg" type="button" aria-label="닫기"><svg aria-hidden="true"><use href="#icon-close"/></svg></button>
           </div>
 
           <div class="modal__body">
             <div class="modal__content">
-              <!-- 1 area — 상시 안내 배너 -->
-              <div class="banner acq-intro-banner" role="status">
-                <span class="icon--md banner__icon" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-info"/></svg></span>
-                <div class="text-description banner__body">
-                  <p class="banner__title">보수 변경신고 안내</p>
-                  <p class="banner__message">변경사유와 변경 후 보수월액을 입력하면 변동율이 자동 계산돼요. 변동율에 따라 신고 대상 보험이 달라져요.</p>
-                </div>
-              </div>
-
               <div class="acq-grid">
 
                 <div class="file-upload" id="p1-upload" data-max-mb="200">
