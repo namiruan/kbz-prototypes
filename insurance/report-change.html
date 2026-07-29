@@ -23,6 +23,20 @@
        좌측 아래 빈 여백 없이 드롭 대상이 커지도록 한다. */
     .acq-grid > .file-upload { height: 100%; }
     .acq-grid > .file-upload .file-upload__dropzone { flex: 1 1 auto; }
+    /* 헤더 설명문 — 신고 자격·조건 안내(기획 배너 내용을 배너 대신 설명문 리스트로).
+       계층을 명확히: 최상위는 원형 불릿, 하위 조건은 a·b(알파벳) 순서. */
+    .acq-guide { max-width: 72ch; }
+    .acq-guide__list { margin: 0; padding-left: var(--space-inset-lg); list-style: disc; display: flex; flex-direction: column; gap: var(--space-gap-xs); }
+    .acq-guide__list > li::marker { color: var(--color-text-subtle); }
+    .acq-guide__sublist { margin-top: var(--space-gap-xs); padding-left: var(--space-inset-xl); list-style: lower-alpha; display: flex; flex-direction: column; gap: var(--space-gap-2xs); }
+    .acq-guide__sublist > li::marker { color: var(--color-text-subtle); }
+    /* 조건 부연(적용 시점) — 본문보다 옅게 */
+    .acq-guide__cond { color: var(--color-text-subtle); }
+    /* 강조 어절 — 설명문(subtle) 안에서 본문 톤 + heading 굵기로 구분 */
+    .acq-guide b { color: var(--color-text-body); font-weight: var(--font-weight-heading); }
+    /* b 조건 종속 고지 — 20% 변동 시 국민연금 선택·증빙. b에 속함을 들여쓰기 + 좌측 강조선 + 옅은 채움으로 시각 구분.
+       배너로 승격시키지 않도록 아이콘·전체 테두리는 두지 않는다. */
+    .acq-guide__callout { margin: var(--space-gap-2xs) 0 0; padding: var(--space-inset-squish-sm) var(--space-inset-md); border-left: var(--stroke-md) solid var(--color-text-caution); background: var(--color-surface-caution-subtle); border-radius: 0 var(--radius-xs) var(--radius-xs) 0; color: var(--color-text-body); }
     /* 폼 세로 스택 — form-field-group보다 섹션 간격을 넓게 */
     .acq-form { display: flex; flex-direction: column; gap: var(--space-gap-xl); }
     /* 가입보험 섹션 — 라벨 + 테이블 */
@@ -243,11 +257,25 @@ exits: index.html
         <div class="modal" role="dialog" aria-modal="true" aria-labelledby="p1-title" style="width:958px;max-width:100%">
 
           <!-- 1 area — 신고서 전반 안내는 특정 정보를 강조하는 배너가 아니라
-               모달 전체에 대한 보조 설명이므로 헤더 설명문(modal__description)으로 둔다. -->
+               모달 전체에 대한 보조 설명이므로 헤더 설명문(modal__description)으로 둔다.
+               자격·조건이 계층을 가지므로 리스트로 구분하고, 20% 변동에 따른 국민연금
+               선택·증빙 고지는 b 조건에 속하므로 b 아래에 콜아웃으로 종속시킨다. -->
           <div class="modal__header">
             <div class="modal__header-text">
               <h2 class="modal__title text-modal-title-sm" id="p1-title">보수 변경신고</h2>
-              <p class="text-description modal__description">변경사유와 변경 후 보수월액을 입력하면 변동율이 자동 계산되고, 변동율에 따라 신고 대상 보험이 달라져요.</p>
+              <div class="text-description modal__description acq-guide">
+                <ul class="acq-guide__list">
+                  <li>자진신고 사업장은 <b>고용보험</b> 및 <b>산재보험</b> 보수변경 신고를 할 수 없습니다.</li>
+                  <li><b>국민연금 소득월액 변경신고</b>는 다음 경우에만 가능합니다.
+                    <ol class="acq-guide__sublist">
+                      <li>취득신고 시 보수를 잘못 신고한 경우 <span class="acq-guide__cond">(입사일 기준으로 적용)</span></li>
+                      <li>보수가 20% 이상 변동(인상·인하)된 경우 <span class="acq-guide__cond">(신고월 다음 달부터 적용)</span>
+                        <p class="acq-guide__callout">※ 이 경우 국민연금 소득월액 변경신고는 의무가 아닌 <b>선택사항</b>이며, 신고 시 <b>증빙서류</b>를 반드시 첨부해야 합니다.</p>
+                      </li>
+                    </ol>
+                  </li>
+                </ul>
+              </div>
             </div>
             <button class="icon-on--lg" type="button" aria-label="닫기"><svg aria-hidden="true"><use href="#icon-close"/></svg></button>
           </div>
