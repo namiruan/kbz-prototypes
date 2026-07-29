@@ -236,6 +236,8 @@
     .acq-doc-disc .disclosure__header { display: flex; align-items: center; gap: var(--space-gap-sm); }
     .acq-doc-title { flex: 1 1 auto; min-width: 0; font-weight: var(--font-weight-heading); color: var(--color-text-body); }
     .acq-doc-disc.disclosure--expanded .disclosure__body { color: inherit; }
+    /* 제출서류 테이블 — 라운드·좌우 테두리 제거(상/하 구분선만 남겨 납작하게) */
+    .acq-doc-table.table-container { border-left: 0; border-right: 0; border-radius: 0; }
     /* 항목/내용 2열 — 항목 열은 내용 폭에 맞춰 좁게, 세로 중앙 정렬 */
     .acq-doc-table .table__cell.acq-doc-key,
     .acq-doc-table .table__head-cell:first-child { width: 96px; white-space: nowrap; }
