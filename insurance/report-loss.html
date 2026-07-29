@@ -161,13 +161,15 @@
        짧은 필드에서 우측 여백이 크게 남는다. 이 폼에선 라벨-위 + 가로 wrap으로 재정의해
        컨텐츠 폭 필드가 왼쪽부터 채워지도록 한다(form.md 필드 너비·정렬 규칙). */
     .acq-form .form-field-group--horizontal { display: flex; flex-wrap: wrap; align-items: flex-start; column-gap: var(--space-gap-lg); row-gap: var(--space-gap-md); }
-    .acq-form .form-field-group--horizontal > .form-field { display: block; flex: 0 1 auto; }
+    .acq-form .form-field-group--horizontal > .form-field { display: flex; flex-direction: column; gap: var(--space-gap-xs); flex: 0 1 auto; }
     /* ── 상실신고 전용 ── */
     /* 상실할 보험 — 체크박스 가로 배열 */
     .acq-ins-checks { display: flex; flex-wrap: wrap; gap: var(--space-gap-xl); }
     /* 상실 보험 미선택 에러 — 섹션 에러 시에만 노출(체크박스 그룹은 form-field가 아님) */
     .acq-ins-err { display: none; }
     .acq-section--error .acq-ins-err { display: block; }
+    /* 체크박스 그룹 에러 — 컨트롤과의 간격을 폼필드 규칙(gap-xs)에 맞춘다(acq-section은 gap-sm) */
+    .acq-ins-err { margin-top: calc(var(--space-gap-xs) - var(--space-gap-sm)); }
     /* (선택) 표기 — 라벨 우측 옅은 보조 텍스트 */
     .form-field__optional { margin-left: var(--space-2); color: var(--color-text-subtle); font-weight: var(--font-weight-body); }
     /* 안내 배너 상하 여백 */
@@ -314,14 +316,14 @@ exits: index.html
 
                   <div class="form-field-group--horizontal">
                     <div class="form-field">
-                      <label class="form-field__label text-form-label" for="s1-prev-amt">전년도 보수총액 <span class="form-field__optional">(선택)</span></label>
+                      <label class="form-field__label text-form-label" for="s1-prev-amt">전년도 보수총액 <span class="form-field__required" aria-hidden="true">(필수)</span></label>
                       <div class="form-field__body"><div class="input-wrap input-wrap--suffix"><input class="input" type="text" id="s1-prev-amt" value="30,000,000" inputmode="numeric"><span class="input__suffix">원</span></div></div>
-                      <div class="form-field__footer"><p class="form-field__error text-helper" id="s1-prev-amt-err" role="alert">숫자만 입력해 주세요</p></div>
+                      <div class="form-field__footer"><p class="form-field__error text-helper" id="s1-prev-amt-err" role="alert">보수총액을 입력해 주세요</p></div>
                     </div>
                     <div class="form-field">
-                      <label class="form-field__label text-form-label" for="s1-prev-mon">전년도 산정월수 <span class="form-field__optional">(선택)</span></label>
+                      <label class="form-field__label text-form-label" for="s1-prev-mon">전년도 산정월수 <span class="form-field__required" aria-hidden="true">(필수)</span></label>
                       <div class="form-field__body"><div class="input-wrap input-wrap--suffix"><input class="input" type="text" id="s1-prev-mon" value="12" inputmode="numeric"><span class="input__suffix">개월</span></div></div>
-                      <div class="form-field__footer"><p class="form-field__error text-helper" id="s1-prev-mon-err" role="alert">숫자만 입력해 주세요</p></div>
+                      <div class="form-field__footer"><p class="form-field__error text-helper" id="s1-prev-mon-err" role="alert">산정월수를 입력해 주세요</p></div>
                     </div>
                   </div>
 
@@ -470,14 +472,14 @@ exits: index.html
 
                   <div class="form-field-group--horizontal">
                     <div class="form-field">
-                      <label class="form-field__label text-form-label" for="s2-prev-amt">전년도 보수총액 <span class="form-field__optional">(선택)</span></label>
+                      <label class="form-field__label text-form-label" for="s2-prev-amt">전년도 보수총액 <span class="form-field__required" aria-hidden="true">(필수)</span></label>
                       <div class="form-field__body"><div class="input-wrap input-wrap--suffix"><input class="input" type="text" id="s2-prev-amt" value="30,000,000" inputmode="numeric"><span class="input__suffix">원</span></div></div>
-                      <div class="form-field__footer"><p class="form-field__error text-helper" id="s2-prev-amt-err" role="alert">숫자만 입력해 주세요</p></div>
+                      <div class="form-field__footer"><p class="form-field__error text-helper" id="s2-prev-amt-err" role="alert">보수총액을 입력해 주세요</p></div>
                     </div>
                     <div class="form-field">
-                      <label class="form-field__label text-form-label" for="s2-prev-mon">전년도 산정월수 <span class="form-field__optional">(선택)</span></label>
+                      <label class="form-field__label text-form-label" for="s2-prev-mon">전년도 산정월수 <span class="form-field__required" aria-hidden="true">(필수)</span></label>
                       <div class="form-field__body"><div class="input-wrap input-wrap--suffix"><input class="input" type="text" id="s2-prev-mon" value="12" inputmode="numeric"><span class="input__suffix">개월</span></div></div>
-                      <div class="form-field__footer"><p class="form-field__error text-helper" id="s2-prev-mon-err" role="alert">숫자만 입력해 주세요</p></div>
+                      <div class="form-field__footer"><p class="form-field__error text-helper" id="s2-prev-mon-err" role="alert">산정월수를 입력해 주세요</p></div>
                     </div>
                   </div>
 
@@ -963,7 +965,7 @@ exits: index.html
     }
 
     /* 3·4) 당해년도(필수) · 전년도(선택) 보수총액·산정월수 */
-    [['-cur-amt', true, '보수총액을 입력해 주세요'], ['-cur-mon', true, '산정월수를 입력해 주세요'], ['-prev-amt', false, ''], ['-prev-mon', false, '']].forEach(function (spec) {
+    [['-cur-amt', true, '보수총액을 입력해 주세요'], ['-cur-mon', true, '산정월수를 입력해 주세요'], ['-prev-amt', true, '보수총액을 입력해 주세요'], ['-prev-mon', true, '산정월수를 입력해 주세요']].forEach(function (spec) {
       var el = q(panel, spec[0]); if (!el) return;
       var field = el.closest('.form-field'), err = field && field.querySelector('.form-field__error');
       if (!field || !err) return;
