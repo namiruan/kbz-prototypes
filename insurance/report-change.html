@@ -843,13 +843,20 @@ exits: index.html
     var val = dd.querySelector('.dropdown__value'); if (val) { val.textContent = '선택'; val.classList.add('dropdown__value--placeholder'); }
   }
 
-  /* 체크박스 상태 (checked + enabled) */
+  /* 체크박스 상태 (checked + enabled) — 비활성(잠금) 박스에 사용 */
   function setBox(input, checked, enabled) {
     if (!input) return;
     input.checked = checked;
     input.disabled = !enabled;
     var label = input.closest('.checkbox');
     if (label) label.classList.toggle('checkbox--disabled', !enabled);
+  }
+  /* 활성(토글 가능) 박스 — 활성 상태만 바꾸고 체크 여부는 사용자 값 보존 */
+  function enableBox(input) {
+    if (!input) return;
+    input.disabled = false;
+    var label = input.closest('.checkbox');
+    if (label) label.classList.remove('checkbox--disabled');
   }
 
   function els(panel) {
@@ -900,17 +907,16 @@ exits: index.html
     var over20 = rate != null && Math.abs(rate) >= 20;
 
     if (reason === '착오정정') {
-      /* 착오정정: 4대보험 모두 신고 대상(건강만 해제 가능), 변동율 미적용, 첨부 필수 */
-      setBox(e.emp, true, false); setBox(e.acc, true, false); setBox(e.pen, true, false); setBox(e.hea, true, true);
+      /* 착오정정: 고용·산재·국민연금 잠금 체크, 건강만 해제 가능(체크 여부는 사용자 값 보존) */
+      setBox(e.emp, true, false); setBox(e.acc, true, false); setBox(e.pen, true, false); enableBox(e.hea);
       if (e.rateField) e.rateField.hidden = true;
       if (e.pensionDoc) e.pensionDoc.hidden = true;
       if (e.fileReq) e.fileReq.hidden = false;
     } else if (isPayChange) {
-      /* 고용·산재·건강은 보수 변동 시 항상 신고 대상. 건강만 해제 가능 */
-      setBox(e.emp, true, false); setBox(e.acc, true, false); setBox(e.hea, true, true);
-      /* 국민연금은 20% 이상 변동 시에만 선택 가능(선택 유지) */
-      if (over20) { e.pen.disabled = false; var pl = e.pen.closest('.checkbox'); if (pl) pl.classList.remove('checkbox--disabled'); }
-      else { setBox(e.pen, false, false); }
+      /* 고용·산재는 잠금 체크. 건강은 해제 가능(체크 유지) */
+      setBox(e.emp, true, false); setBox(e.acc, true, false); enableBox(e.hea);
+      /* 국민연금은 20% 이상 변동 시에만 선택 가능(opt-in) — 활성만, 체크는 사용자 값 유지. 미만이면 잠금 해제 */
+      if (over20) { enableBox(e.pen); } else { setBox(e.pen, false, false); }
       /* 변동율 배지 — 값 입력 시에만 노출, 20% 이상은 caution 톤 */
       if (rate != null) {
         e.rateField.hidden = false;
@@ -947,6 +953,10 @@ exits: index.html
     } else {
       mdClear(e.month); mdDisable(e.month);
     }
+    /* 보험 기본 체크 초기화(사용자 토글 전 기준) — 건강은 대상 사유에서 기본 체크, 국민연금은 항상 opt-in 미체크.
+       착오정정의 국민연금은 refresh가 잠금 체크로 덮는다. */
+    e.hea.checked = (reason === '착오정정' || reason === '보수인상' || reason === '보수인하');
+    e.pen.checked = false;
     panel.dataset.reasonState = reason;
     refresh(panel);
     /* 필드 노출/숨김으로 폭이 바뀔 수 있어 슬라이더를 리플로우 후 재정렬 */
