@@ -162,6 +162,13 @@
        컨텐츠 폭 필드가 왼쪽부터 채워지도록 한다(form.md 필드 너비·정렬 규칙). */
     .acq-form .form-field-group--horizontal { display: flex; flex-wrap: wrap; align-items: flex-start; column-gap: var(--space-gap-lg); row-gap: var(--space-gap-md); }
     .acq-form .form-field-group--horizontal > .form-field { display: block; flex: 0 1 auto; }
+    /* ── 조회 정보 카드 — 이름·주민번호·취득일(입사일)은 입력이 아니라 조회 정보이므로
+       입력 필드와 확실히 구분되도록 카드형(라벨 위 · 값 아래)으로 노출한다. ── */
+    .acq-info-card { display: flex; border: var(--stroke-sm) solid var(--color-border-default); border-radius: var(--radius-md); background: var(--color-surface-subtle); overflow: hidden; }
+    .acq-info-card__item { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; gap: var(--space-gap-2xs); padding: var(--space-inset-lg); }
+    .acq-info-card__item + .acq-info-card__item { border-left: var(--stroke-sm) solid var(--color-border-default); }
+    .acq-info-card__label { font-size: var(--font-size-sm); color: var(--color-text-subtle); }
+    .acq-info-card__value { font-size: var(--font-size-base); font-weight: var(--font-weight-heading); color: var(--color-text-body); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   </style>
 </head>
 <body>
@@ -244,25 +251,11 @@ exits: index.html
                 <div class="acq-form">
 
                   <!-- ── 2 area: 근로자 기본 정보 (수정 불가) ── -->
-                  <div class="form-field-group--horizontal">
-                    <div class="form-field">
-                      <label class="form-field__label text-form-label" for="s1-name">이름</label>
-                      <div class="form-field__body">
-                        <input class="input input--readonly" type="text" id="s1-name" value="유가영" readonly>
-                      </div>
-                    </div>
-                    <div class="form-field">
-                      <label class="form-field__label text-form-label" for="s1-rrn">주민번호</label>
-                      <div class="form-field__body">
-                        <input class="input input--readonly" type="text" id="s1-rrn" value="123456-1234567" readonly>
-                      </div>
-                    </div>
-                    <div class="form-field">
-                      <label class="form-field__label text-form-label" for="s1-hire">입사일</label>
-                      <div class="form-field__body">
-                        <input class="input input--readonly" type="text" id="s1-hire" value="2025-12-12" readonly>
-                      </div>
-                    </div>
+                                    <!-- 조회 정보 (이름·주민번호·입사일) — 입력 아님, 카드로 노출 -->
+                  <div class="acq-info-card">
+                    <div class="acq-info-card__item"><span class="acq-info-card__label">이름</span><span class="acq-info-card__value">유가영</span></div>
+                    <div class="acq-info-card__item"><span class="acq-info-card__label">주민번호</span><span class="acq-info-card__value">123456-1234567</span></div>
+                    <div class="acq-info-card__item"><span class="acq-info-card__label">입사일</span><span class="acq-info-card__value">2025-12-12</span></div>
                   </div>
 
                   <!-- ── 3 area: 가입 보험 — 상태 리스트 (데이터 테이블 아님. 고정 4항목: 보험명 + 상태 배지 + 사업장/제외사유) ── -->
@@ -448,25 +441,11 @@ exits: index.html
 
                 <div class="acq-form">
 
-                  <div class="form-field-group--horizontal">
-                    <div class="form-field">
-                      <label class="form-field__label text-form-label" for="s2-name">이름</label>
-                      <div class="form-field__body">
-                        <input class="input input--readonly" type="text" id="s2-name" value="유가영" readonly>
-                      </div>
-                    </div>
-                    <div class="form-field">
-                      <label class="form-field__label text-form-label" for="s2-rrn">주민번호</label>
-                      <div class="form-field__body">
-                        <input class="input input--readonly" type="text" id="s2-rrn" value="123456-1234567" readonly>
-                      </div>
-                    </div>
-                    <div class="form-field">
-                      <label class="form-field__label text-form-label" for="s2-hire">입사일</label>
-                      <div class="form-field__body">
-                        <input class="input input--readonly" type="text" id="s2-hire" value="2025-12-12" readonly>
-                      </div>
-                    </div>
+                                    <!-- 조회 정보 (이름·주민번호·입사일) — 입력 아님, 카드로 노출 -->
+                  <div class="acq-info-card">
+                    <div class="acq-info-card__item"><span class="acq-info-card__label">이름</span><span class="acq-info-card__value">유가영</span></div>
+                    <div class="acq-info-card__item"><span class="acq-info-card__label">주민번호</span><span class="acq-info-card__value">123456-1234567</span></div>
+                    <div class="acq-info-card__item"><span class="acq-info-card__label">입사일</span><span class="acq-info-card__value">2025-12-12</span></div>
                   </div>
 
                   <div class="acq-section">
@@ -660,25 +639,11 @@ exits: index.html
 
                 <div class="acq-form">
 
-                  <div class="form-field-group--horizontal">
-                    <div class="form-field">
-                      <label class="form-field__label text-form-label" for="s4-name">이름</label>
-                      <div class="form-field__body">
-                        <input class="input input--readonly" type="text" id="s4-name" value="유가영" readonly>
-                      </div>
-                    </div>
-                    <div class="form-field">
-                      <label class="form-field__label text-form-label" for="s4-rrn">주민번호</label>
-                      <div class="form-field__body">
-                        <input class="input input--readonly" type="text" id="s4-rrn" value="123456-1234567" readonly>
-                      </div>
-                    </div>
-                    <div class="form-field">
-                      <label class="form-field__label text-form-label" for="s4-hire">입사일</label>
-                      <div class="form-field__body">
-                        <input class="input input--readonly" type="text" id="s4-hire" value="2025-12-12" readonly>
-                      </div>
-                    </div>
+                                    <!-- 조회 정보 (이름·주민번호·입사일) — 입력 아님, 카드로 노출 -->
+                  <div class="acq-info-card">
+                    <div class="acq-info-card__item"><span class="acq-info-card__label">이름</span><span class="acq-info-card__value">유가영</span></div>
+                    <div class="acq-info-card__item"><span class="acq-info-card__label">주민번호</span><span class="acq-info-card__value">123456-1234567</span></div>
+                    <div class="acq-info-card__item"><span class="acq-info-card__label">입사일</span><span class="acq-info-card__value">2025-12-12</span></div>
                   </div>
 
                   <div class="acq-section">
@@ -845,25 +810,11 @@ exits: index.html
 
                 <div class="acq-form">
 
-                  <div class="form-field-group--horizontal">
-                    <div class="form-field">
-                      <label class="form-field__label text-form-label" for="s5-name">이름</label>
-                      <div class="form-field__body">
-                        <input class="input input--readonly" type="text" id="s5-name" value="유가영" readonly>
-                      </div>
-                    </div>
-                    <div class="form-field">
-                      <label class="form-field__label text-form-label" for="s5-rrn">주민번호</label>
-                      <div class="form-field__body">
-                        <input class="input input--readonly" type="text" id="s5-rrn" value="123456-1234567" readonly>
-                      </div>
-                    </div>
-                    <div class="form-field">
-                      <label class="form-field__label text-form-label" for="s5-hire">입사일</label>
-                      <div class="form-field__body">
-                        <input class="input input--readonly" type="text" id="s5-hire" value="2025-12-12" readonly>
-                      </div>
-                    </div>
+                                    <!-- 조회 정보 (이름·주민번호·입사일) — 입력 아님, 카드로 노출 -->
+                  <div class="acq-info-card">
+                    <div class="acq-info-card__item"><span class="acq-info-card__label">이름</span><span class="acq-info-card__value">유가영</span></div>
+                    <div class="acq-info-card__item"><span class="acq-info-card__label">주민번호</span><span class="acq-info-card__value">123456-1234567</span></div>
+                    <div class="acq-info-card__item"><span class="acq-info-card__label">입사일</span><span class="acq-info-card__value">2025-12-12</span></div>
                   </div>
 
                   <div class="acq-section">
