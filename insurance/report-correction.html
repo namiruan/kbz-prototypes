@@ -20,13 +20,15 @@
     .acq-grid > .file-upload .file-upload__dropzone { flex: 1 1 auto; }
     /* 폼 세로 스택 — 섹션 간격을 넓게 */
     .acq-form { display: flex; flex-direction: column; gap: var(--space-gap-xl); }
-    /* 근로자 정보 — 읽기 전용 이름·주민번호 (라벨 위 · 값 아래, 2열) */
-    .corr-info { display: flex; flex-wrap: wrap; align-items: flex-start; column-gap: var(--space-gap-lg); row-gap: var(--space-gap-md); }
-    .corr-info > .form-field { display: flex; flex-direction: column; gap: var(--space-gap-xs); flex: 1 1 0; min-width: 0; }
-    .corr-info .input { width: 100%; }
-    /* 정정신고 항목 섹션 — 라벨 + 카드 스택 */
+    /* ── 조회 정보 카드 — 이름·주민번호는 입력이 아니라 조회 정보이므로 카드형(라벨 위·값 아래)으로 노출.
+       타 신고 모달(취득·상실·보수변경·이동)과 동일한 .acq-info-card 컴포넌트를 사용해 일관성 유지. ── */
+    .acq-info-card { display: flex; border: var(--stroke-sm) solid var(--color-border-default); border-radius: var(--radius-md); background: var(--color-surface-subtle); overflow: hidden; }
+    .acq-info-card__item { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; align-items: center; text-align: center; gap: var(--space-gap-2xs); padding: var(--space-inset-lg); }
+    .acq-info-card__item + .acq-info-card__item { border-left: var(--stroke-sm) solid var(--color-border-default); }
+    .acq-info-card__label { font-size: var(--font-size-sm); color: var(--color-text-subtle); }
+    .acq-info-card__value { font-size: var(--font-size-base); font-weight: var(--font-weight-heading); color: var(--color-text-body); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    /* 정정신고 항목 섹션 — 라벨 + 카드 스택 (섹션 라벨은 타 모달과 동일하게 text-form-label 기본 굵기) */
     .corr-items { display: flex; flex-direction: column; gap: var(--space-gap-sm); }
-    .corr-items__label { font-weight: var(--font-weight-heading); }
     .corr-cards { display: flex; flex-direction: column; gap: var(--space-gap-md); }
     /* 미선택 안내 — 아무 항목도 체크하지 않았을 때 카드 아래 힌트 */
     .corr-empty-hint { color: var(--color-text-subtle); }
@@ -142,21 +144,15 @@ exits: insurance-join-status.html, index.html
 
                 <div class="acq-form">
 
-                  <!-- 1 area — 근로자 정보 (이름·주민번호, 읽기 전용) -->
-                  <div class="form-field-group--horizontal corr-info">
-                    <div class="form-field">
-                      <label class="form-field__label text-form-label" for="c1-name">이름</label>
-                      <div class="form-field__body"><input class="input" id="c1-name" type="text" value="유가영" readonly></div>
-                    </div>
-                    <div class="form-field">
-                      <label class="form-field__label text-form-label" for="c1-rrn">주민번호</label>
-                      <div class="form-field__body"><input class="input" id="c1-rrn" type="text" value="123456-1234567" readonly></div>
-                    </div>
+                  <!-- 1 area — 근로자 정보 (이름·주민번호 조회 정보 카드, 타 신고 모달과 동일) -->
+                  <div class="acq-info-card">
+                    <div class="acq-info-card__item"><span class="acq-info-card__label">이름</span><span class="acq-info-card__value">유가영</span></div>
+                    <div class="acq-info-card__item"><span class="acq-info-card__label">주민번호</span><span class="acq-info-card__value">123456-1234567</span></div>
                   </div>
 
                   <!-- 2 area — 정정신고 항목 (카드 제목 체크박스 → 체크 시 입력란 노출) -->
                   <div class="corr-items" id="c1-items">
-                    <span class="text-form-label corr-items__label" id="c1-items-label">정정신고 항목</span>
+                    <span class="text-form-label" id="c1-items-label">정정신고 항목</span>
 
                     <div class="corr-cards" role="group" aria-labelledby="c1-items-label">
 
