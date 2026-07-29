@@ -1290,6 +1290,14 @@ exits: index.html
     protoPanels.forEach(function(p) { p.hidden = p !== target; });
   }
 
+  /* 초기 로드 — 활성 시나리오(첫 번째) 하나만 노출. (미처리 시 모든 패널이 쌓여 보임) */
+  (function () {
+    var active = document.querySelector('.proto-nav-btn.is-active');
+    var name = active ? active.dataset.scenario : (protoPanels[0] && protoPanels[0].dataset.scenario);
+    var target = protoPanels.filter(function(p) { return p.dataset.scenario === name; })[0] || protoPanels[0];
+    if (target) showOnlyPanel(target);
+  })();
+
   /* ── 보기 모드 전환 (시나리오 ↔ 인터랙티브) ── */
   document.querySelectorAll('#mode-segment .segment__item').forEach(function(btn) {
     btn.addEventListener('click', function() {
