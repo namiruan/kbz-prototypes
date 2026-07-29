@@ -1,0 +1,1071 @@
+<!-- design-system: v0.5.1 -->
+<!-- prototype: 4대보험 상실신고 Layer Modal (report-loss.html) -->
+<!-- 파일 분리 구조: 허브 index.html · 진입 경로 insurance-join-status.html(사업장 선택 후) -->
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>4대보험 상실신고</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+  <link rel="stylesheet" href="https://namiruan.github.io/kbz_3.0_ui_stytem/tokens.css">
+  <link rel="stylesheet" href="https://namiruan.github.io/kbz_3.0_ui_stytem/components.css">
+  <script src="https://namiruan.github.io/kbz_3.0_ui_stytem/components.js"></script>
+  <style>
+    /* 이 페이지 고유 레이아웃만 — 컴포넌트·프로토타입 크롬은 components.css가 처리 */
+    /* 허브 복귀 링크 — 사이드바 최상단. .link는 인라인이라 블록 배치·여백을 페이지에서 준다 */
+    .proto-hub-link { display: block; padding: var(--space-inset-squish-sm); font-size: var(--font-size-sm); }
+    /* 모달 본문 2열 — 좌 첨부파일(Figma 314px) + 우 폼.
+       modal__aside는 "읽기 전용만" 규칙이라 인터랙티브한 FileUpload를 넣을 수 없어
+       modal__content 안에서 그리드로 구성한다 (→ modal.md 소제목 모달 제약) */
+    .acq-grid { display: grid; grid-template-columns: 314px 1fr; gap: var(--space-gap-2xl); align-items: stretch; }
+    /* 첨부파일 열을 우측 폼 높이에 맞춰 늘리고, 드롭존이 남는 세로 공간을 채워
+       좌측 아래 빈 여백 없이 드롭 대상이 커지도록 한다. */
+    .acq-grid > .file-upload { height: 100%; }
+    .acq-grid > .file-upload .file-upload__dropzone { flex: 1 1 auto; }
+    /* 피부양자 안내 배너 — 특정 필드가 아닌 신고서 전반 안내이므로 헤더 아래 전체폭에 배치.
+       우측 배너는 관련 정보 '아래'에 붙을 때 효용이 있어, 전반 안내는 상단 전체폭이 맞다. */
+    .acq-intro-banner { margin-bottom: var(--space-gap-xl); }
+    /* 상단 배너는 데이터가 아니라 '헤더 보조 설명' 역할 → 헤더에 밀착시킨다.
+       배너가 있는 모달에서만 content 상단 패딩을 제거(헤더 자체 하단 패딩만 남김).
+       배너 없는 시나리오(로딩·저장실패)는 :has로 배제되어 정상 간격 유지. */
+    /* 특정도를 DS .modal:not(.modal--lg) .modal__content(0,3,0)보다 높여(0,4,0) 덮이지 않게 한다. */
+    .modal:not(.modal--lg) .modal__content:has(> .acq-intro-banner) { padding-top: 0; }
+    /* 폼 세로 스택 — form-field-group보다 섹션 간격을 넓게 */
+    .acq-form { display: flex; flex-direction: column; gap: var(--space-gap-xl); }
+    /* 가입보험 섹션 — 라벨 + 테이블 */
+    .acq-section { display: flex; flex-direction: column; gap: var(--space-gap-sm); }
+    /* 직종 선택 — 값을 별도 모달에서 고르는 필드. 단일 트리거(필드 룩) + 후행 검색 아이콘,
+       전체를 클릭하면 모달이 열린다(DatePicker·Dropdown의 '트리거로 패널 열기' 관례). */
+    .acq-job-trigger {
+      display: flex; align-items: center; justify-content: space-between; gap: var(--space-gap-sm);
+      width: 100%;
+      height: var(--height-base);
+      padding: 0 var(--space-inset-lg);
+      background: var(--color-surface-base);
+      border: var(--stroke-sm) solid var(--color-border-default);
+      border-radius: var(--radius-xs);
+      color: var(--color-text-body);
+      font-size: var(--font-size-base);
+      text-align: left; cursor: pointer;
+      transition: border-color var(--duration-fast) var(--easing-base);
+    }
+    /* 가로 그룹 안의 직종 선택: 남는 가로폭을 채우도록 확장 */
+    .acq-form .form-field-group--horizontal > .form-field:has(.acq-job-trigger) { flex: 1 1 auto; }
+    /* 직종 선택 완료 — 값이 채워지면 input--complete와 동일한 테두리로 표시 */
+    .acq-job-trigger--complete { border-color: var(--color-border-complete); }
+    /* 직종 미선택 에러 — input--error와 동일한 테두리 */
+    .acq-job-trigger--error { border-color: var(--color-border-error); }
+    .acq-job-trigger:hover { border-color: var(--color-border-brand); }
+    .acq-job-trigger__value { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .acq-job-trigger--placeholder .acq-job-trigger__value { color: var(--color-text-subtle); }
+    .acq-job-trigger__icon { flex-shrink: 0; color: var(--color-text-subtle); }
+    /* ── 직종 검색 Layer Modal (Figma 14878-5873) ── */
+    .acq-job-modal { width: 520px; max-width: calc(100% - var(--space-inset-2xl)); }
+    /* 헤더: 타이틀 중앙 정렬(브랜드 컬러), 닫기는 우상단 고정 */
+    .acq-job-modal__header { position: relative; justify-content: center; text-align: center; }
+    .acq-job-modal__title { color: var(--color-text-brand); }
+    .acq-job-modal__close { position: absolute; top: var(--space-inset-xl); right: var(--space-inset-xl); }
+    /* 검색: 인풋 + 검색 버튼 한 줄 */
+    .acq-job-search { display: flex; gap: var(--space-gap-sm); margin-bottom: var(--space-gap-lg); }
+    .acq-job-search .input { flex: 1 1 auto; min-width: 0; }
+    .acq-job-search .btn { flex-shrink: 0; }
+    /* 테이블: 선택 열은 내용 폭, 버튼 가운데 */
+    .acq-job-table { width: 100%; }
+    .acq-job-table .acq-job-table__pick-cell { text-align: center; }
+    .acq-job-table .table__body { display: table-row-group; }
+    /* 검색 결과 없음 행 */
+    .acq-job-table__empty td { text-align: center; color: var(--color-text-subtle); padding: var(--space-inset-xl); }
+    /* 페이지네이션 가운데 */
+    .acq-job-pagination { justify-content: center; margin-top: var(--space-gap-lg); }
+    /* 연금 취득월납부 라벨 — 텍스트 + 툴팁 트리거를 한 줄로 */
+    .acq-label-row { display: flex; align-items: center; gap: var(--space-gap-2xs); }
+    /* 도움말 트리거(24px)가 라벨 높이를 키워 옆 필드보다 본문이 아래로 밀리는 문제 방지 —
+       음수 마진으로 버튼의 여분 높이를 흡수해 평문 라벨과 동일 높이 유지. */
+    .acq-label-row .tooltip-wrapper { margin-block: calc(var(--space-4) * -1); }
+    /* 연금 취득월납부 라디오를 옆 입력(height-base 36px)의 세로 중앙에 맞춤 */
+    .acq-form .form-field-group--horizontal .radio-group--horizontal { min-height: var(--height-base); align-items: center; }
+    /* 테이블 셀 안 드롭다운 — 셀 폭을 채운다 (.dropdown은 max-content) */
+    .acq-cell-select .dropdown,
+    .acq-cell-select .dropdown__trigger { width: 100%; }
+    .acq-cell-select .dropdown__value { overflow: hidden; text-overflow: ellipsis; }
+    /* 가입 보험 — 상태 리스트 (데이터 테이블이 아님).
+       행 선택·정렬·다건 조작이 없고 고정 4항목의 '현재 취득 상태'만 보여주므로
+       테이블 대신 각 항목을 보험명 + 상태 배지 + 사업장/제외사유로 나열한다. */
+    .acq-ins-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--space-gap-2xs); }
+    .acq-ins-item {
+      display: grid;
+      box-sizing: border-box;
+      /* 3열 고정 정렬: 보험명 · 상태 배지 · 사업장/제외사유.
+         배지 열을 고정 폭으로 잡아 취득/취득완료/제외 폭이 달라도 뒤 열의 시작이 맞도록 한다. */
+      grid-template-columns: 76px 80px minmax(0, 1fr);
+      align-items: center;
+      column-gap: var(--space-gap-md);
+      /* 모든 항목 세로 높이 통일 — 제외 행의 드롭다운(sm, 32px)에 맞춰 min-height 고정 */
+      min-height: 48px;
+      padding: 0 var(--space-gap-md);
+      border-radius: var(--radius-sm);
+    }
+    /* 상태별 표현 구분 — 취득할 대상 / 이미 취득완료 / 제외를 한눈에 구별 */
+    /* 취득: 이번 신고로 취득할 대상 → 선택된 것처럼 초록 라인(테두리)으로 강조(취득 배지와 톤 일치) */
+    .acq-ins-item[data-status="취득"]   { background: var(--color-surface-base); box-shadow: inset 0 0 0 var(--stroke-md) var(--color-border-success); }
+    /* 취득완료: 이미 완료 → 연한 초록 채움 */
+    .acq-ins-item[data-status="취득완료"] { background: var(--color-surface-success-subtle); }
+    /* 제외: 신고 대상 아님 → 연한 회색 채움 */
+    .acq-ins-item[data-status="제외"]   { background: var(--color-surface-subtle); }
+    .acq-ins-item__name { font-weight: var(--font-weight-heading); color: var(--color-text-body); }
+    .acq-ins-item__status { justify-self: start; }
+    .acq-ins-item__detail { min-width: 0; color: var(--color-text-subtle); font-size: var(--font-size-sm); }
+    /* 제외사유 드롭다운이 들어가는 detail 셀 — 드롭다운 자체 폭 유지 */
+    .acq-ins-item__detail--control { justify-self: start; }
+    /* 예상보험료 요약 — 배너가 아니라 모달 푸터 좌측에 전체 노출(이미지 패턴).
+       계산 결과라 액션(신고요청) 옆에 두어 제출 시점에 함께 보이게 한다. */
+    .modal__footer { align-items: center; }   /* 좌측 요약(다줄)과 우측 버튼 세로 가운데 정렬 */
+    .acq-estimate-footer { margin-right: auto; display: flex; flex-direction: column; gap: var(--space-gap-xs); text-align: left; min-width: 0; }
+    .acq-estimate-footer[hidden] { display: none; }
+    /* 보험을 열로 나열(뱃지 위 / 값 아래 한 줄). 보험이 늘면 옆 열로 확장, 행은 2행 고정.
+       좌측 라벨(예상 고지월·부과금액)은 1회, 값은 고지월·부과금액을 한 줄에 합쳐 노출. */
+    .acq-estimate-footer__table {
+      display: grid;
+      align-self: start;   /* ※ 안내문(긴 줄)이 폭을 넓혀도 테이블은 내용 크기 유지 — 열 벌어짐 방지 */
+      grid-auto-flow: column;
+      grid-template-rows: auto auto;   /* 뱃지 / 예상 고지월·부과금액(한 줄) */
+      align-items: center;
+      column-gap: var(--space-gap-lg);
+      row-gap: var(--space-gap-2xs);
+    }
+    .acq-estimate-footer__badge { justify-self: start; }
+    /* 좌측 타이틀 — 뱃지 대신 브랜드 컬러 텍스트, 헤더보다 한 단계 작게(15px). 2행 세로 중앙. */
+    .acq-estimate-footer__title { grid-row: 1 / span 2; align-self: center; color: var(--color-text-brand); font-size: var(--font-size-lg); font-weight: var(--font-weight-heading); line-height: var(--line-height-ui); white-space: nowrap; }
+    /* 값 한 줄: 날짜(고지월)와 금액(부과금액)을 세로 구분선 + 서로 다른 스타일로 확실히 구분 */
+    .acq-estimate-footer__values { display: inline-flex; align-items: center; gap: var(--space-gap-sm); white-space: nowrap; }
+    .acq-estimate-footer__date { color: var(--color-text-subtle); font-size: var(--font-size-lg); }             /* 날짜: 옅게 */
+    .acq-estimate-footer__amount { color: var(--color-text-body); font-size: var(--font-size-lg); font-weight: var(--font-weight-heading); }  /* 금액: 진하게·굵게 */
+    .acq-estimate-footer__sep { flex-shrink: 0; width: var(--stroke-sm); height: 0.9em; background: var(--color-border-default); }  /* 세로 구분선 */
+    .acq-estimate-footer__note { margin: 0; font-size: var(--font-size-label); color: var(--color-text-subtle); }
+    /* 로딩 스켈레톤 행 */
+    .acq-skeleton-row { display: flex; gap: var(--space-gap-md); }
+    .acq-skeleton-row > * { flex: 1; }
+    /* 입력 길이가 정해진 필드는 컨텐츠에 맞는 폭만 유지 — 불필요하게 전체폭으로 늘리지 않는다.
+       입력 형식이 유추되는(자릿수 고정·상한 있는) 필드에만 적용. */
+    /* 근로시간·급여액은 suffix addon(시간·원) 래퍼를 쓰므로 폭을 래퍼에 지정 */
+    .acq-form .input-wrap--suffix:has(input[id$="-hours"]) { max-width: 140px; }   /* 주소정근로시간: ≤100 + '시간' */
+    .acq-form .input-wrap--suffix:has(input[id$="-pay"])   { max-width: 156px; }   /* 월급여액: 금액 + '원' */
+    /* error·success 상태 시 suffix 테두리도 동기화(DS는 complete·readonly만 처리) */
+    .input-wrap--suffix:has(.input--error) .input__suffix { border-color: var(--color-border-error); }
+    .input-wrap--suffix:has(.input--success) .input__suffix { border-color: var(--color-border-success); }
+    .acq-form input[id$="-rrn"]   { max-width: 184px; }   /* 주민번호: 13자리 고정 */
+    .acq-form input[id$="-hire"]  { max-width: 148px; }   /* 입사일: YYYY-MM-DD */
+    .acq-form input[id$="-name"]  { max-width: 160px; }   /* 이름 */
+    /* 3-필드 그룹 가로 정렬 — DS form-field-group--horizontal은 라벨-옆 세로 스택이라
+       짧은 필드에서 우측 여백이 크게 남는다. 이 폼에선 라벨-위 + 가로 wrap으로 재정의해
+       컨텐츠 폭 필드가 왼쪽부터 채워지도록 한다(form.md 필드 너비·정렬 규칙). */
+    .acq-form .form-field-group--horizontal { display: flex; flex-wrap: wrap; align-items: flex-start; column-gap: var(--space-gap-lg); row-gap: var(--space-gap-md); }
+    .acq-form .form-field-group--horizontal > .form-field { display: block; flex: 0 1 auto; }
+    /* ── 상실신고 전용 ── */
+    /* 상실할 보험 — 체크박스 가로 배열 */
+    .acq-ins-checks { display: flex; flex-wrap: wrap; gap: var(--space-gap-xl); }
+    /* 상실 보험 미선택 에러 — 섹션 에러 시에만 노출(체크박스 그룹은 form-field가 아님) */
+    .acq-ins-err { display: none; }
+    .acq-section--error .acq-ins-err { display: block; }
+    /* (선택) 표기 — 라벨 우측 옅은 보조 텍스트 */
+    .form-field__optional { margin-left: var(--space-2); color: var(--color-text-subtle); font-weight: var(--font-weight-body); }
+    /* 안내 배너 상하 여백 */
+    .acq-loss-banner { margin-block: calc(var(--space-2) * 0); }
+    /* 상실 사유 — 두 개의 드롭다운 세로 스택, 각 폭 100% */
+    .acq-reason-group { display: flex; flex-direction: column; gap: var(--space-gap-sm); }
+    .acq-reason-dd, .acq-reason-dd .dropdown__trigger { width: 100%; }
+    .acq-reason-dd .dropdown__value { overflow: hidden; text-overflow: ellipsis; }
+    /* 필드 폭 — 보수총액/산정월수/날짜 */
+    .acq-form .input-wrap--suffix:has(input[id$="-amt"]) { max-width: 210px; }   /* 보수총액: 금액 + '원' */
+    .acq-form .input-wrap--suffix:has(input[id$="-mon"]) { max-width: 128px; }   /* 산정월수: ≤2자리 + '개월' */
+    .acq-form input[id$="-date"] { max-width: 180px; }                           /* 상실일·퇴사일: YYYY-MM-DD */
+  </style>
+</head>
+<body>
+<!-- @flow
+title: 상실신고
+exits: index.html
+-->
+
+
+<div class="proto-layout">
+
+  <aside class="proto-sidebar" id="proto-sidebar">
+    <!-- 허브 복귀 — 파일 분리 구조 -->
+    <a class="link proto-hub-link" href="index.html">← 화면 목록</a>
+
+    <div class="segment segment--md" role="radiogroup" aria-label="보기 모드" id="mode-segment">
+      <span class="segment__slider" aria-hidden="true"></span>
+      <button class="segment__item segment__item--selected" role="radio" aria-checked="true" type="button" data-mode="scenario">시나리오</button>
+      <button class="segment__item" role="radio" aria-checked="false" type="button" data-mode="interactive">인터랙티브</button>
+    </div>
+
+    <div class="proto-nav-divider" id="proto-nav-divider"></div>
+
+    <nav class="proto-nav" id="proto-nav" aria-label="시나리오 선택">
+      <button class="proto-nav-btn is-active" data-scenario="일부-상실" type="button">일부 상실</button>
+      <button class="proto-nav-btn" data-scenario="전체-상실" type="button">전체 상실 (퇴사)</button>
+    </nav>
+  </aside>
+
+  <main class="proto-content">
+
+    <div id="pane-panels">
+
+    <!-- ══════════════ 시나리오 1: 일부 상실 (일부 보험만 상실 · 재직 유지) ══════════════ -->
+    <section class="scenario-panel" data-scenario="일부-상실" data-step>
+      <div class="page">
+        <div class="modal" role="dialog" aria-modal="true" aria-labelledby="s1-title" style="width:958px;max-width:100%">
+
+          <div class="modal__header">
+            <h2 class="modal__title text-modal-title-sm" id="s1-title">상실신고서</h2>
+            <button class="icon-on--lg" type="button" aria-label="닫기"><svg aria-hidden="true"><use href="#icon-close"/></svg></button>
+          </div>
+
+          <div class="modal__body">
+            <div class="modal__content">
+              <div class="acq-grid">
+
+                <div class="file-upload" id="s1-upload" data-max-mb="200">
+                  <input type="file" id="s1-file-input" hidden multiple>
+                  <div class="file-upload__header">
+                    <span class="text-form-label file-upload__label" style="font-weight:var(--font-weight-heading)">첨부파일</span>
+                    <span class="text-form-label file-upload__usage">0MB / 200MB</span>
+                  </div>
+                  <div class="file-upload__meta">
+                    <p class="text-body file-upload__description">파일을 마우스로 끌어다 놓거나, 추가하기 버튼을 사용해 직접 업로드해 보세요.</p>
+                    <p class="text-body file-upload__constraint">*파일당 10MB 이하 업로드 가능</p>
+                  </div>
+                  <div class="file-upload__dropzone">
+                    <button class="btn btn--secondary btn--sm btn--icon-left" type="button">
+                      <span class="icon icon--sm" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-plus"/></svg></span>추가하기
+                    </button>
+                    <div class="file-upload__grid"></div>
+                  </div>
+                </div>
+
+                <div class="acq-form">
+
+                  <div class="form-field-group--horizontal">
+                    <div class="form-field">
+                      <label class="form-field__label text-form-label" for="s1-name">이름</label>
+                      <div class="form-field__body"><input class="input input--readonly" type="text" id="s1-name" value="유가영" readonly></div>
+                    </div>
+                    <div class="form-field">
+                      <label class="form-field__label text-form-label" for="s1-rrn">주민번호</label>
+                      <div class="form-field__body"><input class="input input--readonly" type="text" id="s1-rrn" value="123456-1234567" readonly></div>
+                    </div>
+                    <div class="form-field">
+                      <label class="form-field__label text-form-label" for="s1-hire">취득일</label>
+                      <div class="form-field__body"><input class="input input--readonly" type="text" id="s1-hire" value="2024-03-02" readonly></div>
+                    </div>
+                  </div>
+
+                  <div class="acq-section">
+                    <span class="text-form-label" id="s1-ins-label">상실할 보험 선택 <span class="form-field__required" aria-hidden="true">(필수)</span></span>
+                    <div class="acq-ins-checks" role="group" aria-labelledby="s1-ins-label">
+                      <label class="checkbox"><input type="checkbox" id="s1-ins-pension" checked><span class="checkbox__control" aria-hidden="true"><span class="checkbox__icon-check"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span><span class="checkbox__label">국민연금</span></label>
+                      <label class="checkbox"><input type="checkbox" id="s1-ins-health" checked><span class="checkbox__control" aria-hidden="true"><span class="checkbox__icon-check"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span><span class="checkbox__label">건강보험</span></label>
+                      <label class="checkbox"><input type="checkbox" id="s1-ins-emp"><span class="checkbox__control" aria-hidden="true"><span class="checkbox__icon-check"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span><span class="checkbox__label">고용보험</span></label>
+                      <label class="checkbox"><input type="checkbox" id="s1-ins-acc"><span class="checkbox__control" aria-hidden="true"><span class="checkbox__icon-check"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span><span class="checkbox__label">산재보험</span></label>
+                    </div>
+                    <p class="form-field__error text-helper acq-ins-err" id="s1-ins-err" role="alert">상실할 보험을 1개 이상 선택해 주세요.</p>
+                  </div>
+
+                  <!-- 안내 배너 — 상실 보험 선택 상태에 따라 토글 -->
+                  <div class="banner acq-loss-banner acq-partial-banner" role="status">
+                    <span class="icon--md banner__icon" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-info"/></svg></span>
+                    <div class="text-description banner__body">
+                      <p class="banner__message">일부 보험만 상실됩니다. 근로자는 재직 상태로 유지됩니다.</p>
+                    </div>
+                  </div>
+                  <div class="banner banner--caution acq-loss-banner acq-leave-banner" role="status" hidden>
+                    <span class="icon--md banner__icon" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-warning"/></svg></span>
+                    <div class="text-description banner__body">
+                      <p class="banner__message">전체 퇴사 처리로 진행됩니다. 공단 처리 완료 시 근로자 관리에 퇴사일이 업데이트 돼요.</p>
+                    </div>
+                  </div>
+
+                  <div class="form-field-group--horizontal">
+                    <div class="form-field acq-leave-date-field" hidden>
+                      <label class="form-field__label text-form-label" for="s1-leave-date">퇴사일(마지막근무일) <span class="form-field__required" aria-hidden="true">(필수)</span></label>
+                      <div class="form-field__body"><input class="input" type="text" id="s1-leave-date" placeholder="YYYY-MM-DD" inputmode="numeric"></div>
+                      <div class="form-field__footer"><p class="form-field__error text-helper" id="s1-leave-date-err" role="alert">퇴사일을 입력해 주세요.</p></div>
+                    </div>
+                    <div class="form-field">
+                      <label class="form-field__label text-form-label" for="s1-loss-date">상실일 <span class="form-field__required" aria-hidden="true">(필수)</span></label>
+                      <div class="form-field__body"><input class="input" type="text" id="s1-loss-date" value="2026-07-01" placeholder="YYYY-MM-DD" inputmode="numeric"></div>
+                      <div class="form-field__footer"><p class="form-field__error text-helper" id="s1-loss-date-err" role="alert">상실일을 입력해 주세요.</p></div>
+                    </div>
+                  </div>
+
+                  <div class="form-field-group--horizontal">
+                    <div class="form-field">
+                      <label class="form-field__label text-form-label" for="s1-cur-amt">당해년도 보수총액 <span class="form-field__required" aria-hidden="true">(필수)</span></label>
+                      <div class="form-field__body"><div class="input-wrap input-wrap--suffix"><input class="input" type="text" id="s1-cur-amt" value="24,000,000" inputmode="numeric" aria-required="true"><span class="input__suffix">원</span></div></div>
+                      <div class="form-field__footer"><p class="form-field__error text-helper" id="s1-cur-amt-err" role="alert">보수총액을 입력해 주세요.</p></div>
+                    </div>
+                    <div class="form-field">
+                      <label class="form-field__label text-form-label" for="s1-cur-mon">당해년도 산정월수 <span class="form-field__required" aria-hidden="true">(필수)</span></label>
+                      <div class="form-field__body"><div class="input-wrap input-wrap--suffix"><input class="input" type="text" id="s1-cur-mon" value="7" inputmode="numeric" aria-required="true"><span class="input__suffix">개월</span></div></div>
+                      <div class="form-field__footer"><p class="form-field__error text-helper" id="s1-cur-mon-err" role="alert">산정월수를 입력해 주세요.</p></div>
+                    </div>
+                  </div>
+
+                  <div class="form-field-group--horizontal">
+                    <div class="form-field">
+                      <label class="form-field__label text-form-label" for="s1-prev-amt">전년도 보수총액 <span class="form-field__optional">(선택)</span></label>
+                      <div class="form-field__body"><div class="input-wrap input-wrap--suffix"><input class="input" type="text" id="s1-prev-amt" value="30,000,000" inputmode="numeric"><span class="input__suffix">원</span></div></div>
+                      <div class="form-field__footer"><p class="form-field__error text-helper" id="s1-prev-amt-err" role="alert">숫자만 입력해 주세요</p></div>
+                    </div>
+                    <div class="form-field">
+                      <label class="form-field__label text-form-label" for="s1-prev-mon">전년도 산정월수 <span class="form-field__optional">(선택)</span></label>
+                      <div class="form-field__body"><div class="input-wrap input-wrap--suffix"><input class="input" type="text" id="s1-prev-mon" value="12" inputmode="numeric"><span class="input__suffix">개월</span></div></div>
+                      <div class="form-field__footer"><p class="form-field__error text-helper" id="s1-prev-mon-err" role="alert">숫자만 입력해 주세요</p></div>
+                    </div>
+                  </div>
+
+                  <div class="form-field">
+                    <span class="form-field__label text-form-label" id="s1-reason-label">상실 사유 <span class="form-field__required" aria-hidden="true">(필수)</span></span>
+                    <div class="form-field__body acq-reason-group">
+                      <div class="dropdown dropdown--button dropdown--menu acq-reason-dd">
+                        <button class="dropdown__trigger" type="button" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="s1-reason-label"><span class="dropdown__value dropdown__value--placeholder">상실 사유 선택</span><span class="dropdown__chevron" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-chevron-down"/></svg></span></button>
+                        <div class="dropdown__panel"><ul class="dropdown__list" role="listbox" aria-label="상실 사유">
+                          <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">자진 퇴사</span></li>
+                          <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">계약 만료</span></li>
+                          <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">정년 퇴직</span></li>
+                          <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">경영상 필요·회사 사정</span></li>
+                          <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">기타</span></li>
+                        </ul></div>
+                      </div>
+                      <div class="dropdown dropdown--button dropdown--menu acq-reason-dd">
+                        <button class="dropdown__trigger" type="button" aria-haspopup="listbox" aria-expanded="false" aria-label="구체적 사유"><span class="dropdown__value dropdown__value--placeholder">구체적 사유 선택</span><span class="dropdown__chevron" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-chevron-down"/></svg></span></button>
+                        <div class="dropdown__panel"><ul class="dropdown__list" role="listbox" aria-label="구체적 사유">
+                          <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">개인 사정</span></li>
+                          <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">이직</span></li>
+                          <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">질병·부상</span></li>
+                          <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">사업장 이전·폐업</span></li>
+                          <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">기타</span></li>
+                        </ul></div>
+                      </div>
+                    </div>
+                    <div class="form-field__footer"><p class="form-field__error text-helper" id="s1-reason-err" role="alert">상실 사유를 선택해 주세요.</p></div>
+                  </div>
+
+                  <div class="form-field">
+                    <label class="form-field__label text-form-label" for="s1-memo">메모</label>
+                    <div class="form-field__body">
+                      <div class="textarea-wrap textarea-wrap--char-count">
+                        <textarea class="textarea" id="s1-memo" rows="4" maxlength="100" placeholder="요청하시는 업무와 관련하여 담당자에게 전달할 내용을 기재해주세요."></textarea>
+                        <span class="textarea-char-count" aria-hidden="true">0/100</span>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="modal__footer">
+            <button class="btn btn--ghost btn--md" type="button" data-acq-cancel>취소</button>
+            <button class="btn btn--secondary btn--solid btn--md" type="button" data-overlay-open="overlay-draft">임시저장</button>
+            <button class="btn btn--primary btn--md" type="button" id="s1-submit">신고요청</button>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════ 시나리오 2: 전체 상실 = 퇴사 (가입된 모든 보험 상실) ══════════════ -->
+    <section class="scenario-panel" data-scenario="전체-상실" data-step hidden>
+      <div class="page">
+        <div class="modal" role="dialog" aria-modal="true" aria-labelledby="s2-title" style="width:958px;max-width:100%">
+
+          <div class="modal__header">
+            <h2 class="modal__title text-modal-title-sm" id="s2-title">상실신고서</h2>
+            <button class="icon-on--lg" type="button" aria-label="닫기"><svg aria-hidden="true"><use href="#icon-close"/></svg></button>
+          </div>
+
+          <div class="modal__body">
+            <div class="modal__content">
+              <div class="acq-grid">
+
+                <div class="file-upload" id="s2-upload" data-max-mb="200">
+                  <input type="file" id="s2-file-input" hidden multiple>
+                  <div class="file-upload__header">
+                    <span class="text-form-label file-upload__label" style="font-weight:var(--font-weight-heading)">첨부파일</span>
+                    <span class="text-form-label file-upload__usage">0MB / 200MB</span>
+                  </div>
+                  <div class="file-upload__meta">
+                    <p class="text-body file-upload__description">파일을 마우스로 끌어다 놓거나, 추가하기 버튼을 사용해 직접 업로드해 보세요.</p>
+                    <p class="text-body file-upload__constraint">*파일당 10MB 이하 업로드 가능</p>
+                  </div>
+                  <div class="file-upload__dropzone">
+                    <button class="btn btn--secondary btn--sm btn--icon-left" type="button">
+                      <span class="icon icon--sm" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-plus"/></svg></span>추가하기
+                    </button>
+                    <div class="file-upload__grid"></div>
+                  </div>
+                </div>
+
+                <div class="acq-form">
+
+                  <div class="form-field-group--horizontal">
+                    <div class="form-field">
+                      <label class="form-field__label text-form-label" for="s2-name">이름</label>
+                      <div class="form-field__body"><input class="input input--readonly" type="text" id="s2-name" value="유가영" readonly></div>
+                    </div>
+                    <div class="form-field">
+                      <label class="form-field__label text-form-label" for="s2-rrn">주민번호</label>
+                      <div class="form-field__body"><input class="input input--readonly" type="text" id="s2-rrn" value="123456-1234567" readonly></div>
+                    </div>
+                    <div class="form-field">
+                      <label class="form-field__label text-form-label" for="s2-hire">취득일</label>
+                      <div class="form-field__body"><input class="input input--readonly" type="text" id="s2-hire" value="2024-03-02" readonly></div>
+                    </div>
+                  </div>
+
+                  <div class="acq-section">
+                    <span class="text-form-label" id="s2-ins-label">상실할 보험 선택 <span class="form-field__required" aria-hidden="true">(필수)</span></span>
+                    <div class="acq-ins-checks" role="group" aria-labelledby="s2-ins-label">
+                      <label class="checkbox"><input type="checkbox" id="s2-ins-pension" checked><span class="checkbox__control" aria-hidden="true"><span class="checkbox__icon-check"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span><span class="checkbox__label">국민연금</span></label>
+                      <label class="checkbox"><input type="checkbox" id="s2-ins-health" checked><span class="checkbox__control" aria-hidden="true"><span class="checkbox__icon-check"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span><span class="checkbox__label">건강보험</span></label>
+                      <label class="checkbox"><input type="checkbox" id="s2-ins-emp" checked><span class="checkbox__control" aria-hidden="true"><span class="checkbox__icon-check"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span><span class="checkbox__label">고용보험</span></label>
+                      <label class="checkbox"><input type="checkbox" id="s2-ins-acc" checked><span class="checkbox__control" aria-hidden="true"><span class="checkbox__icon-check"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span><span class="checkbox__label">산재보험</span></label>
+                    </div>
+                    <p class="form-field__error text-helper acq-ins-err" id="s2-ins-err" role="alert">상실할 보험을 1개 이상 선택해 주세요.</p>
+                  </div>
+
+                  <div class="banner acq-loss-banner acq-partial-banner" role="status" hidden>
+                    <span class="icon--md banner__icon" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-info"/></svg></span>
+                    <div class="text-description banner__body">
+                      <p class="banner__message">일부 보험만 상실됩니다. 근로자는 재직 상태로 유지됩니다.</p>
+                    </div>
+                  </div>
+                  <div class="banner banner--caution acq-loss-banner acq-leave-banner" role="status">
+                    <span class="icon--md banner__icon" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-warning"/></svg></span>
+                    <div class="text-description banner__body">
+                      <p class="banner__message">전체 퇴사 처리로 진행됩니다. 공단 처리 완료 시 근로자 관리에 퇴사일이 업데이트 돼요.</p>
+                    </div>
+                  </div>
+
+                  <div class="form-field-group--horizontal">
+                    <div class="form-field acq-leave-date-field">
+                      <label class="form-field__label text-form-label" for="s2-leave-date">퇴사일(마지막근무일) <span class="form-field__required" aria-hidden="true">(필수)</span></label>
+                      <div class="form-field__body"><input class="input" type="text" id="s2-leave-date" value="2026-06-30" placeholder="YYYY-MM-DD" inputmode="numeric"></div>
+                      <div class="form-field__footer"><p class="form-field__error text-helper" id="s2-leave-date-err" role="alert">퇴사일을 입력해 주세요.</p></div>
+                    </div>
+                    <div class="form-field">
+                      <label class="form-field__label text-form-label" for="s2-loss-date">상실일 <span class="form-field__required" aria-hidden="true">(필수)</span></label>
+                      <div class="form-field__body"><input class="input input--readonly" type="text" id="s2-loss-date" value="2026-07-01" placeholder="YYYY-MM-DD" readonly></div>
+                      <div class="form-field__footer"><p class="form-field__help text-helper">퇴사일 다음 날로 자동 입력돼요.</p></div>
+                    </div>
+                  </div>
+
+                  <div class="form-field-group--horizontal">
+                    <div class="form-field">
+                      <label class="form-field__label text-form-label" for="s2-cur-amt">당해년도 보수총액 <span class="form-field__required" aria-hidden="true">(필수)</span></label>
+                      <div class="form-field__body"><div class="input-wrap input-wrap--suffix"><input class="input" type="text" id="s2-cur-amt" value="18,000,000" inputmode="numeric" aria-required="true"><span class="input__suffix">원</span></div></div>
+                      <div class="form-field__footer"><p class="form-field__error text-helper" id="s2-cur-amt-err" role="alert">보수총액을 입력해 주세요.</p></div>
+                    </div>
+                    <div class="form-field">
+                      <label class="form-field__label text-form-label" for="s2-cur-mon">당해년도 산정월수 <span class="form-field__required" aria-hidden="true">(필수)</span></label>
+                      <div class="form-field__body"><div class="input-wrap input-wrap--suffix"><input class="input" type="text" id="s2-cur-mon" value="6" inputmode="numeric" aria-required="true"><span class="input__suffix">개월</span></div></div>
+                      <div class="form-field__footer"><p class="form-field__error text-helper" id="s2-cur-mon-err" role="alert">산정월수를 입력해 주세요.</p></div>
+                    </div>
+                  </div>
+
+                  <div class="form-field-group--horizontal">
+                    <div class="form-field">
+                      <label class="form-field__label text-form-label" for="s2-prev-amt">전년도 보수총액 <span class="form-field__optional">(선택)</span></label>
+                      <div class="form-field__body"><div class="input-wrap input-wrap--suffix"><input class="input" type="text" id="s2-prev-amt" value="30,000,000" inputmode="numeric"><span class="input__suffix">원</span></div></div>
+                      <div class="form-field__footer"><p class="form-field__error text-helper" id="s2-prev-amt-err" role="alert">숫자만 입력해 주세요</p></div>
+                    </div>
+                    <div class="form-field">
+                      <label class="form-field__label text-form-label" for="s2-prev-mon">전년도 산정월수 <span class="form-field__optional">(선택)</span></label>
+                      <div class="form-field__body"><div class="input-wrap input-wrap--suffix"><input class="input" type="text" id="s2-prev-mon" value="12" inputmode="numeric"><span class="input__suffix">개월</span></div></div>
+                      <div class="form-field__footer"><p class="form-field__error text-helper" id="s2-prev-mon-err" role="alert">숫자만 입력해 주세요</p></div>
+                    </div>
+                  </div>
+
+                  <div class="form-field">
+                    <span class="form-field__label text-form-label" id="s2-reason-label">상실 사유 <span class="form-field__required" aria-hidden="true">(필수)</span></span>
+                    <div class="form-field__body acq-reason-group">
+                      <div class="dropdown dropdown--button dropdown--menu acq-reason-dd">
+                        <button class="dropdown__trigger" type="button" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="s2-reason-label"><span class="dropdown__value dropdown__value--placeholder">상실 사유 선택</span><span class="dropdown__chevron" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-chevron-down"/></svg></span></button>
+                        <div class="dropdown__panel"><ul class="dropdown__list" role="listbox" aria-label="상실 사유">
+                          <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">자진 퇴사</span></li>
+                          <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">계약 만료</span></li>
+                          <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">정년 퇴직</span></li>
+                          <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">경영상 필요·회사 사정</span></li>
+                          <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">기타</span></li>
+                        </ul></div>
+                      </div>
+                      <div class="dropdown dropdown--button dropdown--menu acq-reason-dd">
+                        <button class="dropdown__trigger" type="button" aria-haspopup="listbox" aria-expanded="false" aria-label="구체적 사유"><span class="dropdown__value dropdown__value--placeholder">구체적 사유 선택</span><span class="dropdown__chevron" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-chevron-down"/></svg></span></button>
+                        <div class="dropdown__panel"><ul class="dropdown__list" role="listbox" aria-label="구체적 사유">
+                          <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">개인 사정</span></li>
+                          <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">이직</span></li>
+                          <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">질병·부상</span></li>
+                          <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">사업장 이전·폐업</span></li>
+                          <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">기타</span></li>
+                        </ul></div>
+                      </div>
+                    </div>
+                    <div class="form-field__footer"><p class="form-field__error text-helper" id="s2-reason-err" role="alert">상실 사유를 선택해 주세요.</p></div>
+                  </div>
+
+                  <div class="form-field">
+                    <label class="form-field__label text-form-label" for="s2-memo">메모</label>
+                    <div class="form-field__body">
+                      <div class="textarea-wrap textarea-wrap--char-count">
+                        <textarea class="textarea" id="s2-memo" rows="4" maxlength="100" placeholder="요청하시는 업무와 관련하여 담당자에게 전달할 내용을 기재해주세요."></textarea>
+                        <span class="textarea-char-count" aria-hidden="true">0/100</span>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="modal__footer">
+            <button class="btn btn--ghost btn--md" type="button" data-acq-cancel>취소</button>
+            <button class="btn btn--secondary btn--solid btn--md" type="button" data-overlay-open="overlay-draft">임시저장</button>
+            <button class="btn btn--primary btn--md" type="button" id="s2-submit">신고요청</button>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    </div>
+  </main>
+
+</div>
+
+<!-- ══════════════ 첨부 이미지 미리보기 라이트박스 (DS image-preview) ══════════════ -->
+<div class="image-preview" id="acq-image-preview" role="dialog" aria-modal="true" aria-label="이미지 미리보기">
+  <div class="image-preview__scrim" id="acq-ip-scrim" aria-hidden="true"></div>
+  <div class="image-preview__topbar">
+    <span class="text-body image-preview__filename" id="acq-ip-filename"></span>
+    <div class="image-preview__topbar-actions">
+      <button class="btn btn--secondary btn--sm btn--icon-left" type="button" id="acq-ip-download">
+        <span class="icon icon--sm" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-download"/></svg></span>다운로드
+      </button>
+      <button class="btn btn--secondary btn--sm btn--icon-left" type="button" id="acq-ip-delete">
+        <span class="icon icon--sm" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-delete"/></svg></span>삭제
+      </button>
+      <button class="btn btn--ghost-inverse btn--sm btn--icon-only" type="button" aria-label="닫기" id="acq-ip-close">
+        <span class="icon icon--sm" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-close"/></svg></span>
+      </button>
+    </div>
+  </div>
+  <div class="image-preview__card">
+    <div class="image-preview__body">
+      <img class="image-preview__img" id="acq-ip-img" src="" alt="확대 이미지">
+    </div>
+  </div>
+  <div class="image-preview__toolbar">
+    <button class="btn btn--ghost-inverse btn--sm btn--icon-only" type="button" aria-label="축소" id="acq-ip-zoom-out">
+      <span class="icon icon--sm" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-minus"/></svg></span>
+    </button>
+    <span class="text-body image-preview__zoom-label" id="acq-ip-zoom-label">100%</span>
+    <button class="btn btn--ghost-inverse btn--sm btn--icon-only" type="button" aria-label="확대" id="acq-ip-zoom-in">
+      <span class="icon icon--sm" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-plus"/></svg></span>
+    </button>
+  </div>
+</div>
+
+<!-- ══════════════ 9 area — 취소 확인 (Alert) ══════════════ -->
+<div id="overlay-cancel" data-overlay>
+  <div class="alert" role="alertdialog" aria-modal="true" aria-labelledby="cancel-title" aria-describedby="cancel-body">
+    <div class="alert__header">
+      <p class="text-card-title alert__title" id="cancel-title">작성 중인 상실신고를 취소할까요?</p>
+      <button class="icon-on--sm alert__close" type="button" aria-label="닫기" data-overlay-close><svg aria-hidden="true"><use href="#icon-close"/></svg></button>
+    </div>
+    <div class="alert__body" id="cancel-body">
+      <p class="text-description alert__description">작성한 내용은 저장되지 않아요.</p>
+    </div>
+    <div class="alert__footer">
+      <button class="btn btn--ghost btn--md" type="button" data-overlay-close>계속 작성</button>
+      <button class="btn btn--secondary btn--md" type="button" data-overlay-close>취소하기</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ 10 area — 임시저장 확인 (Alert) ══════════════ -->
+<div id="overlay-draft" data-overlay>
+  <div class="alert" role="alertdialog" aria-modal="true" aria-labelledby="draft-title" aria-describedby="draft-body">
+    <div class="alert__header">
+      <p class="text-card-title alert__title" id="draft-title">작성 중인 내용을 임시저장할까요?</p>
+      <button class="icon-on--sm alert__close" type="button" aria-label="닫기" data-overlay-close><svg aria-hidden="true"><use href="#icon-close"/></svg></button>
+    </div>
+    <div class="alert__body" id="draft-body">
+      <p class="text-description alert__description">임시저장한 신고는 신고대상&amp;진행현황 탭에서 이어서 작성할 수 있어요.</p>
+    </div>
+    <div class="alert__footer">
+      <button class="btn btn--ghost btn--md" type="button" data-overlay-close>취소</button>
+      <button class="btn btn--primary btn--md" type="button" data-overlay-close>임시저장</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ 11 area — 신고요청 확인 (Alert) ══════════════ -->
+<div id="overlay-submit" data-overlay>
+  <div class="alert" role="alertdialog" aria-modal="true" aria-labelledby="submit-title" aria-describedby="submit-body">
+    <div class="alert__header">
+      <p class="text-card-title alert__title" id="submit-title">4대보험 상실신고를 진행할까요?</p>
+      <button class="icon-on--sm alert__close" type="button" aria-label="닫기" data-overlay-close><svg aria-hidden="true"><use href="#icon-close"/></svg></button>
+    </div>
+    <div class="alert__body" id="submit-body">
+      <p class="text-description alert__description">선택한 보험이 상실 처리되고, 신고 정보가 전산망으로 전송돼요. 전체 상실 시 근로자 관리에 퇴사일이 등록돼요.</p>
+    </div>
+    <div class="alert__footer">
+      <button class="btn btn--ghost btn--md" type="button" data-overlay-close>취소</button>
+      <button class="btn btn--primary btn--md" type="button" id="submit-confirm">신고요청</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  /* ── 아이콘 sprite fetch 주입 — 로컬 참조(#icon-*)로 Safari·file:// 차단 회피 ── */
+  fetch('https://namiruan.github.io/kbz_3.0_ui_stytem/icons/sprite.svg')
+    .then(function(r) { return r.text(); })
+    .then(function(t) {
+      var d = document.createElement('div');
+      d.style.display = 'none';
+      d.innerHTML = t;
+      document.body.insertBefore(d, document.body.firstChild);
+    });
+
+  /* ── 컴포넌트 초기화 스캐폴드 ── */
+  function _initComponents(root) {
+    root = root || document;
+    if (typeof initInput === 'function') root.querySelectorAll('.input').forEach(function(el) { if (!el.closest('.input-wrap') && !el.dataset.initInput) { el.dataset.initInput = '1'; initInput(el); } });
+    if (typeof initTextareaContainer === 'function') root.querySelectorAll('.textarea-wrap').forEach(function(el) { initTextareaContainer(el); });
+    if (typeof initDropdown === 'function')   root.querySelectorAll('.dropdown').forEach(function(el) { initDropdown(el.parentElement); });
+    if (typeof initSegment === 'function')    root.querySelectorAll('.segment').forEach(function(el) { initSegment(el.parentElement); });
+    if (typeof initFileUpload === 'function') initFileUpload(root);   /* DS initFileUpload(container)는 컨테이너 안의 .file-upload를 탐색 — 요소가 아닌 root를 넘긴다 */
+    if (typeof initImagePreview === 'function') initImagePreview(root);   /* 첨부 이미지 라이트박스(미리보기) */
+  }
+  _initComponents();
+
+  /* ── 인터랙티브 보기 폼 검증·버튼 로딩 (planner.md 출력 형식 스캐폴드) ── */
+  function setFieldError(fieldId, errId, msg) {
+    var field = document.getElementById(fieldId), err = document.getElementById(errId);
+    if (!field || !err) return;
+    var wrap = field.querySelector('.input-wrap'), input = field.querySelector('input,textarea,select');
+    var icon = field.querySelector('.input-icon'), iconUse = icon && icon.querySelector('use');
+    if (msg) {
+      field.classList.add('form-field--error');
+      if (wrap) wrap.classList.add('input-wrap--icon-right');
+      if (input) { input.classList.remove('input--success','input--complete'); input.classList.add('input--error'); input.setAttribute('aria-invalid','true'); input.setAttribute('aria-describedby',errId); }
+      if (iconUse) iconUse.setAttribute('href','#icon-warning');
+      if (icon) icon.removeAttribute('hidden');
+      err.textContent = msg; err.removeAttribute('hidden');
+    } else {
+      field.classList.remove('form-field--error');
+      if (wrap) wrap.classList.add('input-wrap--icon-right');
+      if (input) { input.classList.remove('input--error','input--complete'); input.classList.add('input--success'); input.removeAttribute('aria-invalid'); }
+      if (iconUse) iconUse.setAttribute('href','#icon-check');
+      if (icon) icon.removeAttribute('hidden');
+      err.setAttribute('hidden','');
+    }
+  }
+  /* 값이 비워지면 success·error·complete 상태를 모두 해제해 중립(기본)으로 되돌린다 */
+  function clearFieldState(fieldId, errId) {
+    var field = document.getElementById(fieldId), err = document.getElementById(errId);
+    if (!field) return;
+    var wrap = field.querySelector('.input-wrap'), input = field.querySelector('input,textarea,select');
+    var icon = field.querySelector('.input-icon');
+    field.classList.remove('form-field--error');
+    if (wrap) wrap.classList.remove('input-wrap--icon-right');
+    if (input) { input.classList.remove('input--error','input--success','input--complete'); input.removeAttribute('aria-invalid'); input.removeAttribute('aria-describedby'); }
+    if (icon) icon.setAttribute('hidden','');
+    if (err) { err.textContent = ''; err.setAttribute('hidden',''); }
+  }
+  /* 값이 비어도 이미 에러(제출 필수 등)면 상태를 유지, 아니면 중립으로 정리 */
+  function clearIfNotError(field, err) {
+    if (!field) return;
+    if (field.classList.contains('form-field--error')) return;
+    clearFieldState(field.id, err && err.id);
+  }
+  function setButtonLoading(btn, label) {
+    var orig = btn.dataset.origLabel || btn.textContent.trim();
+    btn.dataset.origLabel = orig;
+    btn.style.minWidth = btn.offsetWidth + 'px';
+    btn.setAttribute('tabindex','-1');
+    btn.setAttribute('aria-label', label || orig + ' 중...');
+    btn.classList.add('btn--loading');
+    /* fill(primary·secondary·danger) = spinner--inverse. ghost·solid = spinner--sm 만. 출처: button.md ## 동작 loading */
+    var isFill = !btn.classList.contains('btn--solid') && !btn.classList.contains('btn--ghost') && !btn.classList.contains('btn--ghost-inverse');
+    btn.innerHTML = '<span class="spinner spinner--sm' + (isFill ? ' spinner--inverse' : '') + '" aria-hidden="true"><span aria-hidden="true"></span></span>' + (label || orig + ' 중...');
+  }
+  function clearButtonLoading(btn) {
+    btn.classList.remove('btn--loading'); btn.removeAttribute('tabindex'); btn.removeAttribute('aria-label');
+    btn.style.minWidth = '';
+    btn.innerHTML = btn.dataset.origLabel || ''; delete btn.dataset.origLabel;
+  }
+
+  /* ── 스캐폴드 헬퍼 ── */
+  var protoPanels = Array.prototype.slice.call(document.querySelectorAll('#pane-panels > .scenario-panel'));
+
+  function showOnlyPanel(target) {
+    protoPanels.forEach(function(p) { p.hidden = p !== target; });
+  }
+
+  /* ── 보기 모드 전환 (시나리오 ↔ 인터랙티브) ── */
+  document.querySelectorAll('#mode-segment .segment__item').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var interactive = this.dataset.mode === 'interactive';
+      document.getElementById('proto-nav').hidden = interactive;
+      document.getElementById('proto-nav-divider').hidden = interactive;
+      closeAllOverlays();
+      if (interactive) {
+        if (protoPanels[0]) { showOnlyPanel(protoPanels[0]); _initComponents(protoPanels[0]); }
+      } else {
+        var active = document.querySelector('.proto-nav-btn.is-active');
+        var name = active ? active.dataset.scenario : (protoPanels[0] && protoPanels[0].dataset.scenario);
+        var target = protoPanels.filter(function(p) { return p.dataset.scenario === name; })[0] || protoPanels[0];
+        if (target) showOnlyPanel(target);
+      }
+    });
+  });
+
+  /* ── 시나리오 네비게이션 전환 (점프) ── */
+  document.querySelectorAll('.proto-nav-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      closeAllOverlays();
+      var name = this.dataset.scenario;
+      protoPanels.forEach(function(p) { p.hidden = p.dataset.scenario !== name; });
+      document.querySelectorAll('.proto-nav-btn').forEach(function(b) { b.classList.toggle('is-active', b.dataset.scenario === name); });
+    });
+  });
+
+  /* ── 스텝 전환 (인터랙티브 보기 전용) ── */
+  document.querySelectorAll('[data-step-next]').forEach(function(el) {
+    el.addEventListener('click', function() {
+      var cur = this.closest('[data-step]'), sib = cur.nextElementSibling;
+      while (sib && !sib.hasAttribute('data-step')) sib = sib.nextElementSibling;
+      if (sib) { cur.hidden = true; sib.hidden = false; _initComponents(sib); }
+    });
+  });
+  document.querySelectorAll('[data-step-prev]').forEach(function(el) {
+    el.addEventListener('click', function() {
+      var cur = this.closest('[data-step]'), sib = cur.previousElementSibling;
+      while (sib && !sib.hasAttribute('data-step')) sib = sib.previousElementSibling;
+      if (sib) { cur.hidden = true; sib.hidden = false; _initComponents(sib); }
+    });
+  });
+
+  /* ── 오버레이 — 스택 지원 (planner.md 출력 형식 스캐폴드) ──
+     열린 순서대로 스택에 쌓아 z-index를 증가시키고(뒤에 연 것이 항상 위),
+     Escape·backdrop 클릭·닫기 버튼은 최상위 하나만 닫으며, 닫을 때 직전 포커스로 복귀한다.
+     Tab은 최상위 오버레이 안에 가둔다. static 오버레이는 backdrop·Escape로 닫히지 않는다. */
+  var _FOCUSABLE = 'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+  var _overlayStack = [];
+  function _topOverlay() { return _overlayStack[_overlayStack.length - 1]; }
+  function _visibleFocusable(ov) {
+    return Array.prototype.filter.call(ov.querySelectorAll(_FOCUSABLE), function(el) { return el.offsetParent !== null; });
+  }
+  function openOverlay(id) {
+    var ov = document.getElementById(id);
+    if (!ov || ov.classList.contains('is-open')) return;
+    ov._returnFocus = document.activeElement;
+    ov.style.zIndex = 'calc(var(--z-backdrop) + ' + (_overlayStack.length + 1) + ')';
+    ov.classList.add('is-open');
+    _overlayStack.push(ov);
+    var f = _visibleFocusable(ov);
+    (ov.querySelector('[autofocus]') || f[0] || ov).focus();
+  }
+  function closeOverlay(ov) {
+    if (!ov || !ov.classList.contains('is-open')) return;
+    ov.classList.remove('is-open');
+    ov.style.zIndex = '';
+    var i = _overlayStack.indexOf(ov);
+    if (i > -1) _overlayStack.splice(i, 1);
+    if (ov._returnFocus && ov._returnFocus.focus) ov._returnFocus.focus();
+    ov._returnFocus = null;
+  }
+  function closeAllOverlays() { _overlayStack.slice().reverse().forEach(closeOverlay); }
+
+  document.querySelectorAll('[data-overlay-open]').forEach(function(el) {
+    el.addEventListener('click', function(e) { e.preventDefault(); openOverlay(this.dataset.overlayOpen); });
+  });
+  /* 닫기 버튼 → 그 버튼이 속한 오버레이만 */
+  document.addEventListener('click', function(e) {
+    if (e.target.closest('[data-overlay-close]')) closeOverlay(e.target.closest('[data-overlay]'));
+  });
+  /* backdrop(오버레이 여백) 클릭 → 최상위만. static 오버레이는 제외 */
+  document.querySelectorAll('[data-overlay]').forEach(function(ov) {
+    ov.addEventListener('mousedown', function(e) {
+      if (e.target === ov && !ov.hasAttribute('data-overlay-static')) closeOverlay(ov);
+    });
+  });
+  /* Escape → 최상위 하나만(static 제외) · Tab → 최상위 안에 가둠 */
+  document.addEventListener('keydown', function(e) {
+    var top = _topOverlay();
+    if (!top) return;
+    if (e.key === 'Escape' && !top.hasAttribute('data-overlay-static')) { e.preventDefault(); closeOverlay(top); return; }
+    if (e.key !== 'Tab') return;
+    var f = _visibleFocusable(top);
+    if (!f.length) return;
+    var first = f[0], last = f[f.length - 1];
+    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+  });
+</script>
+
+<script>
+/* ══════════════ 상실신고 인터랙션 ══════════════ */
+(function () {
+  var root = document.getElementById('pane-panels');
+  if (!root) return;
+
+  function q(panel, suffix) { return panel.querySelector('[id$="' + suffix + '"]'); }
+  function digits(v) { return String(v == null ? '' : v).replace(/[^0-9]/g, ''); }
+  function comma(n) { return Number(n).toLocaleString('ko-KR'); }
+  function boxes(panel) { return Array.prototype.slice.call(panel.querySelectorAll('.acq-ins-checks input[type="checkbox"]')); }
+  function allChecked(panel) { var e = boxes(panel).filter(function (b) { return !b.disabled; }); return e.length > 0 && e.every(function (b) { return b.checked; }); }
+
+  /* DS motion.md 권장 패턴 — 클래스 제거 → reflow → 재추가로 재시도마다 재생 */
+  function shake(el) { if (!el) return; el.classList.remove('motion-shake'); void el.offsetWidth; el.classList.add('motion-shake'); }
+
+  /* YYYY-MM-DD + n일 */
+  function addDay(s, n) {
+    var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(s).trim());
+    if (!m) return '';
+    var d = new Date(+m[1], +m[2] - 1, +m[3]);
+    d.setDate(d.getDate() + n);
+    return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2);
+  }
+  function autoLossDate(panel) {
+    var leave = q(panel, '-leave-date'), loss = q(panel, '-loss-date');
+    if (leave && loss) { var v = addDay(leave.value, 1); if (v) loss.value = v; }
+  }
+
+  /* 상실 보험 선택 상태 → 배너·퇴사일·상실일 모드 동기화 */
+  function syncLossMode(panel) {
+    var all = allChecked(panel);
+    var partial = panel.querySelector('.acq-partial-banner');
+    var leaveB = panel.querySelector('.acq-leave-banner');
+    var leaveF = panel.querySelector('.acq-leave-date-field');
+    var loss = q(panel, '-loss-date');
+    var anyChecked = boxes(panel).some(function (b) { return b.checked; });
+    if (all) {
+      if (leaveB) leaveB.hidden = false;
+      if (partial) partial.hidden = true;
+      if (leaveF) leaveF.hidden = false;
+      if (loss) { loss.readOnly = true; loss.classList.add('input--readonly'); }
+      autoLossDate(panel);
+    } else {
+      if (leaveB) leaveB.hidden = true;
+      if (partial) partial.hidden = !anyChecked;
+      if (leaveF) leaveF.hidden = true;
+      if (loss) { loss.readOnly = false; loss.classList.remove('input--readonly'); }
+    }
+  }
+
+  /* ── 숫자 입력(보수총액·산정월수) — 숫자 외 문자 시 에러, 유효 시 정리(보수총액은 콤마) ── */
+  function isAmt(id) { return /-amt$/.test(id); }
+  function isNumField(id) { return /-amt$/.test(id) || /-mon$/.test(id); }
+
+  root.addEventListener('input', function (e) {
+    var el = e.target;
+    if (!el.id || !isNumField(el.id)) return;
+    var field = el.closest('.form-field'), err = field && field.querySelector('.form-field__error');
+    if (!field || !err) return;
+    if (!field.id) field.id = el.id + '-field';
+    var v = el.value.trim();
+    if (!v) { clearIfNotError(field, err); return; }
+    var re = isAmt(el.id) ? /^[0-9,]+$/ : /^\d+$/;
+    if (!re.test(v)) { setFieldError(field.id, err.id, '숫자만 입력해 주세요'); return; }
+    if (isAmt(el.id)) {
+      var caret = el.selectionStart;
+      var leftDigits = el.value.slice(0, caret).replace(/\D/g, '').length;
+      var raw = el.value.replace(/\D/g, '');
+      var formatted = raw ? Number(raw).toLocaleString('ko-KR') : '';
+      if (formatted !== el.value) {
+        el.value = formatted;
+        var pos = 0, seen = 0;
+        while (pos < formatted.length && seen < leftDigits) {
+          if (formatted.charCodeAt(pos) >= 48 && formatted.charCodeAt(pos) <= 57) seen++;
+          pos++;
+        }
+        try { el.setSelectionRange(pos, pos); } catch (e2) {}
+      }
+    }
+    clearFieldState(field.id, err.id);
+  });
+
+  root.addEventListener('blur', function (e) {
+    var el = e.target;
+    if (!el.id || !isNumField(el.id)) return;
+    var field = el.closest('.form-field'), err = field && field.querySelector('.form-field__error');
+    if (!field || !err) return;
+    if (!field.id) field.id = el.id + '-field';
+    var v = el.value.trim();
+    if (!v) { clearIfNotError(field, err); return; }
+    var re = isAmt(el.id) ? /^[0-9,]+$/ : /^\d+$/;
+    if (!re.test(v)) { setFieldError(field.id, err.id, '숫자만 입력해 주세요'); return; }
+    if (isAmt(el.id)) el.value = comma(digits(v));
+    setFieldError(field.id, err.id, '');
+  }, true);
+
+  /* 상실 보험 체크 변경 → 모드 동기화 + 에러 해제 */
+  root.addEventListener('change', function (e) {
+    if (!e.target.matches('.acq-ins-checks input[type="checkbox"]')) return;
+    var panel = e.target.closest('.scenario-panel');
+    syncLossMode(panel);
+    if (boxes(panel).some(function (b) { return b.checked; })) {
+      var sec = e.target.closest('.acq-section');
+      if (sec) sec.classList.remove('acq-section--error');
+    }
+  });
+
+  /* 퇴사일 입력 → 전체 모드에서 상실일 자동(+1) */
+  root.addEventListener('input', function (e) {
+    if (!e.target.id || !/-leave-date$/.test(e.target.id)) return;
+    var panel = e.target.closest('.scenario-panel');
+    if (allChecked(panel)) autoLossDate(panel);
+  });
+
+  /* 상실 사유 드롭다운 선택 → 에러 해제 */
+  root.addEventListener('click', function (e) {
+    var opt = e.target.closest('.acq-reason-dd .dropdown__option');
+    if (!opt || opt.classList.contains('dropdown__option--disabled')) return;
+    var dd = opt.closest('.dropdown');
+    if (dd) dd.classList.remove('dropdown--error');
+    var rField = dd.closest('.form-field');
+    if (rField) {
+      var anyPh = Array.prototype.some.call(rField.querySelectorAll('.acq-reason-dd .dropdown__value'), function (v) { return v.classList.contains('dropdown__value--placeholder'); });
+      if (!anyPh) rField.classList.remove('form-field--error');
+    }
+  });
+
+  /* ── 검증 ── */
+  function validate(panel) {
+    var invalid = [], firstBad = null;
+    var mode = allChecked(panel);   /* true = 전체 퇴사 */
+
+    /* 1) 상실 보험 ≥ 1 */
+    var sec = panel.querySelector('.acq-section');
+    if (!boxes(panel).some(function (b) { return b.checked; })) {
+      if (sec) sec.classList.add('acq-section--error');
+      invalid.push(sec); firstBad = firstBad || panel.querySelector('.acq-ins-checks input:not([disabled])');
+    } else if (sec) sec.classList.remove('acq-section--error');
+
+    /* 2) 날짜 — 전체=퇴사일, 일부=상실일 */
+    var dSfx = mode ? '-leave-date' : '-loss-date';
+    var dEl = q(panel, dSfx), dField = dEl && dEl.closest('.form-field'), dErr = dField && dField.querySelector('.form-field__error');
+    if (dEl && dErr) {
+      if (!dField.id) dField.id = dEl.id + '-field';
+      var dv = dEl.value.trim();
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(dv)) {
+        setFieldError(dField.id, dErr.id, mode ? '퇴사일을 입력해 주세요' : '상실일을 입력해 주세요');
+        invalid.push(dField); firstBad = firstBad || dEl;
+      } else setFieldError(dField.id, dErr.id, '');
+    }
+
+    /* 3·4) 당해년도(필수) · 전년도(선택) 보수총액·산정월수 */
+    [['-cur-amt', true, '보수총액을 입력해 주세요'], ['-cur-mon', true, '산정월수를 입력해 주세요'], ['-prev-amt', false, ''], ['-prev-mon', false, '']].forEach(function (spec) {
+      var el = q(panel, spec[0]); if (!el) return;
+      var field = el.closest('.form-field'), err = field && field.querySelector('.form-field__error');
+      if (!field || !err) return;
+      if (!field.id) field.id = el.id + '-field';
+      var v = el.value.trim();
+      var re = isAmt(el.id) ? /^[0-9,]+$/ : /^\d+$/;
+      if (!v) {
+        if (spec[1]) { setFieldError(field.id, err.id, spec[2]); invalid.push(field); firstBad = firstBad || el; }
+        else clearFieldState(field.id, err.id);
+      } else if (!re.test(v)) {
+        setFieldError(field.id, err.id, '숫자만 입력해 주세요'); invalid.push(field); firstBad = firstBad || el;
+      } else setFieldError(field.id, err.id, '');
+    });
+
+    /* 5) 상실 사유 — 두 드롭다운 모두 선택 */
+    var rg = panel.querySelector('.acq-reason-group');
+    if (rg) {
+      var rField = rg.closest('.form-field');
+      var dds = Array.prototype.slice.call(rg.querySelectorAll('.dropdown'));
+      var bad = dds.filter(function (dd) { var v = dd.querySelector('.dropdown__value'); return v && v.classList.contains('dropdown__value--placeholder'); });
+      dds.forEach(function (dd) { dd.classList.remove('dropdown--error'); });
+      if (bad.length) {
+        bad.forEach(function (dd) { dd.classList.add('dropdown--error'); });
+        if (rField) rField.classList.add('form-field--error');
+        invalid.push(rField); firstBad = firstBad || bad[0].querySelector('.dropdown__trigger');
+      } else if (rField) rField.classList.remove('form-field--error');
+    }
+
+    if (invalid.length) {
+      invalid.forEach(shake);
+      if (firstBad && firstBad.focus) firstBad.focus();
+      return false;
+    }
+    return true;
+  }
+
+  /* 신고요청 → 검증 후 확인 Alert */
+  root.addEventListener('click', function (e) {
+    var btn = e.target.closest('button');
+    if (!btn || !btn.id || !/-submit$/.test(btn.id)) return;
+    if (!validate(btn.closest('.scenario-panel'))) return;
+    openOverlay('overlay-submit');
+  });
+
+  /* 확인 Alert의 신고요청 → 전송 연출 후 목록 복귀 */
+  var submitConfirm = document.getElementById('submit-confirm');
+  if (submitConfirm) submitConfirm.addEventListener('click', function () {
+    var btn = this;
+    setButtonLoading(btn, '전송 중...');
+    setTimeout(function () {
+      clearButtonLoading(btn);
+      closeOverlay(document.getElementById('overlay-submit'));
+      location.href = 'insurance-join-status.html';
+    }, 1500);
+  });
+
+  /* 임시저장 → 저장 연출 후 화면 유지 */
+  var draftOv = document.getElementById('overlay-draft');
+  if (draftOv) {
+    var draftBtn = draftOv.querySelector('.btn--primary');
+    if (draftBtn) draftBtn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      var btn = this;
+      setButtonLoading(btn, '저장 중...');
+      setTimeout(function () { clearButtonLoading(btn); closeOverlay(draftOv); }, 1000);
+    });
+  }
+
+  /* 취소 → 작성 내용 있으면 확인 알럿, 없으면 바로 목록 */
+  function panelHasInput(panel) {
+    if (!panel) return false;
+    var vals = panel.querySelectorAll('input[type="text"]:not([readonly]), textarea');
+    for (var i = 0; i < vals.length; i++) { if (String(vals[i].value).trim()) return true; }
+    if (panel.querySelector('.file-upload-item')) return true;
+    if (panel.querySelector('.acq-reason-dd .dropdown__value:not(.dropdown__value--placeholder)')) return true;
+    return false;
+  }
+  document.querySelectorAll('[data-acq-cancel]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      if (panelHasInput(this.closest('.scenario-panel'))) openOverlay('overlay-cancel');
+      else location.href = 'insurance-join-status.html';
+    });
+  });
+  var cancelOv = document.getElementById('overlay-cancel');
+  if (cancelOv) {
+    var cancelBtn = cancelOv.querySelector('.btn--secondary');
+    if (cancelBtn) cancelBtn.addEventListener('click', function () { location.href = 'insurance-join-status.html'; });
+  }
+
+  /* 초기 모드 동기화 */
+  Array.prototype.forEach.call(document.querySelectorAll('#pane-panels > .scenario-panel'), syncLossMode);
+})();
+</script>
+
+</body>
+</html>
