@@ -227,7 +227,8 @@
     .acq-rate-badge { font-variant-numeric: tabular-nums; }
     /* 신고 대상 보험 — 취득 모달처럼 푸터 좌측에 상시 노출(스크롤 없이 신고 대상 확인) */
     .acq-target-footer { margin-right: auto; display: flex; align-items: center; gap: var(--space-gap-md); min-width: 0; }
-    .acq-target-footer__label { flex-shrink: 0; font-weight: var(--font-weight-heading); }
+    /* 라벨 — 취득 모달 푸터 요약 타이틀과 동일한 톤(브랜드 컬러 + font-size-lg) */
+    .acq-target-footer__label { flex-shrink: 0; color: var(--color-text-brand); font-size: var(--font-size-lg); font-weight: var(--font-weight-heading); line-height: var(--line-height-ui); }
     .acq-target-checks { display: flex; flex-wrap: wrap; gap: var(--space-gap-md); }
     /* 국민연금 필요서류 — 기획서처럼 table 노출 + Disclosure로 접기. 조건부 표시 래퍼 */
     .acq-pension-doc[hidden] { display: none; }
