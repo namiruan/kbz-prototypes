@@ -68,7 +68,6 @@
     /* 가입 보험 — 상태 리스트 (데이터 테이블이 아님).
        행 선택·정렬·다건 조작이 없고 고정 4항목의 '현재 취득 상태'만 보여주므로
        테이블 대신 각 항목을 보험명 + 상태 배지 + 사업장/제외사유로 나열한다. */
-    .acq-ins-note { margin: 0; color: var(--color-text-subtle); }
     .acq-ins-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--space-gap-2xs); }
     .acq-ins-item {
       display: grid;
@@ -658,7 +657,6 @@ exits: index.html
 
                   <div class="acq-section">
                     <span class="text-form-label" id="s4-ins-label">가입 보험</span>
-                    <p class="text-helper acq-ins-note">국민연금·건강보험은 이미 가입(취득완료)돼 있어 이번엔 고용보험만 새로 취득해요.</p>
                     <ul class="acq-ins-list" aria-labelledby="s4-ins-label">
                       <li class="acq-ins-item" data-ins="국민연금" data-status="취득완료">
                         <span class="acq-ins-item__name">국민연금</span>
