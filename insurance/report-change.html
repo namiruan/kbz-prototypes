@@ -1566,6 +1566,12 @@ exits: index.html
   function onReasonSelected(panel) {
     var e = els(panel);
     var reason = reasonValue(e.reason);
+    /* 금액이 입력돼 방향이 정해진 경우, 인상/인하 중 실제 방향과 어긋나는 수동 선택은 막고 실제 방향으로 되돌린다.
+       (착오정정은 방향과 무관하므로 언제든 허용) */
+    if (reason === '보수인상' || reason === '보수인하') {
+      var dir = amountDir(e);
+      if (dir && dir !== reason) { setSegReason(e.reason, dir); reason = dir; }
+    }
     var prev = panel.dataset.reasonState || '';
     segSetError(e.reason, false);
     if (reason === '착오정정') {
@@ -1608,23 +1614,31 @@ exits: index.html
     setTimeout(function () { if (/-month$/.test(dd.id)) mdSetError(dd, false); }, 0);
   });
 
+  /* 세그먼트 선택값을 지정 reason으로 설정 + 슬라이더 재정렬 */
+  function setSegReason(seg, reason) {
+    seg.querySelectorAll('.segment__item').forEach(function (it) {
+      var on = it.dataset.reason === reason;
+      it.classList.toggle('segment__item--selected', on);
+      it.setAttribute('aria-checked', on ? 'true' : 'false');
+    });
+    resyncSeg(seg);
+  }
+  /* 입력된 변경 후 보수월액의 방향 — 보수인상 | 보수인하 | null(미입력) */
+  function amountDir(e) {
+    var prev = num(e.prevpay && e.prevpay.value), newv = num(e.newpay && e.newpay.value);
+    if (!e.newpay || !e.newpay.value.trim() || prev <= 0) return null;
+    return (newv - prev) < 0 ? '보수인하' : '보수인상';
+  }
   /* 변경 후 보수월액 방향에 맞춰 변경사유 세그먼트 자동 전환 — 양수=보수인상, 음수=보수인하(착오정정 제외).
      방향이 정해지면 |변동율| 20% 이상일 때 국민연금·제출서류가 뜬다. */
   function autoSyncReason(panel) {
     var e = els(panel);
     var reason = reasonValue(e.reason);
     if (reason !== '보수인상' && reason !== '보수인하') return;
-    var prev = num(e.prevpay && e.prevpay.value), newv = num(e.newpay && e.newpay.value);
-    if (!e.newpay || !e.newpay.value.trim() || prev <= 0) return;
-    var desired = (newv - prev) < 0 ? '보수인하' : '보수인상';
-    if (desired === reason) return;
-    e.reason.querySelectorAll('.segment__item').forEach(function (it) {
-      var on = it.dataset.reason === desired;
-      it.classList.toggle('segment__item--selected', on);
-      it.setAttribute('aria-checked', on ? 'true' : 'false');
-    });
-    resyncSeg(e.reason);
-    panel.dataset.reasonState = desired;
+    var dir = amountDir(e);
+    if (!dir || dir === reason) return;
+    setSegReason(e.reason, dir);
+    panel.dataset.reasonState = dir;
   }
 
   /* 변경 후 보수월액 — 숫자만 허용(콤마 자동), 문자 입력 시 에러. 입력 시 방향 동기화 후 변동율 재계산 */
