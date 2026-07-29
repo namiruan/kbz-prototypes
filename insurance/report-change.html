@@ -221,6 +221,8 @@
     /* 변경 전/후 보수월액 — 금액(콤마) + '원'. 값 폭에 맞춰 컴팩트하게 */
     .acq-form .input-wrap--suffix:has(input[id$="prevpay"]),
     .acq-form .input-wrap--suffix:has(input[id$="newpay"]) { max-width: 128px; }
+    /* 변경 후 보수월액 에러는 한 줄 유지 — 필드가 에러 문구 폭만큼 늘어나되 2줄로 접히지 않게 */
+    .acq-form .form-field:has(input[id$="-newpay"]) .form-field__error { white-space: nowrap; }
     /* 변동율 — 변경 후 보수월액 바로 오른쪽. 라벨은 옆 필드 라벨과 나란히, 배지는 입력 박스(height-base) 세로 중앙에 맞춘다 */
     .acq-rate-field { align-self: flex-start; }
     .acq-rate-field .form-field__body { display: flex; align-items: flex-start; justify-content: center; min-height: var(--height-base); }
@@ -1581,8 +1583,8 @@ exits: index.html
       if (dir && dir !== reason) {
         setSegReason(e.reason, dir); reason = dir;
         markNewpay(panel, 'error', dir === '보수인상'
-          ? '변경 후 보수월액이 인상되어 보수인하로 신고할 수 없어요.'
-          : '변경 후 보수월액이 인하되어 보수인상으로 신고할 수 없어요.');
+          ? '보수인하로 신고할 수 없어요.'
+          : '보수인상으로 신고할 수 없어요.');
         shake(e.newpay.closest('.form-field'));
       } else {
         markNewpay(panel, e.newpay.value.trim() ? 'complete' : 'neutral');
