@@ -141,6 +141,8 @@
     /* 안내(※ 실제 부과금액…)는 타이틀 옆 물음표 버튼(테이블 툴바와 동일한 micro primary 아이콘)의 pinned 툴팁으로.
        최초 강제 노출 → X(또는 Esc)로 닫으면 hover/focus 기본 툴팁으로 전환 */
     .acq-estimate-footer__title .tooltip-wrapper { flex-shrink: 0; }
+    /* 안내문이 2줄로 떨어지도록 패널 폭 확대(기본 max-width 300px는 3줄) */
+    .acq-estimate-footer__title .tooltip-panel { max-width: 360px; }
     /* 값 한 줄: 날짜(고지월)와 금액(부과금액)을 세로 구분선 + 서로 다른 스타일로 확실히 구분 */
     .acq-estimate-footer__values { display: inline-flex; align-items: center; gap: var(--space-gap-sm); white-space: nowrap; }
     .acq-estimate-footer__date { color: var(--color-text-subtle); font-size: var(--font-size-lg); }             /* 날짜: 옅게 */
