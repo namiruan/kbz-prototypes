@@ -128,7 +128,7 @@
        입력 형식이 유추되는(자릿수 고정·상한 있는) 필드에만 적용. */
     /* 근로시간·급여액은 suffix addon(시간·원) 래퍼를 쓰므로 폭을 래퍼에 지정 */
     .acq-form .input-wrap--suffix:has(input[id$="-hours"]) { max-width: 140px; }   /* 주소정근로시간: ≤100 + '시간' */
-    .acq-form .input-wrap--suffix:has(input[id$="-pay"])   { max-width: 178px; }   /* 월급여액: 금액 + '원' */
+    .acq-form .input-wrap--suffix:has(input[id$="-pay"])   { max-width: 156px; }   /* 월급여액: 금액 + '원' */
     /* error·success 상태 시 suffix 테두리도 동기화(DS는 complete·readonly만 처리) */
     .input-wrap--suffix:has(.input--error) .input__suffix { border-color: var(--color-border-error); }
     .input-wrap--suffix:has(.input--success) .input__suffix { border-color: var(--color-border-success); }
