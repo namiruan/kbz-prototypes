@@ -35,9 +35,11 @@
     .corr-empty-hint[hidden] { display: none; }
     .corr-items--error .corr-empty-hint { color: var(--color-text-error); }
 
-    /* ── 체크 항목 카드 — 카드 제목에 체크박스, 체크 시 입력란 노출 ── */
-    .corr-card { border: var(--stroke-sm) solid var(--color-border-default); border-radius: var(--radius-md); overflow: hidden; transition: border-color var(--duration-fast) var(--easing-base); }
-    .corr-card--checked { border-color: var(--color-border-brand); }
+    /* ── 체크 항목 카드 — 카드 제목에 체크박스, 체크 시 입력란 노출 ──
+       활성/비활성은 테두리가 아니라 '배경색'으로 구분한다:
+       비활성(미선택) = 옅은 회색 채움(꺼진 느낌) · 활성(선택) = 브랜드 옅은 채움. */
+    .corr-card { border: var(--stroke-sm) solid var(--color-border-subtle); border-radius: var(--radius-md); overflow: hidden; background: var(--color-surface-subtle); transition: background var(--duration-fast) var(--easing-base); }
+    .corr-card--checked { background: var(--color-surface-brand-subtle); }
     /* 헤더 = 체크박스 전체 폭. 라벨(제목)까지 클릭하면 토글 */
     .corr-card__head { display: block; }
     .corr-card__head .checkbox { width: 100%; box-sizing: border-box; padding: var(--space-inset-md) var(--space-inset-lg); gap: var(--space-gap-sm); }
