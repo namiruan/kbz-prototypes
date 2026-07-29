@@ -272,7 +272,10 @@ exits: index.html
     <div class="proto-nav-divider" id="proto-nav-divider"></div>
 
     <nav class="proto-nav" id="proto-nav" aria-label="시나리오 선택">
-      <button class="proto-nav-btn is-active" data-scenario="보수변경" type="button">보수 변경신고</button>
+      <button class="proto-nav-btn is-active" data-scenario="인상-20이상" type="button">보수인상 · 20% 이상</button>
+      <button class="proto-nav-btn" data-scenario="인상-20미만" type="button">보수인상 · 20% 미만</button>
+      <button class="proto-nav-btn" data-scenario="인하-20이상" type="button">보수인하 · 20% 이상</button>
+      <button class="proto-nav-btn" data-scenario="착오정정" type="button">착오정정</button>
     </nav>
   </aside>
 
@@ -280,8 +283,8 @@ exits: index.html
 
     <div id="pane-panels">
 
-    <!-- ══════════════ 보수 변경신고 ══════════════ -->
-    <section class="scenario-panel" data-scenario="보수변경" data-step>
+    <!-- ══ 보수인상 · 20% 이상 ══ -->
+    <section class="scenario-panel" data-scenario="인상-20이상" data-step>
       <div class="page">
         <div class="modal" role="dialog" aria-modal="true" aria-labelledby="p1-title" style="width:958px;max-width:100%">
 
@@ -374,12 +377,12 @@ exits: index.html
                     <div class="form-field">
                       <span class="form-field__label text-form-label" id="p1-month-label">변경년월 <span class="form-field__required" aria-hidden="true">(필수)</span></span>
                       <div class="form-field__body">
-                        <div class="dropdown dropdown--button dropdown--menu acq-change-dd dropdown--disabled" id="p1-month">
-                          <button class="dropdown__trigger" type="button" aria-haspopup="listbox" aria-expanded="false" disabled aria-disabled="true" aria-labelledby="p1-month-label"><span class="dropdown__value dropdown__value--placeholder">선택</span><span class="dropdown__chevron" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-chevron-down"/></svg></span></button>
+                        <div class="dropdown dropdown--button dropdown--menu acq-change-dd" id="p1-month">
+                          <button class="dropdown__trigger" type="button" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="p1-month-label"><span class="dropdown__value">2026-03</span><span class="dropdown__chevron" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-chevron-down"/></svg></span></button>
                           <div class="dropdown__panel"><ul class="dropdown__list" role="listbox" aria-label="변경년월">
                             <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">2026-01</span></li>
                             <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">2026-02</span></li>
-                            <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">2026-03</span></li>
+                            <li class="dropdown__option dropdown__option--selected" role="option" aria-selected="true" tabindex="-1"><span class="dropdown__option-label">2026-03</span></li>
                             <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">2026-04</span></li>
                             <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">2026-05</span></li>
                             <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">2026-06</span></li>
@@ -400,7 +403,7 @@ exits: index.html
                     </div>
                     <div class="form-field">
                       <label class="form-field__label text-form-label" for="p1-newpay">변경 후 보수월액 <span class="form-field__required" aria-hidden="true">(필수)</span></label>
-                      <div class="form-field__body"><div class="input-wrap input-wrap--suffix"><input class="input" type="text" id="p1-newpay" placeholder="숫자 입력" inputmode="numeric" aria-required="true"><span class="input__suffix">원</span></div></div>
+                      <div class="form-field__body"><div class="input-wrap input-wrap--suffix"><input class="input input--complete" type="text" id="p1-newpay" placeholder="숫자 입력" inputmode="numeric" aria-required="true" value="3,200,000"><span class="input__suffix">원</span></div></div>
                       <div class="form-field__footer"><p class="form-field__error text-helper" id="p1-newpay-err" role="alert">변경 후 보수월액을 입력해 주세요.</p></div>
                     </div>
                     <!-- 6 area — 변동율. 보수인상·인하 + 금액 입력 시 자동 계산되어 이 행 우측에 노출 -->
@@ -480,6 +483,624 @@ exits: index.html
             <button class="btn btn--ghost btn--md" type="button" data-acq-cancel>취소</button>
             <button class="btn btn--secondary btn--solid btn--md" type="button" data-overlay-open="overlay-draft">임시저장</button>
             <button class="btn btn--primary btn--md" type="button" id="p1-submit">신고요청</button>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ══ 보수인상 · 20% 미만 ══ -->
+    <section class="scenario-panel" data-scenario="인상-20미만" data-step>
+      <div class="page">
+        <div class="modal" role="dialog" aria-modal="true" aria-labelledby="p2-title" style="width:958px;max-width:100%">
+
+          <div class="modal__header">
+            <h2 class="modal__title text-modal-title-sm" id="p2-title">보수 변경신고</h2>
+            <button class="icon-on--lg" type="button" aria-label="닫기"><svg aria-hidden="true"><use href="#icon-close"/></svg></button>
+          </div>
+
+          <div class="modal__body">
+            <div class="modal__content">
+              <!-- 1 area — 신고 자격 안내. 성격이 다른 두 안내라 각각 독립 배너(아이콘·타이틀 1:1)로 둔다:
+                   ① 자진신고 사업장의 고용·산재 신고 제약, ② 국민연금 변경신고 가능 조건(a·b).
+                   ②는 조건 목록이 길어 Disclosure(icon-only)로 타이틀 옆에서 접고 펼칠 수 있게 한다.
+                   20% 변동에 따른 선택·증빙 고지는 b 조건에 속하므로 b 아래에 종속 표기. -->
+              <div class="acq-intro-banners">
+                <div class="banner acq-intro-banner" role="status">
+                  <span class="icon--md banner__icon" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-info"/></svg></span>
+                  <div class="text-description banner__body">
+                    <p class="banner__title">자진신고 사업장은 고용보험 및 산재보험 보수변경 신고를 할 수 없습니다</p>
+                  </div>
+                </div>
+                <div class="banner acq-intro-banner" role="status">
+                  <span class="icon--md banner__icon" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-info"/></svg></span>
+                  <div class="text-description banner__body">
+                    <div class="disclosure disclosure--icon-only disclosure--expanded acq-elig-disc" data-label-expand="국민연금 변경신고 조건 펼치기" data-label-collapse="국민연금 변경신고 조건 접기">
+                      <span class="disclosure__header">
+                        <span class="banner__title">국민연금 소득월액 변경신고는 다음 경우에만 가능합니다</span>
+                        <button class="disclosure__trigger" type="button" aria-expanded="true" aria-controls="p2-elig-body" aria-label="국민연금 변경신고 조건 접기">
+                          <span class="disclosure__label">접기</span><span class="icon-on--sm disclosure__icon" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-chevron-down"/></svg></span>
+                        </button>
+                      </span>
+                      <div class="disclosure__body" id="p2-elig-body">
+                        <ol class="acq-elig-list">
+                          <li>취득신고 시 보수를 잘못 신고한 경우 <span class="acq-elig-cond">(입사일 기준으로 적용)</span></li>
+                          <li>보수가 20% 이상 변동(인상·인하)된 경우 <span class="acq-elig-cond">(신고월 다음 달부터 적용)</span>
+                            <p class="acq-elig-note">※ 이 경우 국민연금 소득월액 변경신고는 의무가 아닌 <b>선택사항</b>이며, 신고 시 <b>증빙서류</b>를 반드시 첨부해야 합니다.</p>
+                          </li>
+                        </ol>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="acq-grid">
+
+                <div class="file-upload" id="p2-upload" data-max-mb="200">
+                  <input type="file" id="p2-file-input" hidden multiple>
+                  <div class="file-upload__header">
+                    <span class="text-form-label file-upload__label" style="font-weight:var(--font-weight-heading)">첨부파일 <span class="form-field__required acq-file-req" aria-hidden="true" hidden>(필수)</span></span>
+                    <span class="text-form-label file-upload__usage">0MB / 200MB</span>
+                  </div>
+                  <div class="file-upload__meta">
+                    <p class="text-body file-upload__description">파일을 마우스로 끌어다 놓거나, 추가하기 버튼을 사용해 직접 업로드해 보세요.</p>
+                    <p class="text-body file-upload__constraint">*파일당 10MB 이하 업로드 가능</p>
+                  </div>
+                  <div class="file-upload__dropzone">
+                    <button class="btn btn--secondary btn--sm btn--icon-left" type="button">
+                      <span class="icon icon--sm" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-plus"/></svg></span>추가하기
+                    </button>
+                    <div class="file-upload__grid"></div>
+                  </div>
+                </div>
+
+                <div class="acq-form">
+
+                  <!-- 2 area — 근로자 정보 카드 -->
+                  <div class="acq-info-card">
+                    <div class="acq-info-card__item"><span class="acq-info-card__label">이름</span><span class="acq-info-card__value">유가영</span></div>
+                    <div class="acq-info-card__item"><span class="acq-info-card__label">주민번호</span><span class="acq-info-card__value">123456-1234567</span></div>
+                  </div>
+
+                  <!-- 3 area — 변경사유 (필수). 나머지 입력의 상태를 결정하는 트리거라 최상단에 배치.
+                       선택지가 3개뿐인 상호배타 항목이라 세그먼트로 한눈에 노출한다. -->
+                  <div class="form-field">
+                    <span class="form-field__label text-form-label" id="p2-reason-label">변경사유</span>
+                    <div class="form-field__body">
+                      <div class="segment segment--lg segment--full acq-reason-seg" role="radiogroup" aria-labelledby="p2-reason-label" id="p2-reason">
+                        <span class="segment__slider" aria-hidden="true"></span>
+                        <button class="segment__item segment__item--selected" role="radio" aria-checked="true" type="button" data-reason="보수인상">보수인상</button>
+                        <button class="segment__item" role="radio" aria-checked="false" type="button" data-reason="보수인하">보수인하</button>
+                        <button class="segment__item" role="radio" aria-checked="false" type="button" data-reason="착오정정">착오정정</button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- 4-2·4-3·4-4 area — 변경년월 + 변경 전/후 보수월액 한 줄.
+                       변경년월은 당해년도 월만 노출하므로 드롭다운. 변경사유 선택 후 활성화, 착오정정은 취득월로 고정. -->
+                  <div class="form-field-group--horizontal">
+                    <div class="form-field">
+                      <span class="form-field__label text-form-label" id="p2-month-label">변경년월 <span class="form-field__required" aria-hidden="true">(필수)</span></span>
+                      <div class="form-field__body">
+                        <div class="dropdown dropdown--button dropdown--menu acq-change-dd" id="p2-month">
+                          <button class="dropdown__trigger" type="button" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="p2-month-label"><span class="dropdown__value">2026-03</span><span class="dropdown__chevron" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-chevron-down"/></svg></span></button>
+                          <div class="dropdown__panel"><ul class="dropdown__list" role="listbox" aria-label="변경년월">
+                            <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">2026-01</span></li>
+                            <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">2026-02</span></li>
+                            <li class="dropdown__option dropdown__option--selected" role="option" aria-selected="true" tabindex="-1"><span class="dropdown__option-label">2026-03</span></li>
+                            <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">2026-04</span></li>
+                            <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">2026-05</span></li>
+                            <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">2026-06</span></li>
+                            <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">2026-07</span></li>
+                            <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">2026-08</span></li>
+                            <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">2026-09</span></li>
+                            <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">2026-10</span></li>
+                            <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">2026-11</span></li>
+                            <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">2026-12</span></li>
+                          </ul></div>
+                        </div>
+                      </div>
+                      <div class="form-field__footer"><p class="form-field__error text-helper" id="p2-month-err" role="alert">변경년월을 선택해 주세요.</p></div>
+                    </div>
+                    <div class="form-field">
+                      <label class="form-field__label text-form-label" for="p2-prevpay">변경 전 보수월액</label>
+                      <div class="form-field__body"><div class="input-wrap input-wrap--suffix"><input class="input input--readonly" type="text" id="p2-prevpay" value="2,500,000" readonly><span class="input__suffix">원</span></div></div>
+                    </div>
+                    <div class="form-field">
+                      <label class="form-field__label text-form-label" for="p2-newpay">변경 후 보수월액 <span class="form-field__required" aria-hidden="true">(필수)</span></label>
+                      <div class="form-field__body"><div class="input-wrap input-wrap--suffix"><input class="input input--complete" type="text" id="p2-newpay" placeholder="숫자 입력" inputmode="numeric" aria-required="true" value="2,700,000"><span class="input__suffix">원</span></div></div>
+                      <div class="form-field__footer"><p class="form-field__error text-helper" id="p2-newpay-err" role="alert">변경 후 보수월액을 입력해 주세요.</p></div>
+                    </div>
+                    <!-- 6 area — 변동율. 보수인상·인하 + 금액 입력 시 자동 계산되어 이 행 우측에 노출 -->
+                    <div class="form-field acq-rate-field" hidden>
+                      <span class="form-field__label text-form-label">변동율</span>
+                      <div class="form-field__body"><span class="badge badge--neutral acq-rate-badge">0%</span></div>
+                    </div>
+                  </div>
+
+                  <!-- 7 area — 국민연금 소득월액 변경신고 필요서류 (조건부).
+                       기획서처럼 table로 노출하고, Disclosure(icon-only)로 테이블을 접을 수 있게 한다. -->
+                  <div class="acq-pension-doc" hidden>
+                    <div class="disclosure disclosure--icon-only disclosure--expanded acq-doc-disc" data-label-expand="국민연금 소득월액 변경신고 제출서류 안내 펼치기" data-label-collapse="국민연금 소득월액 변경신고 제출서류 안내 접기">
+                      <span class="disclosure__header">
+                        <span class="text-form-label acq-doc-title">국민연금 소득월액 변경신고 제출서류 안내</span>
+                        <button class="disclosure__trigger" type="button" aria-expanded="true" aria-controls="p2-doc-body" aria-label="국민연금 소득월액 변경신고 제출서류 안내 접기">
+                          <span class="disclosure__label">접기</span><span class="icon-on--sm disclosure__icon" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-chevron-down"/></svg></span>
+                        </button>
+                      </span>
+                      <div class="disclosure__body" id="p2-doc-body">
+                        <div class="table-container acq-doc-table">
+                          <table class="table table--info table--dense">
+                            <thead class="table__head">
+                              <tr>
+                                <th class="table__head-cell" scope="col">항목</th>
+                                <th class="table__head-cell" scope="col">내용</th>
+                              </tr>
+                            </thead>
+                            <tbody class="table__body">
+                              <tr class="table__row">
+                                <td class="table__cell acq-doc-key">필요서류</td>
+                                <td class="table__cell">
+                                  <ol class="acq-doc-list">
+                                    <li>국민연금 기준소득월액 변경신청서 <button class="icon-on--sm acq-doc-dl" type="button" aria-label="국민연금 기준소득월액 변경신청서 양식 다운로드"><svg aria-hidden="true"><use href="#icon-download"/></svg></button></li>
+                                    <li>국민연금 기준소득월액 변경신청 근로자 동의서 <button class="icon-on--sm acq-doc-dl" type="button" aria-label="국민연금 기준소득월액 변경신청 근로자 동의서 양식 다운로드"><svg aria-hidden="true"><use href="#icon-download"/></svg></button></li>
+                                    <li>소득변동을 확인할 수 있는 서류</li>
+                                  </ol>
+                                  <ul class="acq-doc-notes">
+                                    <li>20% 이상 보수 변동 시 연금 특례변경 신고가 가능합니다.</li>
+                                    <li>위 서류를 작성 후 근로자 서명을 받아 첨부해 주세요.</li>
+                                  </ul>
+                                </td>
+                              </tr>
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="form-field">
+                    <label class="form-field__label text-form-label" for="p2-memo">메모</label>
+                    <div class="form-field__body">
+                      <div class="textarea-wrap textarea-wrap--char-count">
+                        <textarea class="textarea" id="p2-memo" rows="4" maxlength="100" placeholder="요청하시는 업무와 관련하여 담당자에게 전달할 내용을 기재해주세요."></textarea>
+                        <span class="textarea-char-count" aria-hidden="true">0/100</span>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="modal__footer">
+            <!-- 신고 대상 보험 — 취득 모달처럼 푸터 좌측에 상시 노출. 변경사유·변동율에 따라 자동 선택되며 건강보험(및 20%↑ 국민연금)만 조정 가능 -->
+            <div class="acq-target-footer" role="group" aria-labelledby="p2-ins-label">
+              <span class="text-form-label acq-target-footer__label" id="p2-ins-label">신고 대상 보험</span>
+              <div class="acq-target-checks">
+                <label class="checkbox checkbox--disabled"><input type="checkbox" id="p2-ins-emp" disabled><span class="checkbox__control" aria-hidden="true"><span class="checkbox__icon-check"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span><span class="checkbox__label">고용보험</span></label>
+                <label class="checkbox checkbox--disabled"><input type="checkbox" id="p2-ins-acc" disabled><span class="checkbox__control" aria-hidden="true"><span class="checkbox__icon-check"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span><span class="checkbox__label">산재보험</span></label>
+                <label class="checkbox checkbox--disabled"><input type="checkbox" id="p2-ins-pen" disabled><span class="checkbox__control" aria-hidden="true"><span class="checkbox__icon-check"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span><span class="checkbox__label">국민연금</span></label>
+                <label class="checkbox checkbox--disabled"><input type="checkbox" id="p2-ins-hea" disabled><span class="checkbox__control" aria-hidden="true"><span class="checkbox__icon-check"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span><span class="checkbox__label">건강보험</span></label>
+              </div>
+            </div>
+            <button class="btn btn--ghost btn--md" type="button" data-acq-cancel>취소</button>
+            <button class="btn btn--secondary btn--solid btn--md" type="button" data-overlay-open="overlay-draft">임시저장</button>
+            <button class="btn btn--primary btn--md" type="button" id="p2-submit">신고요청</button>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ══ 보수인하 · 20% 이상 ══ -->
+    <section class="scenario-panel" data-scenario="인하-20이상" data-step>
+      <div class="page">
+        <div class="modal" role="dialog" aria-modal="true" aria-labelledby="p3-title" style="width:958px;max-width:100%">
+
+          <div class="modal__header">
+            <h2 class="modal__title text-modal-title-sm" id="p3-title">보수 변경신고</h2>
+            <button class="icon-on--lg" type="button" aria-label="닫기"><svg aria-hidden="true"><use href="#icon-close"/></svg></button>
+          </div>
+
+          <div class="modal__body">
+            <div class="modal__content">
+              <!-- 1 area — 신고 자격 안내. 성격이 다른 두 안내라 각각 독립 배너(아이콘·타이틀 1:1)로 둔다:
+                   ① 자진신고 사업장의 고용·산재 신고 제약, ② 국민연금 변경신고 가능 조건(a·b).
+                   ②는 조건 목록이 길어 Disclosure(icon-only)로 타이틀 옆에서 접고 펼칠 수 있게 한다.
+                   20% 변동에 따른 선택·증빙 고지는 b 조건에 속하므로 b 아래에 종속 표기. -->
+              <div class="acq-intro-banners">
+                <div class="banner acq-intro-banner" role="status">
+                  <span class="icon--md banner__icon" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-info"/></svg></span>
+                  <div class="text-description banner__body">
+                    <p class="banner__title">자진신고 사업장은 고용보험 및 산재보험 보수변경 신고를 할 수 없습니다</p>
+                  </div>
+                </div>
+                <div class="banner acq-intro-banner" role="status">
+                  <span class="icon--md banner__icon" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-info"/></svg></span>
+                  <div class="text-description banner__body">
+                    <div class="disclosure disclosure--icon-only disclosure--expanded acq-elig-disc" data-label-expand="국민연금 변경신고 조건 펼치기" data-label-collapse="국민연금 변경신고 조건 접기">
+                      <span class="disclosure__header">
+                        <span class="banner__title">국민연금 소득월액 변경신고는 다음 경우에만 가능합니다</span>
+                        <button class="disclosure__trigger" type="button" aria-expanded="true" aria-controls="p3-elig-body" aria-label="국민연금 변경신고 조건 접기">
+                          <span class="disclosure__label">접기</span><span class="icon-on--sm disclosure__icon" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-chevron-down"/></svg></span>
+                        </button>
+                      </span>
+                      <div class="disclosure__body" id="p3-elig-body">
+                        <ol class="acq-elig-list">
+                          <li>취득신고 시 보수를 잘못 신고한 경우 <span class="acq-elig-cond">(입사일 기준으로 적용)</span></li>
+                          <li>보수가 20% 이상 변동(인상·인하)된 경우 <span class="acq-elig-cond">(신고월 다음 달부터 적용)</span>
+                            <p class="acq-elig-note">※ 이 경우 국민연금 소득월액 변경신고는 의무가 아닌 <b>선택사항</b>이며, 신고 시 <b>증빙서류</b>를 반드시 첨부해야 합니다.</p>
+                          </li>
+                        </ol>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="acq-grid">
+
+                <div class="file-upload" id="p3-upload" data-max-mb="200">
+                  <input type="file" id="p3-file-input" hidden multiple>
+                  <div class="file-upload__header">
+                    <span class="text-form-label file-upload__label" style="font-weight:var(--font-weight-heading)">첨부파일 <span class="form-field__required acq-file-req" aria-hidden="true" hidden>(필수)</span></span>
+                    <span class="text-form-label file-upload__usage">0MB / 200MB</span>
+                  </div>
+                  <div class="file-upload__meta">
+                    <p class="text-body file-upload__description">파일을 마우스로 끌어다 놓거나, 추가하기 버튼을 사용해 직접 업로드해 보세요.</p>
+                    <p class="text-body file-upload__constraint">*파일당 10MB 이하 업로드 가능</p>
+                  </div>
+                  <div class="file-upload__dropzone">
+                    <button class="btn btn--secondary btn--sm btn--icon-left" type="button">
+                      <span class="icon icon--sm" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-plus"/></svg></span>추가하기
+                    </button>
+                    <div class="file-upload__grid"></div>
+                  </div>
+                </div>
+
+                <div class="acq-form">
+
+                  <!-- 2 area — 근로자 정보 카드 -->
+                  <div class="acq-info-card">
+                    <div class="acq-info-card__item"><span class="acq-info-card__label">이름</span><span class="acq-info-card__value">유가영</span></div>
+                    <div class="acq-info-card__item"><span class="acq-info-card__label">주민번호</span><span class="acq-info-card__value">123456-1234567</span></div>
+                  </div>
+
+                  <!-- 3 area — 변경사유 (필수). 나머지 입력의 상태를 결정하는 트리거라 최상단에 배치.
+                       선택지가 3개뿐인 상호배타 항목이라 세그먼트로 한눈에 노출한다. -->
+                  <div class="form-field">
+                    <span class="form-field__label text-form-label" id="p3-reason-label">변경사유</span>
+                    <div class="form-field__body">
+                      <div class="segment segment--lg segment--full acq-reason-seg" role="radiogroup" aria-labelledby="p3-reason-label" id="p3-reason">
+                        <span class="segment__slider" aria-hidden="true"></span>
+                        <button class="segment__item" role="radio" aria-checked="false" type="button" data-reason="보수인상">보수인상</button>
+                        <button class="segment__item segment__item--selected" role="radio" aria-checked="true" type="button" data-reason="보수인하">보수인하</button>
+                        <button class="segment__item" role="radio" aria-checked="false" type="button" data-reason="착오정정">착오정정</button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- 4-2·4-3·4-4 area — 변경년월 + 변경 전/후 보수월액 한 줄.
+                       변경년월은 당해년도 월만 노출하므로 드롭다운. 변경사유 선택 후 활성화, 착오정정은 취득월로 고정. -->
+                  <div class="form-field-group--horizontal">
+                    <div class="form-field">
+                      <span class="form-field__label text-form-label" id="p3-month-label">변경년월 <span class="form-field__required" aria-hidden="true">(필수)</span></span>
+                      <div class="form-field__body">
+                        <div class="dropdown dropdown--button dropdown--menu acq-change-dd" id="p3-month">
+                          <button class="dropdown__trigger" type="button" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="p3-month-label"><span class="dropdown__value">2026-03</span><span class="dropdown__chevron" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-chevron-down"/></svg></span></button>
+                          <div class="dropdown__panel"><ul class="dropdown__list" role="listbox" aria-label="변경년월">
+                            <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">2026-01</span></li>
+                            <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">2026-02</span></li>
+                            <li class="dropdown__option dropdown__option--selected" role="option" aria-selected="true" tabindex="-1"><span class="dropdown__option-label">2026-03</span></li>
+                            <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">2026-04</span></li>
+                            <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">2026-05</span></li>
+                            <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">2026-06</span></li>
+                            <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">2026-07</span></li>
+                            <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">2026-08</span></li>
+                            <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">2026-09</span></li>
+                            <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">2026-10</span></li>
+                            <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">2026-11</span></li>
+                            <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">2026-12</span></li>
+                          </ul></div>
+                        </div>
+                      </div>
+                      <div class="form-field__footer"><p class="form-field__error text-helper" id="p3-month-err" role="alert">변경년월을 선택해 주세요.</p></div>
+                    </div>
+                    <div class="form-field">
+                      <label class="form-field__label text-form-label" for="p3-prevpay">변경 전 보수월액</label>
+                      <div class="form-field__body"><div class="input-wrap input-wrap--suffix"><input class="input input--readonly" type="text" id="p3-prevpay" value="2,500,000" readonly><span class="input__suffix">원</span></div></div>
+                    </div>
+                    <div class="form-field">
+                      <label class="form-field__label text-form-label" for="p3-newpay">변경 후 보수월액 <span class="form-field__required" aria-hidden="true">(필수)</span></label>
+                      <div class="form-field__body"><div class="input-wrap input-wrap--suffix"><input class="input input--complete" type="text" id="p3-newpay" placeholder="숫자 입력" inputmode="numeric" aria-required="true" value="1,750,000"><span class="input__suffix">원</span></div></div>
+                      <div class="form-field__footer"><p class="form-field__error text-helper" id="p3-newpay-err" role="alert">변경 후 보수월액을 입력해 주세요.</p></div>
+                    </div>
+                    <!-- 6 area — 변동율. 보수인상·인하 + 금액 입력 시 자동 계산되어 이 행 우측에 노출 -->
+                    <div class="form-field acq-rate-field" hidden>
+                      <span class="form-field__label text-form-label">변동율</span>
+                      <div class="form-field__body"><span class="badge badge--neutral acq-rate-badge">0%</span></div>
+                    </div>
+                  </div>
+
+                  <!-- 7 area — 국민연금 소득월액 변경신고 필요서류 (조건부).
+                       기획서처럼 table로 노출하고, Disclosure(icon-only)로 테이블을 접을 수 있게 한다. -->
+                  <div class="acq-pension-doc" hidden>
+                    <div class="disclosure disclosure--icon-only disclosure--expanded acq-doc-disc" data-label-expand="국민연금 소득월액 변경신고 제출서류 안내 펼치기" data-label-collapse="국민연금 소득월액 변경신고 제출서류 안내 접기">
+                      <span class="disclosure__header">
+                        <span class="text-form-label acq-doc-title">국민연금 소득월액 변경신고 제출서류 안내</span>
+                        <button class="disclosure__trigger" type="button" aria-expanded="true" aria-controls="p3-doc-body" aria-label="국민연금 소득월액 변경신고 제출서류 안내 접기">
+                          <span class="disclosure__label">접기</span><span class="icon-on--sm disclosure__icon" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-chevron-down"/></svg></span>
+                        </button>
+                      </span>
+                      <div class="disclosure__body" id="p3-doc-body">
+                        <div class="table-container acq-doc-table">
+                          <table class="table table--info table--dense">
+                            <thead class="table__head">
+                              <tr>
+                                <th class="table__head-cell" scope="col">항목</th>
+                                <th class="table__head-cell" scope="col">내용</th>
+                              </tr>
+                            </thead>
+                            <tbody class="table__body">
+                              <tr class="table__row">
+                                <td class="table__cell acq-doc-key">필요서류</td>
+                                <td class="table__cell">
+                                  <ol class="acq-doc-list">
+                                    <li>국민연금 기준소득월액 변경신청서 <button class="icon-on--sm acq-doc-dl" type="button" aria-label="국민연금 기준소득월액 변경신청서 양식 다운로드"><svg aria-hidden="true"><use href="#icon-download"/></svg></button></li>
+                                    <li>국민연금 기준소득월액 변경신청 근로자 동의서 <button class="icon-on--sm acq-doc-dl" type="button" aria-label="국민연금 기준소득월액 변경신청 근로자 동의서 양식 다운로드"><svg aria-hidden="true"><use href="#icon-download"/></svg></button></li>
+                                    <li>소득변동을 확인할 수 있는 서류</li>
+                                  </ol>
+                                  <ul class="acq-doc-notes">
+                                    <li>20% 이상 보수 변동 시 연금 특례변경 신고가 가능합니다.</li>
+                                    <li>위 서류를 작성 후 근로자 서명을 받아 첨부해 주세요.</li>
+                                  </ul>
+                                </td>
+                              </tr>
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="form-field">
+                    <label class="form-field__label text-form-label" for="p3-memo">메모</label>
+                    <div class="form-field__body">
+                      <div class="textarea-wrap textarea-wrap--char-count">
+                        <textarea class="textarea" id="p3-memo" rows="4" maxlength="100" placeholder="요청하시는 업무와 관련하여 담당자에게 전달할 내용을 기재해주세요."></textarea>
+                        <span class="textarea-char-count" aria-hidden="true">0/100</span>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="modal__footer">
+            <!-- 신고 대상 보험 — 취득 모달처럼 푸터 좌측에 상시 노출. 변경사유·변동율에 따라 자동 선택되며 건강보험(및 20%↑ 국민연금)만 조정 가능 -->
+            <div class="acq-target-footer" role="group" aria-labelledby="p3-ins-label">
+              <span class="text-form-label acq-target-footer__label" id="p3-ins-label">신고 대상 보험</span>
+              <div class="acq-target-checks">
+                <label class="checkbox checkbox--disabled"><input type="checkbox" id="p3-ins-emp" disabled><span class="checkbox__control" aria-hidden="true"><span class="checkbox__icon-check"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span><span class="checkbox__label">고용보험</span></label>
+                <label class="checkbox checkbox--disabled"><input type="checkbox" id="p3-ins-acc" disabled><span class="checkbox__control" aria-hidden="true"><span class="checkbox__icon-check"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span><span class="checkbox__label">산재보험</span></label>
+                <label class="checkbox checkbox--disabled"><input type="checkbox" id="p3-ins-pen" disabled><span class="checkbox__control" aria-hidden="true"><span class="checkbox__icon-check"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span><span class="checkbox__label">국민연금</span></label>
+                <label class="checkbox checkbox--disabled"><input type="checkbox" id="p3-ins-hea" disabled><span class="checkbox__control" aria-hidden="true"><span class="checkbox__icon-check"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span><span class="checkbox__label">건강보험</span></label>
+              </div>
+            </div>
+            <button class="btn btn--ghost btn--md" type="button" data-acq-cancel>취소</button>
+            <button class="btn btn--secondary btn--solid btn--md" type="button" data-overlay-open="overlay-draft">임시저장</button>
+            <button class="btn btn--primary btn--md" type="button" id="p3-submit">신고요청</button>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ══ 착오정정 ══ -->
+    <section class="scenario-panel" data-scenario="착오정정" data-step>
+      <div class="page">
+        <div class="modal" role="dialog" aria-modal="true" aria-labelledby="p4-title" style="width:958px;max-width:100%">
+
+          <div class="modal__header">
+            <h2 class="modal__title text-modal-title-sm" id="p4-title">보수 변경신고</h2>
+            <button class="icon-on--lg" type="button" aria-label="닫기"><svg aria-hidden="true"><use href="#icon-close"/></svg></button>
+          </div>
+
+          <div class="modal__body">
+            <div class="modal__content">
+              <!-- 1 area — 신고 자격 안내. 성격이 다른 두 안내라 각각 독립 배너(아이콘·타이틀 1:1)로 둔다:
+                   ① 자진신고 사업장의 고용·산재 신고 제약, ② 국민연금 변경신고 가능 조건(a·b).
+                   ②는 조건 목록이 길어 Disclosure(icon-only)로 타이틀 옆에서 접고 펼칠 수 있게 한다.
+                   20% 변동에 따른 선택·증빙 고지는 b 조건에 속하므로 b 아래에 종속 표기. -->
+              <div class="acq-intro-banners">
+                <div class="banner acq-intro-banner" role="status">
+                  <span class="icon--md banner__icon" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-info"/></svg></span>
+                  <div class="text-description banner__body">
+                    <p class="banner__title">자진신고 사업장은 고용보험 및 산재보험 보수변경 신고를 할 수 없습니다</p>
+                  </div>
+                </div>
+                <div class="banner acq-intro-banner" role="status">
+                  <span class="icon--md banner__icon" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-info"/></svg></span>
+                  <div class="text-description banner__body">
+                    <div class="disclosure disclosure--icon-only disclosure--expanded acq-elig-disc" data-label-expand="국민연금 변경신고 조건 펼치기" data-label-collapse="국민연금 변경신고 조건 접기">
+                      <span class="disclosure__header">
+                        <span class="banner__title">국민연금 소득월액 변경신고는 다음 경우에만 가능합니다</span>
+                        <button class="disclosure__trigger" type="button" aria-expanded="true" aria-controls="p4-elig-body" aria-label="국민연금 변경신고 조건 접기">
+                          <span class="disclosure__label">접기</span><span class="icon-on--sm disclosure__icon" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-chevron-down"/></svg></span>
+                        </button>
+                      </span>
+                      <div class="disclosure__body" id="p4-elig-body">
+                        <ol class="acq-elig-list">
+                          <li>취득신고 시 보수를 잘못 신고한 경우 <span class="acq-elig-cond">(입사일 기준으로 적용)</span></li>
+                          <li>보수가 20% 이상 변동(인상·인하)된 경우 <span class="acq-elig-cond">(신고월 다음 달부터 적용)</span>
+                            <p class="acq-elig-note">※ 이 경우 국민연금 소득월액 변경신고는 의무가 아닌 <b>선택사항</b>이며, 신고 시 <b>증빙서류</b>를 반드시 첨부해야 합니다.</p>
+                          </li>
+                        </ol>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="acq-grid">
+
+                <div class="file-upload" id="p4-upload" data-max-mb="200">
+                  <input type="file" id="p4-file-input" hidden multiple>
+                  <div class="file-upload__header">
+                    <span class="text-form-label file-upload__label" style="font-weight:var(--font-weight-heading)">첨부파일 <span class="form-field__required acq-file-req" aria-hidden="true" hidden>(필수)</span></span>
+                    <span class="text-form-label file-upload__usage">0MB / 200MB</span>
+                  </div>
+                  <div class="file-upload__meta">
+                    <p class="text-body file-upload__description">파일을 마우스로 끌어다 놓거나, 추가하기 버튼을 사용해 직접 업로드해 보세요.</p>
+                    <p class="text-body file-upload__constraint">*파일당 10MB 이하 업로드 가능</p>
+                  </div>
+                  <div class="file-upload__dropzone">
+                    <button class="btn btn--secondary btn--sm btn--icon-left" type="button">
+                      <span class="icon icon--sm" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-plus"/></svg></span>추가하기
+                    </button>
+                    <div class="file-upload__grid"></div>
+                  </div>
+                </div>
+
+                <div class="acq-form">
+
+                  <!-- 2 area — 근로자 정보 카드 -->
+                  <div class="acq-info-card">
+                    <div class="acq-info-card__item"><span class="acq-info-card__label">이름</span><span class="acq-info-card__value">유가영</span></div>
+                    <div class="acq-info-card__item"><span class="acq-info-card__label">주민번호</span><span class="acq-info-card__value">123456-1234567</span></div>
+                  </div>
+
+                  <!-- 3 area — 변경사유 (필수). 나머지 입력의 상태를 결정하는 트리거라 최상단에 배치.
+                       선택지가 3개뿐인 상호배타 항목이라 세그먼트로 한눈에 노출한다. -->
+                  <div class="form-field">
+                    <span class="form-field__label text-form-label" id="p4-reason-label">변경사유</span>
+                    <div class="form-field__body">
+                      <div class="segment segment--lg segment--full acq-reason-seg" role="radiogroup" aria-labelledby="p4-reason-label" id="p4-reason">
+                        <span class="segment__slider" aria-hidden="true"></span>
+                        <button class="segment__item" role="radio" aria-checked="false" type="button" data-reason="보수인상">보수인상</button>
+                        <button class="segment__item" role="radio" aria-checked="false" type="button" data-reason="보수인하">보수인하</button>
+                        <button class="segment__item segment__item--selected" role="radio" aria-checked="true" type="button" data-reason="착오정정">착오정정</button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- 4-2·4-3·4-4 area — 변경년월 + 변경 전/후 보수월액 한 줄.
+                       변경년월은 당해년도 월만 노출하므로 드롭다운. 변경사유 선택 후 활성화, 착오정정은 취득월로 고정. -->
+                  <div class="form-field-group--horizontal">
+                    <div class="form-field">
+                      <span class="form-field__label text-form-label" id="p4-month-label">변경년월 <span class="form-field__required" aria-hidden="true">(필수)</span></span>
+                      <div class="form-field__body">
+                        <div class="dropdown dropdown--button dropdown--menu acq-change-dd dropdown--disabled" id="p4-month">
+                          <button class="dropdown__trigger" type="button" aria-haspopup="listbox" aria-expanded="false" disabled aria-disabled="true" aria-labelledby="p4-month-label"><span class="dropdown__value dropdown__value--placeholder">선택</span><span class="dropdown__chevron" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-chevron-down"/></svg></span></button>
+                          <div class="dropdown__panel"><ul class="dropdown__list" role="listbox" aria-label="변경년월">
+                            <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">2026-01</span></li>
+                            <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">2026-02</span></li>
+                            <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">2026-03</span></li>
+                            <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">2026-04</span></li>
+                            <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">2026-05</span></li>
+                            <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">2026-06</span></li>
+                            <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">2026-07</span></li>
+                            <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">2026-08</span></li>
+                            <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">2026-09</span></li>
+                            <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">2026-10</span></li>
+                            <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">2026-11</span></li>
+                            <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">2026-12</span></li>
+                          </ul></div>
+                        </div>
+                      </div>
+                      <div class="form-field__footer"><p class="form-field__error text-helper" id="p4-month-err" role="alert">변경년월을 선택해 주세요.</p></div>
+                    </div>
+                    <div class="form-field">
+                      <label class="form-field__label text-form-label" for="p4-prevpay">변경 전 보수월액</label>
+                      <div class="form-field__body"><div class="input-wrap input-wrap--suffix"><input class="input input--readonly" type="text" id="p4-prevpay" value="2,500,000" readonly><span class="input__suffix">원</span></div></div>
+                    </div>
+                    <div class="form-field">
+                      <label class="form-field__label text-form-label" for="p4-newpay">변경 후 보수월액 <span class="form-field__required" aria-hidden="true">(필수)</span></label>
+                      <div class="form-field__body"><div class="input-wrap input-wrap--suffix"><input class="input" type="text" id="p4-newpay" placeholder="숫자 입력" inputmode="numeric" aria-required="true"><span class="input__suffix">원</span></div></div>
+                      <div class="form-field__footer"><p class="form-field__error text-helper" id="p4-newpay-err" role="alert">변경 후 보수월액을 입력해 주세요.</p></div>
+                    </div>
+                    <!-- 6 area — 변동율. 보수인상·인하 + 금액 입력 시 자동 계산되어 이 행 우측에 노출 -->
+                    <div class="form-field acq-rate-field" hidden>
+                      <span class="form-field__label text-form-label">변동율</span>
+                      <div class="form-field__body"><span class="badge badge--neutral acq-rate-badge">0%</span></div>
+                    </div>
+                  </div>
+
+                  <!-- 7 area — 국민연금 소득월액 변경신고 필요서류 (조건부).
+                       기획서처럼 table로 노출하고, Disclosure(icon-only)로 테이블을 접을 수 있게 한다. -->
+                  <div class="acq-pension-doc" hidden>
+                    <div class="disclosure disclosure--icon-only disclosure--expanded acq-doc-disc" data-label-expand="국민연금 소득월액 변경신고 제출서류 안내 펼치기" data-label-collapse="국민연금 소득월액 변경신고 제출서류 안내 접기">
+                      <span class="disclosure__header">
+                        <span class="text-form-label acq-doc-title">국민연금 소득월액 변경신고 제출서류 안내</span>
+                        <button class="disclosure__trigger" type="button" aria-expanded="true" aria-controls="p4-doc-body" aria-label="국민연금 소득월액 변경신고 제출서류 안내 접기">
+                          <span class="disclosure__label">접기</span><span class="icon-on--sm disclosure__icon" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-chevron-down"/></svg></span>
+                        </button>
+                      </span>
+                      <div class="disclosure__body" id="p4-doc-body">
+                        <div class="table-container acq-doc-table">
+                          <table class="table table--info table--dense">
+                            <thead class="table__head">
+                              <tr>
+                                <th class="table__head-cell" scope="col">항목</th>
+                                <th class="table__head-cell" scope="col">내용</th>
+                              </tr>
+                            </thead>
+                            <tbody class="table__body">
+                              <tr class="table__row">
+                                <td class="table__cell acq-doc-key">필요서류</td>
+                                <td class="table__cell">
+                                  <ol class="acq-doc-list">
+                                    <li>국민연금 기준소득월액 변경신청서 <button class="icon-on--sm acq-doc-dl" type="button" aria-label="국민연금 기준소득월액 변경신청서 양식 다운로드"><svg aria-hidden="true"><use href="#icon-download"/></svg></button></li>
+                                    <li>국민연금 기준소득월액 변경신청 근로자 동의서 <button class="icon-on--sm acq-doc-dl" type="button" aria-label="국민연금 기준소득월액 변경신청 근로자 동의서 양식 다운로드"><svg aria-hidden="true"><use href="#icon-download"/></svg></button></li>
+                                    <li>소득변동을 확인할 수 있는 서류</li>
+                                  </ol>
+                                  <ul class="acq-doc-notes">
+                                    <li>20% 이상 보수 변동 시 연금 특례변경 신고가 가능합니다.</li>
+                                    <li>위 서류를 작성 후 근로자 서명을 받아 첨부해 주세요.</li>
+                                  </ul>
+                                </td>
+                              </tr>
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="form-field">
+                    <label class="form-field__label text-form-label" for="p4-memo">메모</label>
+                    <div class="form-field__body">
+                      <div class="textarea-wrap textarea-wrap--char-count">
+                        <textarea class="textarea" id="p4-memo" rows="4" maxlength="100" placeholder="요청하시는 업무와 관련하여 담당자에게 전달할 내용을 기재해주세요."></textarea>
+                        <span class="textarea-char-count" aria-hidden="true">0/100</span>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="modal__footer">
+            <!-- 신고 대상 보험 — 취득 모달처럼 푸터 좌측에 상시 노출. 변경사유·변동율에 따라 자동 선택되며 건강보험(및 20%↑ 국민연금)만 조정 가능 -->
+            <div class="acq-target-footer" role="group" aria-labelledby="p4-ins-label">
+              <span class="text-form-label acq-target-footer__label" id="p4-ins-label">신고 대상 보험</span>
+              <div class="acq-target-checks">
+                <label class="checkbox checkbox--disabled"><input type="checkbox" id="p4-ins-emp" disabled><span class="checkbox__control" aria-hidden="true"><span class="checkbox__icon-check"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span><span class="checkbox__label">고용보험</span></label>
+                <label class="checkbox checkbox--disabled"><input type="checkbox" id="p4-ins-acc" disabled><span class="checkbox__control" aria-hidden="true"><span class="checkbox__icon-check"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span><span class="checkbox__label">산재보험</span></label>
+                <label class="checkbox checkbox--disabled"><input type="checkbox" id="p4-ins-pen" disabled><span class="checkbox__control" aria-hidden="true"><span class="checkbox__icon-check"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span><span class="checkbox__label">국민연금</span></label>
+                <label class="checkbox checkbox--disabled"><input type="checkbox" id="p4-ins-hea" disabled><span class="checkbox__control" aria-hidden="true"><span class="checkbox__icon-check"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span><span class="checkbox__label">건강보험</span></label>
+              </div>
+            </div>
+            <button class="btn btn--ghost btn--md" type="button" data-acq-cancel>취소</button>
+            <button class="btn btn--secondary btn--solid btn--md" type="button" data-overlay-open="overlay-draft">임시저장</button>
+            <button class="btn btn--primary btn--md" type="button" id="p4-submit">신고요청</button>
           </div>
 
         </div>
