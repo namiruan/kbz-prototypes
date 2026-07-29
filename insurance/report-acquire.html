@@ -391,7 +391,7 @@ exits: index.html
               </div>
               <p class="acq-estimate-footer__note">※ 실제 부과금액 및 반영 시기는 신고일, 보수월액, 기관 처리 일정 등에 따라 달라질 수 있어요.</p>
             </div>
-            <button class="btn btn--ghost btn--md" type="button" data-overlay-open="overlay-cancel">취소</button>
+            <button class="btn btn--ghost btn--md" type="button" data-acq-cancel>취소</button>
             <button class="btn btn--secondary btn--solid btn--md" type="button" data-overlay-open="overlay-draft">임시저장</button>
             <button class="btn btn--primary btn--md" type="button" id="s1-submit">신고요청</button>
           </div>
@@ -555,7 +555,7 @@ exits: index.html
           </div>
 
           <div class="modal__footer">
-            <button class="btn btn--ghost btn--md" type="button" data-overlay-open="overlay-cancel">취소</button>
+            <button class="btn btn--ghost btn--md" type="button" data-acq-cancel>취소</button>
             <button class="btn btn--secondary btn--solid btn--md" type="button" data-overlay-open="overlay-draft">임시저장</button>
             <button class="btn btn--primary btn--md" type="button" id="s2-submit">신고요청</button>
           </div>
@@ -775,7 +775,7 @@ exits: index.html
               </div>
               <p class="acq-estimate-footer__note">※ 실제 부과금액 및 반영 시기는 신고일, 보수월액, 기관 처리 일정 등에 따라 달라질 수 있어요.</p>
             </div>
-            <button class="btn btn--ghost btn--md" type="button" data-overlay-open="overlay-cancel">취소</button>
+            <button class="btn btn--ghost btn--md" type="button" data-acq-cancel>취소</button>
             <button class="btn btn--secondary btn--solid btn--md" type="button" data-overlay-open="overlay-draft">임시저장</button>
             <button class="btn btn--primary btn--md" type="button" id="s4-submit">신고요청</button>
           </div>
@@ -952,7 +952,7 @@ exits: index.html
               </div>
               <p class="acq-estimate-footer__note">※ 실제 부과금액 및 반영 시기는 신고일, 보수월액, 기관 처리 일정 등에 따라 달라질 수 있어요.</p>
             </div>
-            <button class="btn btn--ghost btn--md" type="button" data-overlay-open="overlay-cancel">취소</button>
+            <button class="btn btn--ghost btn--md" type="button" data-acq-cancel>취소</button>
             <button class="btn btn--secondary btn--solid btn--md" type="button" data-overlay-open="overlay-draft">임시저장</button>
             <button class="btn btn--primary btn--md" type="button" id="s5-submit">다시 시도</button>
           </div>
@@ -1538,7 +1538,23 @@ exits: index.html
     });
   }
 
-  /* ── 13. 취소하기 → 목록으로 복귀 ── */
+  /* ── 13. 취소 → 작성 내용이 있을 때만 확인 알럿, 빈 폼이면 바로 목록으로 ── */
+  function panelHasInput(panel) {
+    if (!panel) return false;
+    var suffixes = ['-hours', '-pay', '-memo', '-job'];
+    for (var i = 0; i < suffixes.length; i++) {
+      var el = q(panel, suffixes[i]);
+      if (el && String(el.value).trim()) return true;
+    }
+    if (panel.querySelector('.file-upload-item')) return true;   /* 첨부파일 있음 */
+    return false;
+  }
+  document.querySelectorAll('[data-acq-cancel]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      if (panelHasInput(this.closest('.scenario-panel'))) openOverlay('overlay-cancel');
+      else location.href = 'insurance-join-status.html';
+    });
+  });
   var cancelOv = document.getElementById('overlay-cancel');
   if (cancelOv) {
     var cancelBtn = cancelOv.querySelector('.btn--secondary');
