@@ -68,6 +68,7 @@
     /* 가입 보험 — 상태 리스트 (데이터 테이블이 아님).
        행 선택·정렬·다건 조작이 없고 고정 4항목의 '현재 취득 상태'만 보여주므로
        테이블 대신 각 항목을 보험명 + 상태 배지 + 사업장/제외사유로 나열한다. */
+    .acq-ins-note { margin: 0; color: var(--color-text-subtle); }
     .acq-ins-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--space-gap-2xs); }
     .acq-ins-item {
       display: grid;
@@ -165,7 +166,7 @@ exits: index.html
       <button class="proto-nav-btn is-active" data-scenario="작성-중" type="button">작성 중</button>
       <button class="proto-nav-btn" data-scenario="첫-진입" type="button">첫 진입</button>
       <button class="proto-nav-btn" data-scenario="로딩" type="button">로딩</button>
-      <button class="proto-nav-btn" data-scenario="제약-케이스" type="button">제약 케이스</button>
+      <button class="proto-nav-btn" data-scenario="제약-케이스" type="button">이미 가입</button>
       <button class="proto-nav-btn" data-scenario="저장-실패" type="button">저장 실패</button>
     </nav>
   </aside>
@@ -255,11 +256,6 @@ exits: index.html
                         <span class="badge badge--success badge--line acq-ins-item__status">취득 예정</span>
                         <span class="acq-ins-item__detail">LG U+ 파주 1239 신축공사 철근콘크리트공사</span>
                       </li>
-                      <li class="acq-ins-item" data-ins="산재보험" data-status="취득완료">
-                        <span class="acq-ins-item__name">산재보험</span>
-                        <span class="badge badge--success badge--fill acq-ins-item__status">취득완료</span>
-                        <span class="acq-ins-item__detail">(주)남웅건설</span>
-                      </li>
                       <li class="acq-ins-item acq-ins-item--excluded" data-ins="고용보험" data-status="제외">
                         <span class="acq-ins-item__name">고용보험</span>
                         <span class="badge badge--neutral acq-ins-item__status">제외</span>
@@ -274,6 +270,23 @@ exits: index.html
                                 <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">대표자/사업주</span></li>
                                 <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">만 65세 이상</span></li>
                                 <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">외국인 (체류자격 제외 대상)</span></li>
+                              </ul>
+                            </div>
+                          </div>
+                        </span>
+                      </li>
+                      <li class="acq-ins-item acq-ins-item--excluded" data-ins="산재보험" data-status="제외">
+                        <span class="acq-ins-item__name">산재보험</span>
+                        <span class="badge badge--neutral acq-ins-item__status">제외</span>
+                        <span class="acq-ins-item__detail acq-ins-item__detail--control">
+                          <div class="dropdown dropdown--button dropdown--menu dropdown--sm dropdown--disabled">
+                            <button class="dropdown__trigger" type="button" aria-haspopup="listbox" aria-expanded="false" disabled aria-disabled="true" aria-label="산재보험 제외 사유">
+                              <span class="dropdown__value">자진신고 사업장</span>
+                              <span class="dropdown__chevron" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-chevron-down"/></svg></span>
+                            </button>
+                            <div class="dropdown__panel">
+                              <ul class="dropdown__list" role="listbox" aria-label="산재보험 제외 사유">
+                                <li class="dropdown__option" role="option" aria-selected="true" tabindex="-1"><span class="dropdown__option-label">자진신고 사업장</span></li>
                               </ul>
                             </div>
                           </div>
@@ -645,6 +658,7 @@ exits: index.html
 
                   <div class="acq-section">
                     <span class="text-form-label" id="s4-ins-label">가입 보험</span>
+                    <p class="text-helper acq-ins-note">국민연금·건강보험은 이미 가입(취득완료)돼 있어 이번엔 고용보험만 새로 취득해요.</p>
                     <ul class="acq-ins-list" aria-labelledby="s4-ins-label">
                       <li class="acq-ins-item" data-ins="국민연금" data-status="취득완료">
                         <span class="acq-ins-item__name">국민연금</span>
