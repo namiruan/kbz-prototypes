@@ -50,6 +50,9 @@
       text-align: left; cursor: pointer;
       transition: border-color var(--duration-fast) var(--easing-base);
     }
+    /* 가로 그룹 안의 직종 선택: 남는 가로폭을 채우도록 확장 */
+    .acq-form .form-field-group--horizontal > .form-field:has(.acq-job-trigger) { flex: 1 1 auto; }
+    .form-field-group--horizontal .acq-job-trigger { max-width: none; }
     .acq-job-trigger:hover { border-color: var(--color-border-brand); }
     .acq-job-trigger__value { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .acq-job-trigger--placeholder .acq-job-trigger__value { color: var(--color-text-subtle); }
