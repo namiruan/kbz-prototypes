@@ -221,9 +221,9 @@
     /* 변경 전/후 보수월액 — 금액(콤마) + '원'. 값 폭에 맞춰 컴팩트하게 */
     .acq-form .input-wrap--suffix:has(input[id$="prevpay"]),
     .acq-form .input-wrap--suffix:has(input[id$="newpay"]) { max-width: 128px; }
-    /* 변동율 — 변경 후 보수월액 바로 오른쪽. 라벨+배지 묶음을 옆 입력 필드 세로 중앙에 맞춘다 */
-    .acq-rate-field { align-self: stretch; justify-content: center; }
-    .acq-rate-field .form-field__body { display: flex; align-items: center; }
+    /* 변동율 — 변경 후 보수월액 바로 오른쪽. 라벨은 옆 필드 라벨과 나란히, 배지는 입력 박스(height-base) 세로 중앙에 맞춘다 */
+    .acq-rate-field { align-self: flex-start; }
+    .acq-rate-field .form-field__body { display: flex; align-items: flex-start; justify-content: center; min-height: var(--height-base); }
     .acq-rate-badge { font-variant-numeric: tabular-nums; }
     /* 신고 대상 보험 — 취득 모달처럼 푸터 좌측에 상시 노출(스크롤 없이 신고 대상 확인) */
     .acq-target-footer { margin-right: auto; display: flex; align-items: center; gap: var(--space-gap-md); min-width: 0; }
@@ -906,8 +906,9 @@ exits: index.html
       if (rate != null) {
         e.rateField.hidden = false;
         e.rateBadge.textContent = (rate > 0 ? '+' : '') + rate + '%';
-        /* 20% 미만 neutral / 이상 success(초록) — 기획 디자인 톤 + 미만·이상 색상 구분 */
-        e.rateBadge.className = 'badge acq-rate-badge ' + (over20 ? 'badge--success' : 'badge--neutral');
+        /* 20% 미만 neutral / 이상은 방향 구분 — 인상 success(초록), 인하 caution(하락 강조) */
+        var rateTone = !over20 ? 'badge--neutral' : (rate > 0 ? 'badge--success' : 'badge--caution');
+        e.rateBadge.className = 'badge acq-rate-badge ' + rateTone;
       } else if (e.rateField) { e.rateField.hidden = true; }
       /* 국민연금 소득월액 서류 안내 + 첨부 필수 — 20% 이상 & 국민연금 선택 시 */
       var pensionOn = over20 && e.pen.checked;
