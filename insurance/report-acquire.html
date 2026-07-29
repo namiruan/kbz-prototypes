@@ -285,7 +285,7 @@ exits: index.html
                         <span class="acq-ins-item__detail acq-ins-item__detail--control">
                           <div class="dropdown dropdown--button dropdown--menu dropdown--sm">
                             <button class="dropdown__trigger" type="button" aria-haspopup="listbox" aria-expanded="false" aria-label="고용보험 제외 사유">
-                              <span class="dropdown__value dropdown__value--placeholder">제외 사유 선택</span>
+                              <span class="dropdown__value dropdown__value--placeholder">제외 사유 선택 <span class="form-field__required">(필수)</span></span>
                               <span class="dropdown__chevron" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-chevron-down"/></svg></span>
                             </button>
                             <div class="dropdown__panel">
@@ -485,7 +485,7 @@ exits: index.html
                       <li class="acq-ins-item acq-ins-item--excluded" data-ins="고용보험" data-status="제외">
                         <span class="acq-ins-item__name">고용보험</span>
                         <span class="badge badge--neutral acq-ins-item__status">제외</span>
-                        <span class="acq-ins-item__detail acq-ins-item__detail--control"><div class="dropdown dropdown--button dropdown--menu dropdown--sm"><button class="dropdown__trigger" type="button" aria-haspopup="listbox" aria-expanded="false" aria-label="고용보험 제외 사유"><span class="dropdown__value dropdown__value--placeholder">제외 사유 선택</span><span class="dropdown__chevron" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-chevron-down"/></svg></span></button><div class="dropdown__panel"><ul class="dropdown__list" role="listbox" aria-label="고용보험 제외 사유"><li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">대표자/사업주</span></li><li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">만 65세 이상</span></li><li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">외국인 (체류자격 제외 대상)</span></li></ul></div></div></span>
+                        <span class="acq-ins-item__detail acq-ins-item__detail--control"><div class="dropdown dropdown--button dropdown--menu dropdown--sm"><button class="dropdown__trigger" type="button" aria-haspopup="listbox" aria-expanded="false" aria-label="고용보험 제외 사유"><span class="dropdown__value dropdown__value--placeholder">제외 사유 선택 <span class="form-field__required">(필수)</span></span><span class="dropdown__chevron" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-chevron-down"/></svg></span></button><div class="dropdown__panel"><ul class="dropdown__list" role="listbox" aria-label="고용보험 제외 사유"><li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">대표자/사업주</span></li><li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">만 65세 이상</span></li><li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">외국인 (체류자격 제외 대상)</span></li></ul></div></div></span>
                       </li>
                       <li class="acq-ins-item acq-ins-item--excluded" data-ins="산재보험" data-status="제외">
                         <span class="acq-ins-item__name">산재보험</span>
@@ -1559,8 +1559,20 @@ exits: index.html
       if (jobEmpty) { ok = false; firstBad = firstBad || jobTrigger || job; }
     }
 
-    if (!ok && firstBad && firstBad.focus) firstBad.focus();
+    if (!ok) {
+      /* 재시도(신고요청) 시 놓친 에러로 시선 유도 — DS .motion-shake 유틸리티 사용 */
+      panel.querySelectorAll('.form-field--error').forEach(shake);
+      if (firstBad && firstBad.focus) firstBad.focus();
+    }
     return ok;
+  }
+
+  /* DS motion.md 권장 패턴 — 클래스 제거 → 강제 reflow → 재추가로 재시도마다 재생 */
+  function shake(el) {
+    if (!el) return;
+    el.classList.remove('motion-shake');
+    void el.offsetWidth;
+    el.classList.add('motion-shake');
   }
 
   root.addEventListener('click', function (e) {
