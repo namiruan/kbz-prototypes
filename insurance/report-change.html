@@ -23,19 +23,22 @@
        좌측 아래 빈 여백 없이 드롭 대상이 커지도록 한다. */
     .acq-grid > .file-upload { height: 100%; }
     .acq-grid > .file-upload .file-upload__dropzone { flex: 1 1 auto; }
-    /* 자격 안내 배너 — 헤더 아래 전체폭. 조건 목록이 있어 헤더 밀착(상단 패딩 제거). */
-    .acq-intro-banner { margin-bottom: var(--space-gap-xl); }
-    .modal:not(.modal--lg) .modal__content:has(> .acq-intro-banner) { padding-top: 0; }
-    /* 성격이 다른 두 안내(자진신고 제약 · 국민연금 조건)를 각각 타이틀 블록으로 구분 — 블록 간 간격을 넓게 */
-    .acq-elig-body { gap: var(--space-gap-lg); }
-    .acq-elig-block { display: flex; flex-direction: column; gap: var(--space-gap-xs); }
-    /* 국민연금 변경신고 자격 조건 — a·b(알파벳) 순서 목록. 배너 본문 톤(brand) 상속 */
+    /* 자격 안내 배너 묶음 — 헤더 아래 전체폭. 성격이 다른 두 안내를 독립 배너(아이콘·타이틀 1:1)로 스택 */
+    .acq-intro-banners { display: flex; flex-direction: column; gap: var(--space-gap-sm); margin-bottom: var(--space-gap-xl); }
+    .modal:not(.modal--lg) .modal__content:has(> .acq-intro-banners) { padding-top: 0; }
+    /* 국민연금 변경신고 자격 조건 — a·b(알파벳) 순서 목록. 배너 본문 톤 유지 */
     .acq-elig-list { margin: 0; padding-left: var(--space-inset-xl); list-style: lower-alpha; display: flex; flex-direction: column; gap: var(--space-gap-2xs); font-size: var(--font-size-sm); line-height: var(--line-height-reading); }
     /* 조건 부연(적용 시점) — 한 톤 옅게 */
     .acq-elig-cond { opacity: 0.8; }
     /* b 조건 종속 고지 — 20% 변동 시 선택·증빙. b의 li 안에 위치해 자연 들여쓰기로 종속 표시 */
     .acq-elig-note { margin: var(--space-gap-xs) 0 var(--space-gap-2xs); }
     .acq-elig-note b { font-weight: var(--font-weight-heading); }
+    /* Disclosure(icon-only) — 배너 폭을 채워 타이틀은 좌측, 셰브론 트리거는 타이틀 끝에 붙인다.
+       펼침 body는 배너 본문 톤을 유지(디스클로저 기본 subtle 색 덮음). */
+    .acq-elig-disc { display: flex; flex-direction: column; align-items: stretch; width: 100%; }
+    .acq-elig-disc .disclosure__header { display: flex; align-items: center; gap: var(--space-gap-sm); }
+    .acq-elig-disc .banner__title { flex: 1 1 auto; min-width: 0; }
+    .acq-elig-disc.disclosure--expanded .disclosure__body { color: inherit; }
     /* 폼 세로 스택 — form-field-group보다 섹션 간격을 넓게 */
     .acq-form { display: flex; flex-direction: column; gap: var(--space-gap-xl); }
     /* 가입보험 섹션 — 라벨 + 테이블 */
@@ -206,7 +209,9 @@
     .acq-move-item__arrow { flex-shrink: 0; color: var(--color-text-subtle); }
     .acq-move-item__to { color: var(--color-text-success); font-weight: var(--font-weight-heading); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     /* ── 보수 변경신고 전용 ── */
-    /* 변경사유·변경년월 드롭다운 — form-field 폭을 채운다(.dropdown은 max-content 기본) */
+    /* 변경사유 세그먼트 — 미선택 시작 허용(초기 슬라이더 숨김). 필수 검증 실패 시 에러 테두리 */
+    .segment.segment--error { box-shadow: inset 0 0 0 var(--stroke-md) var(--color-border-error); }
+    /* 변경년월 드롭다운 — form-field 폭을 채운다(.dropdown은 max-content 기본) */
     .acq-form .form-field-group--horizontal > .form-field:has(.acq-change-dd) { flex: 1 1 0; min-width: 160px; }
     .acq-change-dd, .acq-change-dd .dropdown__trigger { width: 100%; }
     .acq-change-dd .dropdown__value { overflow: hidden; text-overflow: ellipsis; }
@@ -262,23 +267,36 @@ exits: index.html
 
           <div class="modal__body">
             <div class="modal__content">
-              <!-- 1 area — 신고 자격 안내 배너. 성격이 다른 두 안내를 각각 타이틀로 구분한다:
+              <!-- 1 area — 신고 자격 안내. 성격이 다른 두 안내라 각각 독립 배너(아이콘·타이틀 1:1)로 둔다:
                    ① 자진신고 사업장의 고용·산재 신고 제약, ② 국민연금 변경신고 가능 조건(a·b).
+                   ②는 조건 목록이 길어 Disclosure(icon-only)로 타이틀 옆에서 접고 펼칠 수 있게 한다.
                    20% 변동에 따른 선택·증빙 고지는 b 조건에 속하므로 b 아래에 종속 표기. -->
-              <div class="banner acq-intro-banner" role="status">
-                <span class="icon--md banner__icon" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-info"/></svg></span>
-                <div class="text-description banner__body acq-elig-body">
-                  <div class="acq-elig-block">
+              <div class="acq-intro-banners">
+                <div class="banner acq-intro-banner" role="status">
+                  <span class="icon--md banner__icon" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-info"/></svg></span>
+                  <div class="text-description banner__body">
                     <p class="banner__title">자진신고 사업장은 고용보험 및 산재보험 보수변경 신고를 할 수 없습니다</p>
                   </div>
-                  <div class="acq-elig-block">
-                    <p class="banner__title">국민연금 소득월액 변경신고는 다음 경우에만 가능합니다</p>
-                    <ol class="acq-elig-list">
-                      <li>취득신고 시 보수를 잘못 신고한 경우 <span class="acq-elig-cond">(입사일 기준으로 적용)</span></li>
-                      <li>보수가 20% 이상 변동(인상·인하)된 경우 <span class="acq-elig-cond">(신고월 다음 달부터 적용)</span>
-                        <p class="acq-elig-note">※ 이 경우 국민연금 소득월액 변경신고는 의무가 아닌 <b>선택사항</b>이며, 신고 시 <b>증빙서류</b>를 반드시 첨부해야 합니다.</p>
-                      </li>
-                    </ol>
+                </div>
+                <div class="banner acq-intro-banner" role="status">
+                  <span class="icon--md banner__icon" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-info"/></svg></span>
+                  <div class="text-description banner__body">
+                    <div class="disclosure disclosure--icon-only disclosure--expanded acq-elig-disc" data-label-expand="국민연금 변경신고 조건 펼치기" data-label-collapse="국민연금 변경신고 조건 접기">
+                      <span class="disclosure__header">
+                        <span class="banner__title">국민연금 소득월액 변경신고는 다음 경우에만 가능합니다</span>
+                        <button class="disclosure__trigger" type="button" aria-expanded="true" aria-controls="p1-elig-body" aria-label="국민연금 변경신고 조건 접기">
+                          <span class="disclosure__label">접기</span><span class="icon-on--sm disclosure__icon" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-chevron-down"/></svg></span>
+                        </button>
+                      </span>
+                      <div class="disclosure__body" id="p1-elig-body">
+                        <ol class="acq-elig-list">
+                          <li>취득신고 시 보수를 잘못 신고한 경우 <span class="acq-elig-cond">(입사일 기준으로 적용)</span></li>
+                          <li>보수가 20% 이상 변동(인상·인하)된 경우 <span class="acq-elig-cond">(신고월 다음 달부터 적용)</span>
+                            <p class="acq-elig-note">※ 이 경우 국민연금 소득월액 변경신고는 의무가 아닌 <b>선택사항</b>이며, 신고 시 <b>증빙서류</b>를 반드시 첨부해야 합니다.</p>
+                          </li>
+                        </ol>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -311,34 +329,23 @@ exits: index.html
                     <div class="acq-info-card__item"><span class="acq-info-card__label">주민번호</span><span class="acq-info-card__value">123456-1234567</span></div>
                   </div>
 
-                  <!-- 3 area — 신고 대상 보험 (변경사유·변동율에 따라 자동 선택) -->
-                  <div class="acq-section">
-                    <span class="text-form-label" id="p1-ins-label">신고 대상 보험</span>
-                    <div class="acq-ins-checks" role="group" aria-labelledby="p1-ins-label">
-                      <label class="checkbox checkbox--disabled"><input type="checkbox" id="p1-ins-emp" disabled><span class="checkbox__control" aria-hidden="true"><span class="checkbox__icon-check"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span><span class="checkbox__label">고용보험</span></label>
-                      <label class="checkbox checkbox--disabled"><input type="checkbox" id="p1-ins-acc" disabled><span class="checkbox__control" aria-hidden="true"><span class="checkbox__icon-check"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span><span class="checkbox__label">산재보험</span></label>
-                      <label class="checkbox checkbox--disabled"><input type="checkbox" id="p1-ins-pen" disabled><span class="checkbox__control" aria-hidden="true"><span class="checkbox__icon-check"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span><span class="checkbox__label">국민연금</span></label>
-                      <label class="checkbox checkbox--disabled"><input type="checkbox" id="p1-ins-hea" disabled><span class="checkbox__control" aria-hidden="true"><span class="checkbox__icon-check"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span><span class="checkbox__label">건강보험</span></label>
+                  <!-- 3 area — 변경사유 (필수). 나머지 입력의 상태를 결정하는 트리거라 최상단에 배치.
+                       선택지가 3개뿐인 상호배타 항목이라 세그먼트로 한눈에 노출한다. -->
+                  <div class="form-field">
+                    <span class="form-field__label text-form-label" id="p1-reason-label">변경사유 <span class="form-field__required" aria-hidden="true">(필수)</span></span>
+                    <div class="form-field__body">
+                      <div class="segment segment--md acq-reason-seg" role="radiogroup" aria-labelledby="p1-reason-label" id="p1-reason">
+                        <span class="segment__slider" aria-hidden="true"></span>
+                        <button class="segment__item" role="radio" aria-checked="false" type="button" data-reason="보수인상">보수인상</button>
+                        <button class="segment__item" role="radio" aria-checked="false" type="button" data-reason="보수인하">보수인하</button>
+                        <button class="segment__item" role="radio" aria-checked="false" type="button" data-reason="착오정정">착오정정</button>
+                      </div>
                     </div>
-                    <p class="form-field__help text-helper">변경사유와 변동율에 따라 신고 대상 보험이 자동 선택돼요.</p>
+                    <div class="form-field__footer"><p class="form-field__error text-helper" id="p1-reason-err" role="alert">변경사유를 선택해 주세요.</p></div>
                   </div>
 
-                  <!-- 4-1·4-2 area — 변경사유 + 변경년월 -->
+                  <!-- 4-2 area — 변경년월 (필수). 변경사유 선택 후 활성화되며, 착오정정은 취득월로 고정. -->
                   <div class="form-field-group--horizontal">
-                    <div class="form-field">
-                      <span class="form-field__label text-form-label" id="p1-reason-label">변경사유 <span class="form-field__required" aria-hidden="true">(필수)</span></span>
-                      <div class="form-field__body">
-                        <div class="dropdown dropdown--button dropdown--menu acq-change-dd" id="p1-reason">
-                          <button class="dropdown__trigger" type="button" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="p1-reason-label"><span class="dropdown__value dropdown__value--placeholder">선택</span><span class="dropdown__chevron" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-chevron-down"/></svg></span></button>
-                          <div class="dropdown__panel"><ul class="dropdown__list" role="listbox" aria-label="변경사유">
-                            <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1" data-reason="보수인상"><span class="dropdown__option-label">보수인상</span></li>
-                            <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1" data-reason="보수인하"><span class="dropdown__option-label">보수인하</span></li>
-                            <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1" data-reason="착오정정"><span class="dropdown__option-label">착오정정</span></li>
-                          </ul></div>
-                        </div>
-                      </div>
-                      <div class="form-field__footer"><p class="form-field__error text-helper" id="p1-reason-err" role="alert">변경사유를 선택해 주세요.</p></div>
-                    </div>
                     <div class="form-field">
                       <span class="form-field__label text-form-label" id="p1-month-label">변경년월 <span class="form-field__required" aria-hidden="true">(필수)</span></span>
                       <div class="form-field__body">
@@ -373,6 +380,18 @@ exits: index.html
                       <span class="form-field__label text-form-label">변동율</span>
                       <div class="form-field__body"><span class="badge badge--neutral acq-rate-badge">0%</span></div>
                     </div>
+                  </div>
+
+                  <!-- 신고 대상 보험 — 변경사유·변동율의 '결과'라 입력(사유→년월→보수월액) 뒤 결과 요약으로 배치 -->
+                  <div class="acq-section">
+                    <span class="text-form-label" id="p1-ins-label">신고 대상 보험</span>
+                    <div class="acq-ins-checks" role="group" aria-labelledby="p1-ins-label">
+                      <label class="checkbox checkbox--disabled"><input type="checkbox" id="p1-ins-emp" disabled><span class="checkbox__control" aria-hidden="true"><span class="checkbox__icon-check"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span><span class="checkbox__label">고용보험</span></label>
+                      <label class="checkbox checkbox--disabled"><input type="checkbox" id="p1-ins-acc" disabled><span class="checkbox__control" aria-hidden="true"><span class="checkbox__icon-check"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span><span class="checkbox__label">산재보험</span></label>
+                      <label class="checkbox checkbox--disabled"><input type="checkbox" id="p1-ins-pen" disabled><span class="checkbox__control" aria-hidden="true"><span class="checkbox__icon-check"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span><span class="checkbox__label">국민연금</span></label>
+                      <label class="checkbox checkbox--disabled"><input type="checkbox" id="p1-ins-hea" disabled><span class="checkbox__control" aria-hidden="true"><span class="checkbox__icon-check"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span><span class="checkbox__label">건강보험</span></label>
+                    </div>
+                    <p class="form-field__help text-helper">변경사유와 변동율에 따라 신고 대상 보험이 자동 선택돼요.</p>
                   </div>
 
                   <!-- 7 area — 국민연금 소득월액 변경신고 필요서류 안내 (조건부) -->
@@ -528,6 +547,7 @@ exits: index.html
     if (typeof initFileUpload === 'function') initFileUpload(root);   /* DS initFileUpload(container)는 컨테이너 안의 .file-upload를 탐색 — 요소가 아닌 root를 넘긴다 */
     if (typeof initImagePreview === 'function') initImagePreview(root);   /* 첨부 이미지 라이트박스(미리보기) */
     if (typeof initDatePicker === 'function') initDatePicker(root);   /* 날짜 선택 캘린더 */
+    if (typeof initDisclosure === 'function') initDisclosure(root);   /* 자격 안내 접기/펼치기 */
   }
   _initComponents();
 
@@ -722,6 +742,18 @@ exits: index.html
     var ff = dd.closest('.form-field');
     if (ff) ff.classList.toggle('form-field--error', on);
   }
+  /* 변경사유 세그먼트 — 선택된 segment__item의 data-reason */
+  function reasonValue(seg) {
+    if (!seg) return '';
+    var sel = seg.querySelector('.segment__item--selected');
+    return sel ? (sel.dataset.reason || '') : '';
+  }
+  function segSetError(seg, on) {
+    if (!seg) return;
+    seg.classList.toggle('segment--error', on);
+    var ff = seg.closest('.form-field');
+    if (ff) ff.classList.toggle('form-field--error', on);
+  }
   /* 변경년월 잠금(착오정정=취득월 고정) / 선택가능 / 비활성(선택 전) */
   function ddLock(dd, valueText) {
     if (!dd) return;
@@ -797,7 +829,7 @@ exits: index.html
   /* 변경사유·변동율에 따라 보험 선택·변동율 배지·국민연금 서류·첨부 필수 동기화 */
   function refresh(panel) {
     var e = els(panel);
-    var reason = ddValue(e.reason);
+    var reason = reasonValue(e.reason);
     var prev = num(e.prevpay && e.prevpay.value);
     var haveNew = e.newpay && e.newpay.value.trim() !== '';
     var newv = num(e.newpay && e.newpay.value);
@@ -839,9 +871,9 @@ exits: index.html
   /* 변경사유 선택 시 — 변경년월 모드 전환(고정/선택가능/비활성) 후 재동기화 */
   function onReasonSelected(panel) {
     var e = els(panel);
-    var reason = ddValue(e.reason);
+    var reason = reasonValue(e.reason);
     var prev = panel.dataset.reasonState || '';
-    ddSetError(e.reason, false);
+    segSetError(e.reason, false);
     if (reason === '착오정정') {
       ddLock(e.month, ACQUIRE_MONTH);
     } else if (reason === '보수인상' || reason === '보수인하') {
@@ -857,17 +889,26 @@ exits: index.html
     refresh(panel);
   }
 
-  /* 드롭다운 옵션 클릭 — DS가 selected 갱신한 뒤(setTimeout) 반응 */
+  /* 변경사유 세그먼트 선택 — DS initSegment가 selected 갱신한 뒤(setTimeout) 반응. 클릭·방향키 모두 처리 */
+  function onSegActivity(target) {
+    var item = target.closest('.acq-reason-seg .segment__item');
+    if (!item) return;
+    var panel = item.closest('.scenario-panel');
+    setTimeout(function () { onReasonSelected(panel); }, 0);
+  }
+  root.addEventListener('click', function (e) { onSegActivity(e.target); });
+  root.addEventListener('keyup', function (e) {
+    if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].indexOf(e.key) < 0) return;
+    onSegActivity(e.target);
+  });
+
+  /* 변경년월 드롭다운 옵션 클릭 — 선택 시 에러 해제 */
   root.addEventListener('click', function (e) {
     var opt = e.target.closest('.dropdown__option');
     if (!opt) return;
     var dd = opt.closest('.dropdown');
-    var panel = opt.closest('.scenario-panel');
-    if (!dd || !panel) return;
-    setTimeout(function () {
-      if (/-reason$/.test(dd.id)) onReasonSelected(panel);
-      else if (/-month$/.test(dd.id)) ddSetError(dd, false);
-    }, 0);
+    if (!dd) return;
+    setTimeout(function () { if (/-month$/.test(dd.id)) ddSetError(dd, false); }, 0);
   });
 
   /* 변경 후 보수월액 — 숫자만 허용(콤마 자동), 문자 입력 시 에러. 입력 시 변동율 재계산 */
@@ -892,10 +933,10 @@ exits: index.html
   /* ── 검증 ── */
   function validate(panel) {
     var e = els(panel), invalid = [], firstBad = null;
-    var reason = ddValue(e.reason);
+    var reason = reasonValue(e.reason);
 
-    if (!reason) { ddSetError(e.reason, true); invalid.push(e.reason.closest('.form-field')); firstBad = firstBad || e.reason.querySelector('.dropdown__trigger'); }
-    else ddSetError(e.reason, false);
+    if (!reason) { segSetError(e.reason, true); invalid.push(e.reason.closest('.form-field')); firstBad = firstBad || e.reason.querySelector('.segment__item'); }
+    else segSetError(e.reason, false);
 
     /* 변경년월 — 착오정정은 자동 고정이라 검증 제외, 그 외엔 필수 */
     if (reason && reason !== '착오정정') {
@@ -953,7 +994,7 @@ exits: index.html
   function panelHasInput(panel) {
     if (!panel) return false;
     var e = els(panel);
-    if (ddValue(e.reason)) return true;
+    if (reasonValue(e.reason)) return true;
     if (e.newpay && e.newpay.value.trim()) return true;
     var memo = panel.querySelector('textarea');
     if (memo && memo.value.trim()) return true;
