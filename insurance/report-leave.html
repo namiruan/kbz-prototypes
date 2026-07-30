@@ -30,14 +30,17 @@
     .acq-info-card__item + .acq-info-card__item { border-left: var(--stroke-sm) solid var(--color-border-default); }
     .acq-info-card__label { font-size: var(--font-size-sm); color: var(--color-text-subtle); }
     .acq-info-card__value { font-size: var(--font-size-base); font-weight: var(--font-weight-heading); color: var(--color-text-body); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    /* 휴직사유 — 단독 행, 폭 제한 */
-    .lv-reason-field { max-width: 240px; }
+    /* 휴직사유 — 단독 행, 드롭다운 꽉차게 */
+    .lv-reason-field .dropdown,
+    .lv-reason-field .dropdown__trigger { width: 100%; }
     /* 시작일·종료(예정)일(데이트피커) + 육아휴직 대상자녀 한 줄 — 입력창 하단 정렬 */
     .lv-date-row { display: flex; flex-wrap: wrap; align-items: flex-end; column-gap: var(--space-gap-lg); row-gap: var(--space-gap-md); }
     .lv-date-row > .form-field { flex: 1 1 150px; min-width: 140px; }
     .lv-date-row > .lv-child-field { flex: 1.5 1 240px; }
-    /* 휴직 항목 — 보험 체크박스 가로 나열(항상 비활성, 휴직사유로 자동 결정) */
-    .lv-ins-checks { display: flex; flex-wrap: wrap; gap: var(--space-gap-lg); }
+    /* 휴직 항목 — 보수변경 모달처럼 푸터 좌측에 상시 노출(항상 비활성, 휴직사유로 자동 결정) */
+    .acq-target-footer { margin-right: auto; display: flex; align-items: center; gap: var(--space-gap-md); min-width: 0; }
+    .acq-target-footer__label { flex-shrink: 0; color: var(--color-text-brand); font-size: var(--font-size-lg); font-weight: var(--font-weight-heading); line-height: var(--line-height-ui); }
+    .acq-target-checks { display: flex; flex-wrap: wrap; gap: var(--space-gap-md); }
     /* 제출서류 안내 — table--info + Disclosure */
     .acq-doc-disc { display: flex; flex-direction: column; align-items: stretch; width: 100%; }
     .acq-doc-disc .disclosure__header { display: flex; align-items: center; gap: var(--space-gap-sm); }
@@ -162,19 +165,6 @@ exits: insurance-join-status.html, index.html
                     </div>
                   </div>
 
-                  <!-- 3 area — 휴직 항목 (필수). 휴직사유에 따라 자동 선택·항상 비활성 -->
-                  <div class="form-field">
-                    <span class="form-field__label text-form-label" id="lv-ins-label">휴직 항목 <span class="form-field__required" aria-hidden="true">(필수)</span></span>
-                    <div class="form-field__body">
-                      <div class="lv-ins-checks" role="group" aria-labelledby="lv-ins-label">
-                        <label class="checkbox checkbox--disabled"><input type="checkbox" id="lv-ins-emp" disabled aria-disabled="true"><span class="checkbox__control" aria-hidden="true"><span class="checkbox__icon-check"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span><span class="checkbox__label">고용보험</span></label>
-                        <label class="checkbox checkbox--disabled"><input type="checkbox" id="lv-ins-acc" disabled aria-disabled="true"><span class="checkbox__control" aria-hidden="true"><span class="checkbox__icon-check"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span><span class="checkbox__label">산재보험</span></label>
-                        <label class="checkbox checkbox--disabled"><input type="checkbox" id="lv-ins-pen" disabled aria-disabled="true"><span class="checkbox__control" aria-hidden="true"><span class="checkbox__icon-check"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span><span class="checkbox__label">국민연금</span></label>
-                        <label class="checkbox checkbox--disabled"><input type="checkbox" id="lv-ins-hea" disabled aria-disabled="true"><span class="checkbox__control" aria-hidden="true"><span class="checkbox__icon-check"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span><span class="checkbox__label">건강보험</span></label>
-                      </div>
-                    </div>
-                  </div>
-
                   <!-- 4 area — 제출서류 안내 (Disclosure로 접기) -->
                   <div class="corr-doc">
                     <div class="disclosure disclosure--icon-only disclosure--expanded acq-doc-disc" data-label-expand="제출서류 안내 펼치기" data-label-collapse="제출서류 안내 접기">
@@ -234,6 +224,16 @@ exits: insurance-join-status.html, index.html
           </div>
 
           <div class="modal__footer">
+            <!-- 휴직 항목 — 보수변경 모달처럼 푸터 좌측에 상시 노출. 휴직사유에 따라 자동 선택되며 항상 비활성 -->
+            <div class="acq-target-footer" role="group" aria-labelledby="lv-ins-label">
+              <span class="text-form-label acq-target-footer__label" id="lv-ins-label">휴직 항목</span>
+              <div class="acq-target-checks">
+                <label class="checkbox checkbox--disabled"><input type="checkbox" id="lv-ins-emp" disabled aria-disabled="true"><span class="checkbox__control" aria-hidden="true"><span class="checkbox__icon-check"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span><span class="checkbox__label">고용보험</span></label>
+                <label class="checkbox checkbox--disabled"><input type="checkbox" id="lv-ins-acc" disabled aria-disabled="true"><span class="checkbox__control" aria-hidden="true"><span class="checkbox__icon-check"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span><span class="checkbox__label">산재보험</span></label>
+                <label class="checkbox checkbox--disabled"><input type="checkbox" id="lv-ins-pen" disabled aria-disabled="true"><span class="checkbox__control" aria-hidden="true"><span class="checkbox__icon-check"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span><span class="checkbox__label">국민연금</span></label>
+                <label class="checkbox checkbox--disabled"><input type="checkbox" id="lv-ins-hea" disabled aria-disabled="true"><span class="checkbox__control" aria-hidden="true"><span class="checkbox__icon-check"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span><span class="checkbox__label">건강보험</span></label>
+              </div>
+            </div>
             <button class="btn btn--ghost btn--md" type="button" data-acq-cancel>취소</button>
             <button class="btn btn--secondary btn--solid btn--md" type="button" data-overlay-open="overlay-draft">임시저장</button>
             <button class="btn btn--primary btn--md" type="button" id="lv-submit">신고요청</button>
@@ -537,11 +537,16 @@ exits: insurance-join-status.html, index.html
     if (yr) yr.value = y; if (mo) mo.value = m; if (dy) dy.value = d;
     if (dp) dp.classList.toggle('dp--has-value', !!y);
   }
-  /* 날짜 입력·선택 시 에러 해제 (캘린더 클릭·직접 입력 모두) */
+  /* 날짜 입력·선택 시 에러 해제 (캘린더 클릭·직접 입력 모두). 순서가 유효(시작<종료)해지면 양쪽 순서 에러 모두 해제 */
+  function clearDateErrorsIfValid(pfx) {
+    if (dpVal(pfx)) dpFieldError(pfx, null);
+    var sv = dpVal('lv-start'), ev = dpVal('lv-end');
+    if (sv && ev && sv < ev) { dpFieldError('lv-start', null); dpFieldError('lv-end', null); }
+  }
   ['lv-start', 'lv-end'].forEach(function (pfx) {
     var dp = $(pfx + '-dp'); if (!dp) return;
-    dp.addEventListener('input', function () { if (dpVal(pfx)) dpFieldError(pfx, null); });
-    dp.addEventListener('click', function () { setTimeout(function () { if (dpVal(pfx)) dpFieldError(pfx, null); }, 0); });
+    dp.addEventListener('input', function () { clearDateErrorsIfValid(pfx); });
+    dp.addEventListener('click', function () { setTimeout(function () { clearDateErrorsIfValid(pfx); }, 0); });
   });
   /* 육아휴직 대상자녀 — 000000-0 자동 하이픈(숫자 7자리) */
   var child = $('lv-child');
@@ -568,8 +573,12 @@ exits: insurance-join-status.html, index.html
     else dpFieldError('lv-start', null);
     if (!ev) { dpFieldError('lv-end', '종료일을 입력해 주세요.'); shake(ef); firstBad = firstBad || $('lv-end-yr'); ok = false; }
     else dpFieldError('lv-end', null);
-    /* 시작일 > 종료일 */
-    if (sv && ev && sv > ev) { dpFieldError('lv-start', '시작일은 종료일 이후로 설정할 수 없습니다.'); shake(sf); firstBad = firstBad || $('lv-start-yr'); ok = false; }
+    /* 시작일은 종료일보다 빨라야 함 — 같거나 이후면 불가(start < end 강제) */
+    if (sv && ev && sv >= ev) {
+      dpFieldError('lv-start', '휴직 시작일은 종료일보다 빨라야 합니다.');
+      dpFieldError('lv-end', '휴직 종료일은 시작일보다 늦어야 합니다.');
+      shake(sf); shake(ef); firstBad = firstBad || $('lv-start-yr'); ok = false;
+    }
     /* 육아휴직 대상자녀 */
     if (reason === '육아휴직') {
       var c = $('lv-child');
