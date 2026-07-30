@@ -261,7 +261,7 @@ exits: insurance-join-status.html, index.html
                                 <tbody class="table__body">
                                   <tr class="table__row"><td class="table__cell corr-info-key">퇴사일</td><td class="table__cell">2024-05-30</td></tr>
                                   <tr class="table__row"><td class="table__cell corr-info-key">상실일</td><td class="table__cell">2024-05-31</td></tr>
-                                  <tr class="table__row"><td class="table__cell corr-info-key">신고 보험</td><td class="table__cell corr-info-brand">고용보험, 산재보험, 국민연금</td></tr>
+                                  <tr class="table__row"><td class="table__cell corr-info-key">신고 보험</td><td class="table__cell corr-info-brand" id="c1-cc-ins-summary">고용보험, 산재보험, 국민연금</td></tr>
                                   <tr class="table__row"><td class="table__cell corr-info-key">전년도 보수총액/산정월수</td><td class="table__cell">2,800,000 원 / 10 개월</td></tr>
                                   <tr class="table__row"><td class="table__cell corr-info-key">당해년도 보수총액/산정월수</td><td class="table__cell">3,200,000 원 / 12 개월</td></tr>
                                   <tr class="table__row"><td class="table__cell corr-info-key">상실사유</td><td class="table__cell">자진 퇴사 / 개인 사정</td></tr>
@@ -662,6 +662,23 @@ exits: insurance-join-status.html, index.html
     if (anyChecked) panel.querySelector('.corr-items').classList.remove('corr-items--error');
   }
 
+  /* 상실 취소 대상 보험 → 상실 정보의 '신고 보험'을 선택된 보험으로 동기화(선택 해제 시 목록에서 제거) */
+  function syncCancelIns(panel) {
+    var box = panel.querySelector('.corr-cc-ins');
+    var summary = panel.querySelector('#c1-cc-ins-summary');
+    if (!box || !summary) return;
+    var names = Array.prototype.slice.call(box.querySelectorAll('input[type="checkbox"]'))
+      .filter(function (c) { return c.checked; })
+      .map(function (c) { var l = c.closest('.checkbox').querySelector('.checkbox__label'); return l ? l.textContent.trim() : ''; })
+      .filter(Boolean);
+    summary.textContent = names.length ? names.join(', ') : '—';
+  }
+  root.addEventListener('change', function (e) {
+    if (e.target && e.target.type === 'checkbox' && e.target.closest('.corr-ins-checks')) {
+      syncCancelIns(e.target.closest('.scenario-panel'));
+    }
+  });
+
   /* 상실 취소 단독 선택 */
   function applyExclusive(panel, changed) {
     var exclusive = panel.querySelector('.corr-cards [data-corr-exclusive]');
@@ -826,6 +843,7 @@ exits: insurance-join-status.html, index.html
     itemChecks(panel).forEach(syncCard);
     syncDoc(panel);
     syncEmptyHint(panel);
+    syncCancelIns(panel);
   });
 
   /* 첨부파일 세로 높이 — 보이는 본문 영역에 맞춤(실측) */
