@@ -68,8 +68,9 @@
     .corr-field-row > .form-field { display: flex; flex-direction: column; gap: var(--space-gap-xs); flex: 0 1 200px; }
     .corr-field-row .input { max-width: 200px; }
     .corr-field-arrow { flex: 0 0 auto; align-self: flex-start; margin-top: calc(var(--font-size-sm) + var(--space-gap-xs)); height: var(--height-base); display: inline-flex; align-items: center; color: var(--color-text-subtle); font-size: var(--font-size-lg); }
-    /* 취득 정보 — 읽기 전용 참조 데이터. 입력(취득취소 사유)이 주인공이므로 패널·배경 없이 조용하게 둔다.
-       제목은 카드 헤더(브랜드·semibold·14px)와 구분되게 옅은 소제목 라벨로. */
+    /* 취득 정보 — 읽기 전용 참조 데이터. 입력(취득취소 사유)이 주인공이므로 흰 패널(강한 대비) 대신
+       옅은 실선 테두리만으로 '하나의 묶음'처럼 조용히 그룹핑한다(채움 없음 → 시선 안 뺏김). */
+    .corr-subsection { border: var(--stroke-sm) solid var(--color-border-subtle); border-radius: var(--radius-md); padding: var(--space-inset-md) var(--space-inset-lg); }
     .corr-sub-title { display: block; font-size: var(--font-size-sm); font-weight: var(--font-weight-medium); color: var(--color-text-subtle); margin-bottom: var(--space-gap-sm); }
     .corr-dl { display: grid; grid-template-columns: max-content 1fr; column-gap: var(--space-gap-2xl); row-gap: var(--space-gap-sm); margin: 0; }
     .corr-dl dt { color: var(--color-text-subtle); }
