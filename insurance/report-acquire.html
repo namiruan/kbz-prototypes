@@ -22,7 +22,7 @@
     /* 첨부파일 열 — 내용이 적으면 우측 폼 높이에 맞춰 늘어나(모달도 내용만큼만 줄어듦),
        많으면 보이는 영역(max-height)에서 멈추고 리스트만 내부 스크롤한다. sticky로 화면에 고정.
        (modal.md '첨부·조회 사이드 + 폼 2열 본문 레이아웃' 패턴) */
-    .acq-grid > .file-upload { position: sticky; top: 0; max-height: calc(90vh - 172px); min-height: 0; overflow: hidden; }
+    .acq-grid > .file-upload { position: sticky; top: 0; max-height: calc(90vh - 240px); min-height: 0; overflow: hidden; }
     .acq-grid > .file-upload .file-upload__dropzone { flex: 1 1 auto; min-height: 240px; overflow: hidden; align-items: center; justify-content: center; }
     /* 파일이 있으면: 안내문 숨기고 상단 정렬 + 그리드만 세로 스크롤(썸네일 자연 높이 유지) */
     .acq-grid > .file-upload .file-upload__dropzone:has(.file-upload-item) { justify-content: flex-start; }
@@ -31,14 +31,13 @@
     /* 첨부파일 신규 기본값(DS file-upload v0.4.0) — 안내문 드롭존 안 가운데 + 라벨 도움말(?) 툴팁 */
     .file-upload__label { display: inline-flex; align-items: center; gap: var(--space-gap-2xs); }
     .file-upload__hint { margin: 0; max-width: 28em; text-align: center; color: var(--color-text-subtle); font-size: var(--font-size-sm); line-height: var(--line-height-reading); word-break: keep-all; }
-    /* 피부양자 안내 배너 — 특정 필드가 아닌 신고서 전반 안내이므로 헤더 아래 전체폭에 배치.
-       우측 배너는 관련 정보 '아래'에 붙을 때 효용이 있어, 전반 안내는 상단 전체폭이 맞다. */
-    .acq-intro-banner { margin-bottom: var(--space-gap-xl); }
-    /* 상단 배너는 데이터가 아니라 '헤더 보조 설명' 역할 → 헤더에 밀착시킨다.
-       배너가 있는 모달에서만 content 상단 패딩을 제거(헤더 자체 하단 패딩만 남김).
-       배너 없는 시나리오(로딩·저장실패)는 :has로 배제되어 정상 간격 유지. */
-    /* 특정도를 DS .modal:not(.modal--lg) .modal__content(0,3,0)보다 높여(0,4,0) 덮이지 않게 한다. */
-    .modal:not(.modal--lg) .modal__content:has(> .acq-intro-banner) { padding-top: 0; }
+    /* 피부양자 안내 배너 — 신고서 전반 안내(제약)이므로 헤더 아래 '고정 밴드'로 배치.
+       스크롤과 무관하게 항상 보이도록 modal__body 직속(modal__content 앞)에 둔다.
+       (→ modal.md '모달 내 배너 사용' — 헤더 고정 밴드) */
+    .acq-intro-banners { display: flex; flex-direction: column; gap: var(--space-gap-sm); }
+    .modal__body:has(> .acq-intro-banners) { flex-direction: column; }
+    /* 밴드 상하 패딩 0 — 타이틀과의 간격은 헤더 pad-bottom(≈16), 본문과의 간격은 content pad-top(≈16)이 담당 */
+    .modal__body > .acq-intro-banners { flex-shrink: 0; padding: 0 var(--space-inset-3xl); margin: 0; }
     /* 폼 세로 스택 — form-field-group보다 섹션 간격을 넓게 */
     .acq-form { display: flex; flex-direction: column; gap: var(--space-gap-xl); }
     /* 가입보험 섹션 — 라벨 + 테이블 */
@@ -230,8 +229,8 @@ exits: index.html
           </div>
 
           <div class="modal__body">
-            <div class="modal__content">
-              <!-- 피부양자 안내 배너 — 헤더 아래 전체폭 (신고서 전반 안내) -->
+            <div class="acq-intro-banners">
+              <!-- 피부양자 안내 배너 — 헤더 아래 고정 밴드 (신고서 전반 안내·제약) -->
               <div class="banner acq-intro-banner" role="status">
                 <span class="icon--md banner__icon" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-info"/></svg></span>
                 <div class="text-description banner__body">
@@ -239,7 +238,8 @@ exits: index.html
                   <p class="banner__message">피부양자 취득신고는 현재 지원하지 않아요. (추후 제공 예정) 피부양자 취득신고는 비즈씨를 통해 진행해주세요.</p>
                 </div>
               </div>
-
+            </div>
+            <div class="modal__content">
               <div class="acq-grid">
 
                 <!-- ── 1 area: 첨부파일 ── -->
@@ -419,8 +419,8 @@ exits: index.html
           </div>
 
           <div class="modal__body">
-            <div class="modal__content">
-              <!-- 피부양자 안내 배너 — 헤더 아래 전체폭 (신고서 전반 안내) -->
+            <div class="acq-intro-banners">
+              <!-- 피부양자 안내 배너 — 헤더 아래 고정 밴드 (신고서 전반 안내·제약) -->
               <div class="banner acq-intro-banner" role="status">
                 <span class="icon--md banner__icon" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-info"/></svg></span>
                 <div class="text-description banner__body">
@@ -428,7 +428,8 @@ exits: index.html
                   <p class="banner__message">피부양자 취득신고는 현재 지원하지 않아요. (추후 제공 예정) 피부양자 취득신고는 비즈씨를 통해 진행해주세요.</p>
                 </div>
               </div>
-
+            </div>
+            <div class="modal__content">
               <div class="acq-grid">
 
                 <div class="file-upload" id="s2-upload" data-max-mb="200">
@@ -614,8 +615,8 @@ exits: index.html
           </div>
 
           <div class="modal__body">
-            <div class="modal__content">
-              <!-- 피부양자 안내 배너 — 헤더 아래 전체폭 (신고서 전반 안내) -->
+            <div class="acq-intro-banners">
+              <!-- 피부양자 안내 배너 — 헤더 아래 고정 밴드 (신고서 전반 안내·제약) -->
               <div class="banner acq-intro-banner" role="status">
                 <span class="icon--md banner__icon" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-info"/></svg></span>
                 <div class="text-description banner__body">
@@ -623,7 +624,8 @@ exits: index.html
                   <p class="banner__message">피부양자 취득신고는 현재 지원하지 않아요. (추후 제공 예정) 피부양자 취득신고는 비즈씨를 통해 진행해주세요.</p>
                 </div>
               </div>
-
+            </div>
+            <div class="modal__content">
               <div class="acq-grid">
 
                 <div class="file-upload" id="s4-upload" data-max-mb="200">
@@ -781,8 +783,8 @@ exits: index.html
           </div>
 
           <div class="modal__body">
-            <div class="modal__content">
-              <!-- 피부양자 안내 배너 — 헤더 아래 전체폭 (신고서 전반 안내) -->
+            <div class="acq-intro-banners">
+              <!-- 피부양자 안내 배너 — 헤더 아래 고정 밴드 (신고서 전반 안내·제약) -->
               <div class="banner acq-intro-banner" role="status">
                 <span class="icon--md banner__icon" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-info"/></svg></span>
                 <div class="text-description banner__body">
@@ -790,7 +792,8 @@ exits: index.html
                   <p class="banner__message">피부양자 취득신고는 현재 지원하지 않아요. (추후 제공 예정) 피부양자 취득신고는 비즈씨를 통해 진행해주세요.</p>
                 </div>
               </div>
-
+            </div>
+            <div class="modal__content">
               <div class="acq-grid">
 
                 <div class="file-upload" id="s5-upload" data-max-mb="200">
