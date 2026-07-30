@@ -786,7 +786,7 @@ exits: insurance-join-status.html, index.html
     if (checked.length && !upHasFile(panel)) {
       var up = panel.querySelector('.file-upload');
       if (up) { up.classList.add('file-upload--error'); shake(up); }
-      firstBad = firstBad || (up && up.querySelector('button'));
+      firstBad = firstBad || (up && up.querySelector('.file-upload__dropzone .btn'));
       ok = false;
     }
 
