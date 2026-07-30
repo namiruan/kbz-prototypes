@@ -640,6 +640,15 @@ exits: insurance-join-status.html, index.html
   if (!root) return;
 
   function shake(el) { if (!el) return; el.classList.remove('motion-shake'); void el.offsetWidth; el.classList.add('motion-shake'); }
+  /* 실제 달력상 유효한 날짜인지(월 1~12, 일수, 윤년 반영) */
+  function isValidDate(s) {
+    var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s || '');
+    if (!m) return false;
+    var y = +m[1], mo = +m[2], d = +m[3];
+    if (mo < 1 || mo > 12 || d < 1 || d > 31) return false;
+    var dt = new Date(y, mo - 1, d);
+    return dt.getFullYear() === y && dt.getMonth() === (mo - 1) && dt.getDate() === d;
+  }
   function cardOf(input) { return input.closest('.corr-card'); }
   function bodyOf(card) { return card.querySelector('.corr-card__body'); }
   function itemChecks(panel) { return Array.prototype.slice.call(panel.querySelectorAll('.corr-cards [data-corr-check]')); }
@@ -736,6 +745,7 @@ exits: insurance-join-status.html, index.html
       this.value = out;
       var f = this.closest('.form-field'); var fid = f.id || (f.id = 'c1-ld-after-field');
       if (/[^0-9-]/.test(raw)) { setFieldError(fid, 'c1-ld-after-err', '숫자만 입력해 주세요.'); return; }
+      if (/^\d{4}-\d{2}-\d{2}$/.test(this.value) && !isValidDate(this.value)) { setFieldError(fid, 'c1-ld-after-err', '올바른 날짜를 입력해 주세요.'); return; }
       if (this.value.trim() && f.classList.contains('form-field--error')) clearFieldState(fid, 'c1-ld-after-err');
     });
   })();
@@ -782,7 +792,9 @@ exits: insurance-join-status.html, index.html
         if (!el.value.trim()) { setFieldError(el.closest('.form-field').id || (el.closest('.form-field').id = 'c1-nc-after-field'), 'c1-nc-after-err', '변경 후 성명을 입력해 주세요.'); shake(el.closest('.form-field')); firstBad = firstBad || el; ok = false; }
       } else if (item === 'lossdate') {
         var d = document.getElementById('c1-ld-after');
-        if (!d.value.trim()) { setFieldError(d.closest('.form-field').id || (d.closest('.form-field').id = 'c1-ld-after-field'), 'c1-ld-after-err', '변경 후 상실일을 입력해 주세요.'); shake(d.closest('.form-field')); firstBad = firstBad || d; ok = false; }
+        var dfid = d.closest('.form-field').id || (d.closest('.form-field').id = 'c1-ld-after-field');
+        if (!d.value.trim()) { setFieldError(dfid, 'c1-ld-after-err', '변경 후 상실일을 입력해 주세요.'); shake(d.closest('.form-field')); firstBad = firstBad || d; ok = false; }
+        else if (!isValidDate(d.value.trim())) { setFieldError(dfid, 'c1-ld-after-err', '올바른 날짜를 입력해 주세요.'); shake(d.closest('.form-field')); firstBad = firstBad || d; ok = false; }
       } else if (item === 'lossreason') {
         var f = document.getElementById('c1-lr-field');
         if (!ddSelected(document.getElementById('c1-lr-reason'))) {
