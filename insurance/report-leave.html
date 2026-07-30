@@ -155,16 +155,16 @@ exits: insurance-join-status.html, index.html
                     </div>
                   </div>
 
-                  <!-- 2-2 area — 휴직 시작일 · 종료(예정)일(데이트피커) 한 줄 -->
+                  <!-- 2-2 area — 휴직 시작일 · 종료(예정)일(일반 인풋, YYYY-MM-DD 자동 포맷) 한 줄 -->
                   <div class="lv-date-row">
                     <div class="form-field">
-                      <label class="form-field__label text-form-label" for="lv-start-yr">휴직 시작일 <span class="form-field__required" aria-hidden="true">(필수)</span></label>
-                      <div class="form-field__body"><div class="dp acq-date-dp" id="lv-start-dp"><div class="dp__trigger" aria-haspopup="dialog" aria-label="휴직 시작일 선택"><div class="dp__value-group"><input class="dp__value-part dp__value-part--year" id="lv-start-yr" type="text" inputmode="numeric" placeholder="YYYY" maxlength="4" aria-label="연도" autocomplete="off" value=""><span class="dp__value-sep" aria-hidden="true">.</span><input class="dp__value-part dp__value-part--md" id="lv-start-mo" type="text" inputmode="numeric" placeholder="MM" maxlength="2" aria-label="월" autocomplete="off" value=""><span class="dp__value-sep" aria-hidden="true">.</span><input class="dp__value-part dp__value-part--md" id="lv-start-dy" type="text" inputmode="numeric" placeholder="DD" maxlength="2" aria-label="일" autocomplete="off" value=""></div><span class="dp__chevron" aria-hidden="true"><span class="icon icon--sm"><svg aria-hidden="true"><use href="#icon-calendar"/></svg></span></span></div></div></div>
+                      <label class="form-field__label text-form-label" for="lv-start">휴직 시작일 <span class="form-field__required" aria-hidden="true">(필수)</span></label>
+                      <div class="form-field__body"><input class="input" type="text" id="lv-start" placeholder="YYYY-MM-DD" inputmode="numeric" maxlength="10" autocomplete="off"></div>
                       <div class="form-field__footer"><p class="form-field__error text-helper" id="lv-start-err" role="alert">시작일을 입력해 주세요.</p></div>
                     </div>
                     <div class="form-field">
-                      <label class="form-field__label text-form-label" for="lv-end-yr">휴직 종료(예정)일 <span class="form-field__required" aria-hidden="true">(필수)</span></label>
-                      <div class="form-field__body"><div class="dp acq-date-dp" id="lv-end-dp"><div class="dp__trigger" aria-haspopup="dialog" aria-label="휴직 종료(예정)일 선택"><div class="dp__value-group"><input class="dp__value-part dp__value-part--year" id="lv-end-yr" type="text" inputmode="numeric" placeholder="YYYY" maxlength="4" aria-label="연도" autocomplete="off" value=""><span class="dp__value-sep" aria-hidden="true">.</span><input class="dp__value-part dp__value-part--md" id="lv-end-mo" type="text" inputmode="numeric" placeholder="MM" maxlength="2" aria-label="월" autocomplete="off" value=""><span class="dp__value-sep" aria-hidden="true">.</span><input class="dp__value-part dp__value-part--md" id="lv-end-dy" type="text" inputmode="numeric" placeholder="DD" maxlength="2" aria-label="일" autocomplete="off" value=""></div><span class="dp__chevron" aria-hidden="true"><span class="icon icon--sm"><svg aria-hidden="true"><use href="#icon-calendar"/></svg></span></span></div></div></div>
+                      <label class="form-field__label text-form-label" for="lv-end">휴직 종료(예정)일 <span class="form-field__required" aria-hidden="true">(필수)</span></label>
+                      <div class="form-field__body"><input class="input" type="text" id="lv-end" placeholder="YYYY-MM-DD" inputmode="numeric" maxlength="10" autocomplete="off"></div>
                       <div class="form-field__footer"><p class="form-field__error text-helper" id="lv-end-err" role="alert">종료일을 입력해 주세요.</p></div>
                     </div>
                   </div>
@@ -523,34 +523,56 @@ exits: insurance-join-status.html, index.html
     }, 0);
   });
 
-  /* 데이트피커 값 읽기 — 'YYYY-MM-DD' 또는 '' */
-  function dpVal(pfx) {
-    var y = $(pfx + '-yr'), m = $(pfx + '-mo'), d = $(pfx + '-dy');
-    if (!y) return '';
-    var yy = y.value.trim(), mm = m.value.trim(), dd = d.value.trim();
-    if (yy.length === 4 && mm && dd) return yy + '-' + ('0' + mm).slice(-2) + '-' + ('0' + dd).slice(-2);
-    return '';
+  /* 날짜 값 읽기 — 완성된 'YYYY-MM-DD'만 반환, 아니면 '' */
+  function dpVal(id) {
+    var el = $(id); if (!el) return '';
+    var v = el.value.trim();
+    return /^\d{4}-\d{2}-\d{2}$/.test(v) ? v : '';
   }
-  function dpFieldError(pfx, msg) {
-    var field = $(pfx + '-yr').closest('.form-field'), err = $(pfx + '-err'), dp = $(pfx + '-dp');
-    if (msg) { if (field) field.classList.add('form-field--error'); if (dp) dp.classList.add('dp--error'); if (err) { err.textContent = msg; err.removeAttribute('hidden'); } }
-    else { if (field) field.classList.remove('form-field--error'); if (dp) dp.classList.remove('dp--error'); if (err) err.setAttribute('hidden', ''); }
+  function dpFieldError(id, msg) {
+    var el = $(id); if (!el) return;
+    var field = el.closest('.form-field'), err = $(id + '-err');
+    if (msg) {
+      if (field) field.classList.add('form-field--error');
+      el.classList.remove('input--complete', 'input--success'); el.classList.add('input--error'); el.setAttribute('aria-invalid', 'true');
+      if (err) { err.textContent = msg; err.removeAttribute('hidden'); }
+    } else {
+      if (field) field.classList.remove('form-field--error');
+      el.classList.remove('input--error'); el.removeAttribute('aria-invalid');
+      if (err) err.setAttribute('hidden', '');
+    }
   }
-  function setDp(pfx, y, m, d) {
-    var yr = $(pfx + '-yr'), mo = $(pfx + '-mo'), dy = $(pfx + '-dy'), dp = $(pfx + '-dp');
-    if (yr) yr.value = y; if (mo) mo.value = m; if (dy) dy.value = d;
-    if (dp) dp.classList.toggle('dp--has-value', !!y);
+  function setDp(id, val) {
+    var el = $(id); if (!el) return;
+    el.value = val || '';
+    el.classList.remove('input--error'); el.removeAttribute('aria-invalid');
+    var field = el.closest('.form-field'); if (field) field.classList.remove('form-field--error');
+    var err = $(id + '-err'); if (err) err.setAttribute('hidden', '');
   }
-  /* 날짜 입력·선택 시 에러 해제 (캘린더 클릭·직접 입력 모두). 순서가 유효(시작<종료)해지면 양쪽 순서 에러 모두 해제 */
-  function clearDateErrorsIfValid(pfx) {
-    if (dpVal(pfx)) dpFieldError(pfx, null);
+  /* 실시간 순서 검증 — 한쪽 날짜가 이미 있으면, 다음 입력이 완성되는 즉시 시작<종료를 검증해 에러 표시/해제 */
+  function liveValidateDates(changedId) {
+    if (dpVal(changedId)) dpFieldError(changedId, null);
     var sv = dpVal('lv-start'), ev = dpVal('lv-end');
-    if (sv && ev && sv < ev) { dpFieldError('lv-start', null); dpFieldError('lv-end', null); }
+    if (sv && ev) {
+      if (sv >= ev) {
+        dpFieldError('lv-start', '휴직 시작일은 종료일보다 빨라야 합니다.');
+        dpFieldError('lv-end', '휴직 종료일은 시작일보다 늦어야 합니다.');
+      } else {
+        dpFieldError('lv-start', null); dpFieldError('lv-end', null);
+      }
+    }
   }
-  ['lv-start', 'lv-end'].forEach(function (pfx) {
-    var dp = $(pfx + '-dp'); if (!dp) return;
-    dp.addEventListener('input', function () { clearDateErrorsIfValid(pfx); });
-    dp.addEventListener('click', function () { setTimeout(function () { clearDateErrorsIfValid(pfx); }, 0); });
+  /* YYYY-MM-DD 자동 하이픈 + 입력 즉시 검증 */
+  ['lv-start', 'lv-end'].forEach(function (id) {
+    var el = $(id); if (!el) return;
+    el.addEventListener('input', function () {
+      var d = this.value.replace(/[^0-9]/g, '').slice(0, 8);
+      var out = d;
+      if (d.length > 6) out = d.slice(0, 4) + '-' + d.slice(4, 6) + '-' + d.slice(6);
+      else if (d.length > 4) out = d.slice(0, 4) + '-' + d.slice(4);
+      this.value = out;
+      liveValidateDates(id);
+    });
   });
   /* 육아휴직 대상자녀 — 000000-0 자동 하이픈(숫자 7자리) */
   var child = $('lv-child');
@@ -572,16 +594,16 @@ exits: insurance-join-status.html, index.html
     else { rf.classList.remove('form-field--error'); }
     /* 시작일·종료일 (데이트피커) */
     var sv = dpVal('lv-start'), ev = dpVal('lv-end');
-    var sf = $('lv-start-yr').closest('.form-field'), ef = $('lv-end-yr').closest('.form-field');
-    if (!sv) { dpFieldError('lv-start', '시작일을 입력해 주세요.'); shake(sf); firstBad = firstBad || $('lv-start-yr'); ok = false; }
+    var sf = $('lv-start').closest('.form-field'), ef = $('lv-end').closest('.form-field');
+    if (!sv) { dpFieldError('lv-start', '시작일을 입력해 주세요.'); shake(sf); firstBad = firstBad || $('lv-start'); ok = false; }
     else dpFieldError('lv-start', null);
-    if (!ev) { dpFieldError('lv-end', '종료일을 입력해 주세요.'); shake(ef); firstBad = firstBad || $('lv-end-yr'); ok = false; }
+    if (!ev) { dpFieldError('lv-end', '종료일을 입력해 주세요.'); shake(ef); firstBad = firstBad || $('lv-end'); ok = false; }
     else dpFieldError('lv-end', null);
     /* 시작일은 종료일보다 빨라야 함 — 같거나 이후면 불가(start < end 강제) */
     if (sv && ev && sv >= ev) {
       dpFieldError('lv-start', '휴직 시작일은 종료일보다 빨라야 합니다.');
       dpFieldError('lv-end', '휴직 종료일은 시작일보다 늦어야 합니다.');
-      shake(sf); shake(ef); firstBad = firstBad || $('lv-start-yr'); ok = false;
+      shake(sf); shake(ef); firstBad = firstBad || $('lv-start'); ok = false;
     }
     /* 육아휴직 대상자녀 */
     if (reason === '육아휴직') {
@@ -631,7 +653,7 @@ exits: insurance-join-status.html, index.html
   /* 취소 → 작성 내용 있으면 확인 알럿 */
   function panelHasInput() {
     if (reasonVal()) return true;
-    if (dpVal('lv-start') || dpVal('lv-end') || $('lv-start-yr').value.trim() || $('lv-end-yr').value.trim() || $('lv-child').value.trim()) return true;
+    if ($('lv-start').value.trim() || $('lv-end').value.trim() || $('lv-child').value.trim()) return true;
     var memo = $('lv-memo'); if (memo && memo.value.trim()) return true;
     if (upHasFile()) return true;
     return false;
@@ -663,7 +685,7 @@ exits: insurance-join-status.html, index.html
   }
   window.applyLeaveScenario = function (name) {
     /* 리셋 */
-    ['lv-start', 'lv-end'].forEach(function (pfx) { setDp(pfx, '', '', ''); dpFieldError(pfx, null); });
+    ['lv-start', 'lv-end'].forEach(function (id) { setDp(id, ''); dpFieldError(id, null); });
     var childEl = $('lv-child'); if (childEl) childEl.value = '';
     clearFieldState('lv-child-field', 'lv-child-err');
     var memo = $('lv-memo'); if (memo) memo.value = '';
@@ -675,7 +697,7 @@ exits: insurance-join-status.html, index.html
     else if (name === '기타') { ddApply('기타'); }
     refresh();
     /* 데모 값 채우기(첫 진입 제외) */
-    if (name !== '첫-진입') { setDp('lv-start', '2026', '08', '01'); setDp('lv-end', '2027', '07', '31'); }
+    if (name !== '첫-진입') { setDp('lv-start', '2026-08-01'); setDp('lv-end', '2027-07-31'); }
     if (name === '육아휴직') { $('lv-child').value = '200315-3'; }
   };
 
