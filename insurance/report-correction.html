@@ -15,16 +15,12 @@
     /* 이 페이지 고유 레이아웃만 — 컴포넌트·프로토타입 크롬은 components.css가 처리 */
     .proto-hub-link { display: block; padding: var(--space-inset-squish-sm); font-size: var(--font-size-sm); }
     /* 모달 본문 2열 — 좌 첨부파일(Figma 314px) + 우 폼 */
-    .acq-grid { display: grid; grid-template-columns: 314px 1fr; gap: var(--space-gap-2xl); align-items: stretch; height: 100%; min-height: 0; }
-    /* 본문(2열)은 모달 보이는 영역 높이에 맞추고, 스크롤은 각 열이 따로 담당한다
-       (전체 콘텐츠가 함께 스크롤되지 않도록 modal__content 자체 스크롤은 끈다). */
-    .modal__content:has(.acq-grid) { overflow: hidden; }
-    .acq-form { min-height: 0; overflow-y: auto; }
-    /* 첨부파일 열 — 보이는 영역까지만 노출되고, 파일이 많아지면 열이 커지지 않고
-       리스트(그리드)만 내부 스크롤되도록 overflow·min-height로 높이를 가둔다. */
-    .acq-grid > .file-upload { height: 100%; min-height: 0; overflow: hidden; }
-    /* 드롭존 — 안내 문구·버튼을 드래그 영역 가운데(가로·세로) 정렬 */
-    .acq-grid > .file-upload .file-upload__dropzone { flex: 1 1 auto; min-height: 0; overflow: hidden; align-items: center; justify-content: center; }
+    .acq-grid { display: grid; grid-template-columns: 314px 1fr; gap: var(--space-gap-2xl); align-items: start; }
+    /* 첨부파일 열 — 모달은 평소처럼 전체가 자연스럽게 스크롤되고(상단 잘림 없음),
+       첨부파일만 화면 보이는 영역에 고정(sticky)돼 항상 보이며 리스트는 내부 스크롤한다. */
+    .acq-grid > .file-upload { position: sticky; top: 0; align-self: start; max-height: calc(90vh - 160px); min-height: 0; overflow: hidden; }
+    /* 드롭존 — 안내 문구·버튼을 드래그 영역 가운데(가로·세로) 정렬. 빈 상태에도 넉넉한 드롭 영역 유지 */
+    .acq-grid > .file-upload .file-upload__dropzone { flex: 1 1 auto; min-height: 240px; overflow: hidden; align-items: center; justify-content: center; }
     /* 파일이 있으면: 안내문 숨기고 상단 정렬 + 그리드만 세로 스크롤 (열 높이는 우측 콘텐츠 기준 유지) */
     .acq-grid > .file-upload .file-upload__dropzone:has(.file-upload-item) { justify-content: flex-start; }
     .acq-grid > .file-upload .file-upload__dropzone:has(.file-upload-item) .file-upload__hint { display: none; }
