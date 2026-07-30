@@ -223,7 +223,8 @@ exits: index.html
     <div class="proto-nav-divider" id="proto-nav-divider"></div>
 
     <nav class="proto-nav" id="proto-nav" aria-label="시나리오 선택">
-      <button class="proto-nav-btn is-active" data-scenario="일부-상실" type="button">일부 상실</button>
+      <button class="proto-nav-btn is-active" data-scenario="첫-진입" type="button">첫 진입</button>
+      <button class="proto-nav-btn" data-scenario="일부-상실" type="button">일부 상실</button>
       <button class="proto-nav-btn" data-scenario="전체-상실" type="button">전체 상실 (퇴사)</button>
     </nav>
   </aside>
@@ -232,8 +233,166 @@ exits: index.html
 
     <div id="pane-panels">
 
+    <!-- ══════════════ 첫 진입 — 모달 최초 오픈(기본 상태, 입력 전) ══════════════ -->
+    <section class="scenario-panel" data-scenario="첫-진입" data-step>
+      <div class="page">
+        <div class="modal" role="dialog" aria-modal="true" aria-labelledby="s0-title" style="width:958px;max-width:100%">
+
+          <div class="modal__header">
+            <h2 class="modal__title text-modal-title-sm" id="s0-title">상실신고서</h2>
+            <button class="icon-on--lg" type="button" aria-label="닫기"><svg aria-hidden="true"><use href="#icon-close"/></svg></button>
+          </div>
+
+          <div class="modal__body">
+            <div class="modal__content">
+              <div class="acq-grid">
+
+                <div class="file-upload" id="s0-upload" data-max-mb="200">
+                  <input type="file" id="s0-file-input" hidden multiple>
+                  <div class="file-upload__header">
+                    <span class="text-form-label file-upload__label" style="font-weight:var(--font-weight-heading)">첨부파일<span class="tooltip-wrapper" onmouseenter="this.querySelector('.tooltip-panel').classList.add('tooltip-panel--visible')" onmouseleave="this.querySelector('.tooltip-panel').classList.remove('tooltip-panel--visible')"><button class="tooltip-trigger tooltip-trigger--sm" type="button" aria-label="첨부파일 안내" aria-describedby="s0-upload-tip" onfocus="this.closest('.tooltip-wrapper').querySelector('.tooltip-panel').classList.add('tooltip-panel--visible')" onblur="this.closest('.tooltip-wrapper').querySelector('.tooltip-panel').classList.remove('tooltip-panel--visible')"><svg aria-hidden="true"><use href="#icon-help"/></svg></button><div class="tooltip-panel elevation-tooltip tooltip-panel--top" id="s0-upload-tip" role="tooltip">파일당 10MB 이하 업로드 가능</div></span></span>
+                    <span class="text-form-label file-upload__usage">0MB / 200MB</span>
+                  </div>
+                  <div class="file-upload__dropzone">
+                    <p class="file-upload__hint">파일을 마우스로 끌어다 놓거나,<br>추가하기 버튼을 사용해 직접 업로드해 보세요.</p>
+                    <button class="btn btn--secondary btn--sm btn--icon-left" type="button">
+                      <span class="icon icon--sm" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-plus"/></svg></span>추가하기
+                    </button>
+                    <div class="file-upload__grid"></div>
+                  </div>
+                </div>
+
+                <div class="acq-form">
+
+                  <!-- 조회 정보 (이름·주민번호·취득일) — 입력 아님, 카드로 노출 -->
+                  <div class="acq-info-card">
+                    <div class="acq-info-card__item"><span class="acq-info-card__label">이름</span><span class="acq-info-card__value">유가영</span></div>
+                    <div class="acq-info-card__item"><span class="acq-info-card__label">주민번호</span><span class="acq-info-card__value">123456-1234567</span></div>
+                    <div class="acq-info-card__item"><span class="acq-info-card__label">취득일</span><span class="acq-info-card__value">2024-03-02</span></div>
+                  </div>
+
+                  <div class="acq-section">
+                    <span class="text-form-label" id="s0-ins-label">상실할 보험 선택 <span class="form-field__required" aria-hidden="true">(필수)</span></span>
+                    <div class="acq-ins-checks" role="group" aria-labelledby="s0-ins-label">
+                      <label class="checkbox"><input type="checkbox" id="s0-ins-pension" checked><span class="checkbox__control" aria-hidden="true"><span class="checkbox__icon-check"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span><span class="checkbox__label">국민연금</span></label>
+                      <label class="checkbox"><input type="checkbox" id="s0-ins-health" checked><span class="checkbox__control" aria-hidden="true"><span class="checkbox__icon-check"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span><span class="checkbox__label">건강보험</span></label>
+                      <label class="checkbox"><input type="checkbox" id="s0-ins-emp"><span class="checkbox__control" aria-hidden="true"><span class="checkbox__icon-check"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span><span class="checkbox__label">고용보험</span></label>
+                      <label class="checkbox"><input type="checkbox" id="s0-ins-acc"><span class="checkbox__control" aria-hidden="true"><span class="checkbox__icon-check"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span><span class="checkbox__label">산재보험</span></label>
+                    </div>
+                    <p class="form-field__error text-helper acq-ins-err" id="s0-ins-err" role="alert">상실할 보험을 1개 이상 선택해 주세요.</p>
+                  </div>
+
+                  <!-- 안내 배너 — 상실 보험 선택 상태에 따라 토글 -->
+                  <div class="banner acq-loss-banner acq-partial-banner" role="status">
+                    <span class="icon--md banner__icon" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-info"/></svg></span>
+                    <div class="text-description banner__body">
+                      <p class="banner__message">일부 보험만 상실됩니다. 근로자는 재직 상태로 유지됩니다.</p>
+                    </div>
+                  </div>
+                  <div class="banner banner--caution acq-loss-banner acq-leave-banner" role="status" hidden>
+                    <span class="icon--md banner__icon" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-triangle-alert"/></svg></span>
+                    <div class="text-description banner__body">
+                      <p class="banner__message">전체 퇴사 처리로 진행됩니다. 공단 처리 완료 시 근로자 관리에 퇴사일이 업데이트 돼요.</p>
+                    </div>
+                  </div>
+
+                  <div class="form-field-group--horizontal">
+                    <div class="form-field acq-leave-date-field" hidden>
+                      <label class="form-field__label text-form-label" for="s0-leave-yr">퇴사일(마지막근무일) <span class="form-field__required" aria-hidden="true">(필수)</span></label>
+                      <div class="form-field__body"><div class="dp acq-date-dp" id="s0-leave-dp"><div class="dp__trigger" aria-haspopup="dialog" aria-label="퇴사일 선택"><div class="dp__value-group"><input class="dp__value-part dp__value-part--year" id="s0-leave-yr" type="text" inputmode="numeric" placeholder="YYYY" maxlength="4" aria-label="연도" autocomplete="off" value=""><span class="dp__value-sep" aria-hidden="true">.</span><input class="dp__value-part dp__value-part--md" id="s0-leave-mo" type="text" inputmode="numeric" placeholder="MM" maxlength="2" aria-label="월" autocomplete="off" value=""><span class="dp__value-sep" aria-hidden="true">.</span><input class="dp__value-part dp__value-part--md" id="s0-leave-dy" type="text" inputmode="numeric" placeholder="DD" maxlength="2" aria-label="일" autocomplete="off" value=""></div><span class="dp__chevron" aria-hidden="true"><span class="icon icon--sm"><svg aria-hidden="true"><use href="#icon-calendar"/></svg></span></span></div></div></div>
+                      <div class="form-field__footer"><p class="form-field__error text-helper" id="s0-leave-date-err" role="alert">퇴사일을 선택해 주세요.</p></div>
+                    </div>
+                    <div class="form-field acq-loss-dp-field">
+                      <label class="form-field__label text-form-label" for="s0-loss-yr">상실일 <span class="form-field__required" aria-hidden="true">(필수)</span></label>
+                      <div class="form-field__body"><div class="dp acq-date-dp dp--has-value" id="s0-loss-dp"><div class="dp__trigger" aria-haspopup="dialog" aria-label="상실일 선택"><div class="dp__value-group"><input class="dp__value-part dp__value-part--year" id="s0-loss-yr" type="text" inputmode="numeric" placeholder="YYYY" maxlength="4" aria-label="연도" autocomplete="off" value="2026"><span class="dp__value-sep" aria-hidden="true">.</span><input class="dp__value-part dp__value-part--md" id="s0-loss-mo" type="text" inputmode="numeric" placeholder="MM" maxlength="2" aria-label="월" autocomplete="off" value="07"><span class="dp__value-sep" aria-hidden="true">.</span><input class="dp__value-part dp__value-part--md" id="s0-loss-dy" type="text" inputmode="numeric" placeholder="DD" maxlength="2" aria-label="일" autocomplete="off" value="01"></div><span class="dp__chevron" aria-hidden="true"><span class="icon icon--sm"><svg aria-hidden="true"><use href="#icon-calendar"/></svg></span></span></div></div></div>
+                      <div class="form-field__footer"><p class="form-field__error text-helper" id="s0-loss-date-err" role="alert">상실일을 선택해 주세요.</p></div>
+                    </div>
+                    <div class="form-field acq-loss-auto-field" hidden>
+                      <div class="form-field__label text-form-label acq-label-row" id="s0-loss-auto-label">상실일<span class="tooltip-wrapper" onmouseenter="this.querySelector('.tooltip-panel').classList.add('tooltip-panel--visible')" onmouseleave="this.querySelector('.tooltip-panel').classList.remove('tooltip-panel--visible')"><button class="tooltip-trigger tooltip-trigger--sm" type="button" aria-label="상실일 안내" aria-describedby="s0-loss-tip" onfocus="this.closest('.tooltip-wrapper').querySelector('.tooltip-panel').classList.add('tooltip-panel--visible')" onblur="this.closest('.tooltip-wrapper').querySelector('.tooltip-panel').classList.remove('tooltip-panel--visible')"><svg aria-hidden="true"><use href="#icon-help"/></svg></button><div class="tooltip-panel elevation-tooltip tooltip-panel--bottom" id="s0-loss-tip" role="tooltip">전체 퇴사 시 상실일은 퇴사일 다음 날로 자동 입력돼요.</div></span></div>
+                      <div class="form-field__body"><input class="input input--readonly" type="text" id="s0-loss-auto" aria-labelledby="s0-loss-auto-label" value="" readonly></div>
+                    </div>
+                  </div>
+
+                  <div class="form-field-group--horizontal">
+                    <div class="form-field">
+                      <label class="form-field__label text-form-label" for="s0-cur-amt">당해년도 보수총액 <span class="form-field__required" aria-hidden="true">(필수)</span></label>
+                      <div class="form-field__body"><div class="input-wrap input-wrap--suffix"><input class="input" type="text" id="s0-cur-amt" placeholder="보수총액 입력" inputmode="numeric" aria-required="true"><span class="input__suffix">원</span></div></div>
+                      <div class="form-field__footer"><p class="form-field__error text-helper" id="s0-cur-amt-err" role="alert">보수총액을 입력해 주세요.</p></div>
+                    </div>
+                    <div class="form-field">
+                      <label class="form-field__label text-form-label" for="s0-cur-mon">당해년도 산정월수 <span class="form-field__required" aria-hidden="true">(필수)</span></label>
+                      <div class="form-field__body"><div class="input-wrap input-wrap--suffix"><input class="input" type="text" id="s0-cur-mon" placeholder="산정월수 입력" inputmode="numeric" aria-required="true"><span class="input__suffix">개월</span></div></div>
+                      <div class="form-field__footer"><p class="form-field__error text-helper" id="s0-cur-mon-err" role="alert">산정월수를 입력해 주세요.</p></div>
+                    </div>
+                  </div>
+
+                  <div class="form-field-group--horizontal">
+                    <div class="form-field">
+                      <label class="form-field__label text-form-label" for="s0-prev-amt">전년도 보수총액 <span class="form-field__required" aria-hidden="true">(필수)</span></label>
+                      <div class="form-field__body"><div class="input-wrap input-wrap--suffix"><input class="input" type="text" id="s0-prev-amt" placeholder="보수총액 입력" inputmode="numeric"><span class="input__suffix">원</span></div></div>
+                      <div class="form-field__footer"><p class="form-field__error text-helper" id="s0-prev-amt-err" role="alert">보수총액을 입력해 주세요</p></div>
+                    </div>
+                    <div class="form-field">
+                      <label class="form-field__label text-form-label" for="s0-prev-mon">전년도 산정월수 <span class="form-field__required" aria-hidden="true">(필수)</span></label>
+                      <div class="form-field__body"><div class="input-wrap input-wrap--suffix"><input class="input" type="text" id="s0-prev-mon" placeholder="산정월수 입력" inputmode="numeric"><span class="input__suffix">개월</span></div></div>
+                      <div class="form-field__footer"><p class="form-field__error text-helper" id="s0-prev-mon-err" role="alert">산정월수를 입력해 주세요</p></div>
+                    </div>
+                  </div>
+
+                  <div class="form-field">
+                    <span class="form-field__label text-form-label" id="s0-reason-label">상실 사유 <span class="form-field__required" aria-hidden="true">(필수)</span></span>
+                    <div class="form-field__body acq-reason-group">
+                      <div class="dropdown dropdown--button dropdown--menu acq-reason-dd">
+                        <button class="dropdown__trigger" type="button" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="s0-reason-label"><span class="dropdown__value dropdown__value--placeholder">상실 사유 선택</span><span class="dropdown__chevron" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-chevron-down"/></svg></span></button>
+                        <div class="dropdown__panel"><ul class="dropdown__list" role="listbox" aria-label="상실 사유">
+                          <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">자진 퇴사</span></li>
+                          <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">계약 만료</span></li>
+                          <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">정년 퇴직</span></li>
+                          <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">경영상 필요·회사 사정</span></li>
+                          <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">기타</span></li>
+                        </ul></div>
+                      </div>
+                      <div class="dropdown dropdown--button dropdown--menu acq-reason-dd">
+                        <button class="dropdown__trigger" type="button" aria-haspopup="listbox" aria-expanded="false" aria-label="구체적 사유"><span class="dropdown__value dropdown__value--placeholder">구체적 사유 선택</span><span class="dropdown__chevron" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-chevron-down"/></svg></span></button>
+                        <div class="dropdown__panel"><ul class="dropdown__list" role="listbox" aria-label="구체적 사유">
+                          <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">개인 사정</span></li>
+                          <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">이직</span></li>
+                          <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">질병·부상</span></li>
+                          <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">사업장 이전·폐업</span></li>
+                          <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">기타</span></li>
+                        </ul></div>
+                      </div>
+                    </div>
+                    <div class="form-field__footer"><p class="form-field__error text-helper" id="s0-reason-err" role="alert">상실 사유를 선택해 주세요.</p></div>
+                  </div>
+
+                  <div class="form-field">
+                    <label class="form-field__label text-form-label" for="s0-memo">메모</label>
+                    <div class="form-field__body">
+                      <div class="textarea-wrap textarea-wrap--char-count">
+                        <textarea class="textarea" id="s0-memo" rows="4" maxlength="100" placeholder="요청하시는 업무와 관련하여 담당자에게 전달할 내용을 기재해주세요."></textarea>
+                        <span class="textarea-char-count" aria-hidden="true">0/100</span>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="modal__footer">
+            <button class="btn btn--ghost btn--md" type="button" data-acq-cancel>취소</button>
+            <button class="btn btn--secondary btn--solid btn--md" type="button" data-overlay-open="overlay-draft">임시저장</button>
+            <button class="btn btn--primary btn--md" type="button" id="s0-submit">신고요청</button>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
     <!-- ══════════════ 시나리오 1: 일부 상실 (일부 보험만 상실 · 재직 유지) ══════════════ -->
-    <section class="scenario-panel" data-scenario="일부-상실" data-step>
+    <section class="scenario-panel" data-scenario="일부-상실" data-step hidden>
       <div class="page">
         <div class="modal" role="dialog" aria-modal="true" aria-labelledby="s1-title" style="width:958px;max-width:100%">
 
@@ -253,7 +412,7 @@ exits: index.html
                     <span class="text-form-label file-upload__usage">0MB / 200MB</span>
                   </div>
                   <div class="file-upload__dropzone">
-                    <p class="file-upload__hint">파일을 마우스로 끌어다 놓거나, 추가하기 버튼을 사용해 직접 업로드해 보세요.</p>
+                    <p class="file-upload__hint">파일을 마우스로 끌어다 놓거나,<br>추가하기 버튼을 사용해 직접 업로드해 보세요.</p>
                     <button class="btn btn--secondary btn--sm btn--icon-left" type="button">
                       <span class="icon icon--sm" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-plus"/></svg></span>추가하기
                     </button>
@@ -412,7 +571,7 @@ exits: index.html
                     <span class="text-form-label file-upload__usage">0MB / 200MB</span>
                   </div>
                   <div class="file-upload__dropzone">
-                    <p class="file-upload__hint">파일을 마우스로 끌어다 놓거나, 추가하기 버튼을 사용해 직접 업로드해 보세요.</p>
+                    <p class="file-upload__hint">파일을 마우스로 끌어다 놓거나,<br>추가하기 버튼을 사용해 직접 업로드해 보세요.</p>
                     <button class="btn btn--secondary btn--sm btn--icon-left" type="button">
                       <span class="icon icon--sm" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-plus"/></svg></span>추가하기
                     </button>

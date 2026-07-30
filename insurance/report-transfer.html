@@ -232,7 +232,8 @@ exits: index.html
     <div class="proto-nav-divider" id="proto-nav-divider"></div>
 
     <nav class="proto-nav" id="proto-nav" aria-label="시나리오 선택">
-      <button class="proto-nav-btn is-active" data-scenario="사업장-이동" type="button">사업장 이동</button>
+      <button class="proto-nav-btn is-active" data-scenario="첫-진입" type="button">첫 진입</button>
+      <button class="proto-nav-btn" data-scenario="사업장-이동" type="button">사업장 이동</button>
     </nav>
   </aside>
 
@@ -240,8 +241,128 @@ exits: index.html
 
     <div id="pane-panels">
 
+    <!-- ══════════════ 첫 진입 — 모달 최초 오픈(기본 상태, 전입일 미입력) ══════════════ -->
+    <section class="scenario-panel" data-scenario="첫-진입" data-step>
+      <div class="page">
+        <div class="modal" role="dialog" aria-modal="true" aria-labelledby="c0-title" style="width:958px;max-width:100%">
+
+          <div class="modal__header">
+            <h2 class="modal__title text-modal-title-sm" id="c0-title">사업장 이동 신고</h2>
+            <button class="icon-on--lg" type="button" aria-label="닫기"><svg aria-hidden="true"><use href="#icon-close"/></svg></button>
+          </div>
+
+          <div class="modal__body">
+            <div class="modal__content">
+              <div class="acq-grid">
+
+                <div class="file-upload" id="c0-upload" data-max-mb="200">
+                  <input type="file" id="c0-file-input" hidden multiple>
+                  <div class="file-upload__header">
+                    <span class="text-form-label file-upload__label" style="font-weight:var(--font-weight-heading)">첨부파일<span class="tooltip-wrapper" onmouseenter="this.querySelector('.tooltip-panel').classList.add('tooltip-panel--visible')" onmouseleave="this.querySelector('.tooltip-panel').classList.remove('tooltip-panel--visible')"><button class="tooltip-trigger tooltip-trigger--sm" type="button" aria-label="첨부파일 안내" aria-describedby="c0-upload-tip" onfocus="this.closest('.tooltip-wrapper').querySelector('.tooltip-panel').classList.add('tooltip-panel--visible')" onblur="this.closest('.tooltip-wrapper').querySelector('.tooltip-panel').classList.remove('tooltip-panel--visible')"><svg aria-hidden="true"><use href="#icon-help"/></svg></button><div class="tooltip-panel elevation-tooltip tooltip-panel--top" id="c0-upload-tip" role="tooltip">파일당 10MB 이하 업로드 가능</div></span></span>
+                    <span class="text-form-label file-upload__usage">0MB / 200MB</span>
+                  </div>
+                  <div class="file-upload__dropzone">
+                    <p class="file-upload__hint">파일을 마우스로 끌어다 놓거나,<br>추가하기 버튼을 사용해 직접 업로드해 보세요.</p>
+                    <button class="btn btn--secondary btn--sm btn--icon-left" type="button">
+                      <span class="icon icon--sm" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-plus"/></svg></span>추가하기
+                    </button>
+                    <div class="file-upload__grid"></div>
+                  </div>
+                </div>
+
+                <div class="acq-form">
+
+                  <!-- 1 area — 근로자 정보 (이름·주민번호) 카드 -->
+                  <div class="acq-info-card">
+                    <div class="acq-info-card__item"><span class="acq-info-card__label">이름</span><span class="acq-info-card__value">유가영</span></div>
+                    <div class="acq-info-card__item"><span class="acq-info-card__label">주민번호</span><span class="acq-info-card__value">123456-1234567</span></div>
+                  </div>
+
+                  <!-- 2 area — 신고 사업장 정보 -->
+                  <div class="acq-section">
+                    <span class="text-form-label" id="c0-ws-label">신고 사업장 정보</span>
+                    <ul class="acq-ins-list acq-move-list" aria-labelledby="c0-ws-label">
+                      <li class="acq-ins-item acq-move-item">
+                        <span class="acq-ins-item__name">국민연금</span>
+                        <span class="acq-move-item__flow"><span class="acq-move-item__from">(주)한성산업</span><span class="sr-only">에서</span><span class="acq-move-item__arrow" aria-hidden="true">→</span><span class="acq-move-item__to">(주)한성산업-제조</span><span class="sr-only">(으)로 변경</span></span>
+                      </li>
+                      <li class="acq-ins-item acq-move-item">
+                        <span class="acq-ins-item__name">건강보험</span>
+                        <span class="acq-move-item__flow"><span class="acq-move-item__from">(주)한성산업</span><span class="sr-only">에서</span><span class="acq-move-item__arrow" aria-hidden="true">→</span><span class="acq-move-item__to">(주)한성산업-제조</span><span class="sr-only">(으)로 변경</span></span>
+                      </li>
+                      <li class="acq-ins-item acq-move-item">
+                        <span class="acq-ins-item__name">산재보험</span>
+                        <span class="acq-move-item__flow"><span class="acq-move-item__from">(주)한성산업</span><span class="sr-only">에서</span><span class="acq-move-item__arrow" aria-hidden="true">→</span><span class="acq-move-item__to">(주)한성산업-제조</span><span class="sr-only">(으)로 변경</span></span>
+                      </li>
+                    </ul>
+                  </div>
+
+                  <!-- 3·4 area — 전입일 + 연금 취득월납부여부 -->
+                  <div class="form-field-group--horizontal">
+                    <div class="form-field">
+                      <label class="form-field__label text-form-label" for="c0-in-yr">전입일 <span class="form-field__required" aria-hidden="true">(필수)</span></label>
+                      <div class="form-field__body">
+                        <div class="dp acq-date-dp" id="c0-in-dp">
+                          <div class="dp__trigger" aria-haspopup="dialog" aria-label="전입일 선택">
+                            <div class="dp__value-group">
+                              <input class="dp__value-part dp__value-part--year" id="c0-in-yr" type="text" inputmode="numeric" placeholder="YYYY" maxlength="4" aria-label="연도" autocomplete="off" value="">
+                              <span class="dp__value-sep" aria-hidden="true">.</span>
+                              <input class="dp__value-part dp__value-part--md" id="c0-in-mo" type="text" inputmode="numeric" placeholder="MM" maxlength="2" aria-label="월" autocomplete="off" value="">
+                              <span class="dp__value-sep" aria-hidden="true">.</span>
+                              <input class="dp__value-part dp__value-part--md" id="c0-in-dy" type="text" inputmode="numeric" placeholder="DD" maxlength="2" aria-label="일" autocomplete="off" value="">
+                            </div>
+                            <span class="dp__chevron" aria-hidden="true"><span class="icon icon--sm"><svg aria-hidden="true"><use href="#icon-calendar"/></svg></span></span>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="form-field__footer"><p class="form-field__error text-helper" id="c0-in-date-err" role="alert">전입일을 선택해 주세요.</p></div>
+                    </div>
+
+                    <div class="form-field">
+                      <div class="form-field__label text-form-label acq-label-row" id="c0-pension-label">
+                        연금 취득월납부여부 <span class="form-field__required" aria-hidden="true">(필수)</span>
+                        <span class="tooltip-wrapper" onmouseenter="this.querySelector('.tooltip-panel').classList.add('tooltip-panel--visible')" onmouseleave="this.querySelector('.tooltip-panel').classList.remove('tooltip-panel--visible')">
+                          <button class="tooltip-trigger tooltip-trigger--sm" type="button" aria-label="연금 취득월납부여부 안내" aria-describedby="c0-pension-tip" onfocus="this.closest('.tooltip-wrapper').querySelector('.tooltip-panel').classList.add('tooltip-panel--visible')" onblur="this.closest('.tooltip-wrapper').querySelector('.tooltip-panel').classList.remove('tooltip-panel--visible')"><svg aria-hidden="true"><use href="#icon-help"/></svg></button>
+                          <div class="tooltip-panel elevation-tooltip tooltip-panel--bottom" id="c0-pension-tip" role="tooltip">사업장을 이동한 달의 국민연금 보험료를 어느 사업장에서 납부할지 선택하세요.<br>• 희망 (새 사업장에서 납부)<br>• 미희망 (기존 사업장에서 납부)</div>
+                        </span>
+                      </div>
+                      <div class="form-field__body">
+                        <fieldset class="radio-group radio-group--horizontal" id="c0-pension-group" aria-labelledby="c0-pension-label">
+                          <label class="radio"><input type="radio" name="c0-pension" value="희망"><span class="radio__control" aria-hidden="true"></span><span class="radio__label">희망</span></label>
+                          <label class="radio"><input type="radio" name="c0-pension" value="미희망" checked><span class="radio__control" aria-hidden="true"></span><span class="radio__label">미희망</span></label>
+                        </fieldset>
+                        <p class="form-field__help text-helper acq-pension-hint" hidden>전입일이 1일이면 새 사업장에서 납부(희망)로 고정돼요.</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="form-field">
+                    <label class="form-field__label text-form-label" for="c0-memo">메모</label>
+                    <div class="form-field__body">
+                      <div class="textarea-wrap textarea-wrap--char-count">
+                        <textarea class="textarea" id="c0-memo" rows="4" maxlength="100" placeholder="요청하시는 업무와 관련하여 담당자에게 전달할 내용을 기재해주세요."></textarea>
+                        <span class="textarea-char-count" aria-hidden="true">0/100</span>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="modal__footer">
+            <button class="btn btn--ghost btn--md" type="button" data-acq-cancel>취소</button>
+            <button class="btn btn--secondary btn--solid btn--md" type="button" data-overlay-open="overlay-draft">임시저장</button>
+            <button class="btn btn--primary btn--md" type="button" id="c0-submit">신고요청</button>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
     <!-- ══════════════ 사업장 이동 신고 ══════════════ -->
-    <section class="scenario-panel" data-scenario="사업장-이동" data-step>
+    <section class="scenario-panel" data-scenario="사업장-이동" data-step hidden>
       <div class="page">
         <div class="modal" role="dialog" aria-modal="true" aria-labelledby="c1-title" style="width:958px;max-width:100%">
 
@@ -261,7 +382,7 @@ exits: index.html
                     <span class="text-form-label file-upload__usage">0MB / 200MB</span>
                   </div>
                   <div class="file-upload__dropzone">
-                    <p class="file-upload__hint">파일을 마우스로 끌어다 놓거나, 추가하기 버튼을 사용해 직접 업로드해 보세요.</p>
+                    <p class="file-upload__hint">파일을 마우스로 끌어다 놓거나,<br>추가하기 버튼을 사용해 직접 업로드해 보세요.</p>
                     <button class="btn btn--secondary btn--sm btn--icon-left" type="button">
                       <span class="icon icon--sm" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-plus"/></svg></span>추가하기
                     </button>
