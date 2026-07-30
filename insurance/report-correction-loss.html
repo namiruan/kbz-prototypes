@@ -56,6 +56,7 @@
     /* 상실 취소 대상 보험 — 체크박스 가로 나열, 상실 정보와 맞춰 가운데 정렬 */
     .corr-ins-checks { display: flex; flex-wrap: wrap; gap: var(--space-gap-lg); justify-content: center; }
     .corr-cc-ins .form-field__label { text-align: center; }
+    .corr-cc-ins .form-field__footer { justify-content: center; text-align: center; }
     /* 상실 정보 — 읽기 전용 데이터테이블 인포(내용 폭만큼, 가운데 정렬) */
     .corr-subsection { align-self: center; max-width: 100%; }
     .corr-sub-title { display: block; text-align: center; font-size: var(--font-size-sm); font-weight: var(--font-weight-body); color: var(--color-text-body); margin-bottom: var(--space-gap-xs); }
@@ -251,6 +252,7 @@ exits: insurance-join-status.html, index.html
                                 <label class="checkbox"><input type="checkbox" id="c1-cc-ins-pen" checked><span class="checkbox__control" aria-hidden="true"><span class="checkbox__icon-check"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span><span class="checkbox__label">국민연금</span></label>
                               </div>
                             </div>
+                            <div class="form-field__footer"><p class="form-field__error text-helper" id="c1-cc-ins-err" role="alert">상실 취소할 보험을 1개 이상 선택해 주세요.</p></div>
                           </div>
                           <!-- 7 area — 상실 정보 (읽기 전용) -->
                           <div class="corr-subsection">
@@ -674,7 +676,12 @@ exits: insurance-join-status.html, index.html
   }
   root.addEventListener('change', function (e) {
     if (e.target && e.target.type === 'checkbox' && e.target.closest('.corr-ins-checks')) {
-      syncCancelIns(e.target.closest('.scenario-panel'));
+      var panel = e.target.closest('.scenario-panel');
+      syncCancelIns(panel);
+      var insField = panel.querySelector('.corr-cc-ins');
+      if (insField && Array.prototype.slice.call(insField.querySelectorAll('input[type="checkbox"]:not([disabled])')).some(function (c) { return c.checked; })) {
+        insField.classList.remove('form-field--error');
+      }
     }
   });
 
@@ -758,6 +765,13 @@ exits: insurance-join-status.html, index.html
           shake(f); firstBad = firstBad || document.querySelector('#c1-lr-reason .dropdown__trigger'); ok = false;
         }
       } else if (item === 'cancel') {
+        /* 상실 취소 대상 보험 — 선택 가능한 보험을 모두 해제하면 에러 */
+        var insField = panel.querySelector('.corr-cc-ins');
+        var enabledIns = insField ? Array.prototype.slice.call(insField.querySelectorAll('input[type="checkbox"]:not([disabled])')) : [];
+        if (insField && !enabledIns.some(function (c) { return c.checked; })) {
+          insField.classList.add('form-field--error');
+          shake(insField); firstBad = firstBad || enabledIns[0]; ok = false;
+        } else if (insField) { insField.classList.remove('form-field--error'); }
         var r = document.getElementById('c1-cc-reason');
         if (!r.value.trim()) { setFieldError(r.closest('.form-field').id || (r.closest('.form-field').id = 'c1-cc-reason-field'), 'c1-cc-reason-err', '상실취소 사유를 입력해 주세요.'); shake(r.closest('.form-field')); firstBad = firstBad || r; ok = false; }
       }
