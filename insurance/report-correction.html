@@ -68,14 +68,13 @@
     .corr-field-row > .form-field { display: flex; flex-direction: column; gap: var(--space-gap-xs); flex: 0 1 200px; }
     .corr-field-row .input { max-width: 200px; }
     .corr-field-arrow { flex: 0 0 auto; align-self: flex-start; margin-top: calc(var(--font-size-sm) + var(--space-gap-xs)); height: var(--height-base); display: inline-flex; align-items: center; color: var(--color-text-subtle); font-size: var(--font-size-lg); }
-    /* 취득 정보 — 읽기 전용 참조 데이터. 입력(취득취소 사유)이 주인공이므로 흰 패널(강한 대비) 대신
-       옅은 실선 테두리만으로 '하나의 묶음'처럼 조용히 그룹핑한다(채움 없음 → 시선 안 뺏김). */
-    .corr-subsection { border: var(--stroke-sm) solid var(--color-border-subtle); border-radius: var(--radius-md); padding: var(--space-inset-md) var(--space-inset-lg); }
-    .corr-sub-title { display: block; font-size: var(--font-size-sm); font-weight: var(--font-weight-medium); color: var(--color-text-subtle); margin-bottom: var(--space-gap-sm); }
-    .corr-dl { display: grid; grid-template-columns: max-content 1fr; column-gap: var(--space-gap-2xl); row-gap: var(--space-gap-sm); margin: 0; }
-    .corr-dl dt { color: var(--color-text-subtle); }
-    .corr-dl dd { margin: 0; color: var(--color-text-body); }
-    .corr-dl dd.corr-dl__brand { color: var(--color-text-brand); font-weight: var(--font-weight-heading); }
+    /* 취득 정보 — 읽기 전용 참조 데이터. 데이터테이블 인포(table--info: 상하 구분선만) 형태로 가볍게 얹고,
+       내용 폭만큼만 차지하도록(fit-content) 가로를 줄여 입력(취득취소 사유)이 계속 주인공이 되게 한다. */
+    .corr-subsection { align-self: flex-start; max-width: 100%; }
+    .corr-sub-title { display: block; font-size: var(--font-size-sm); font-weight: var(--font-weight-medium); color: var(--color-text-subtle); margin-bottom: var(--space-gap-xs); }
+    .corr-info-table.table-container { border-left: 0; border-right: 0; border-radius: 0; width: fit-content; max-width: 100%; }
+    .corr-info-table .table__cell.corr-info-key { white-space: nowrap; color: var(--color-text-subtle); font-weight: var(--font-weight-medium); padding-right: var(--space-gap-2xl); }
+    .corr-info-table .table__cell.corr-info-brand { color: var(--color-text-brand); font-weight: var(--font-weight-heading); }
 
     /* ── 제출서류 안내 — 체크된 항목이 있을 때만 노출, Disclosure로 접기 ── */
     .corr-doc[hidden] { display: none; }
@@ -229,13 +228,17 @@ exits: insurance-join-status.html, index.html
                         <div class="corr-card__body" id="c1-cc-body" hidden>
                           <div class="corr-subsection">
                             <span class="corr-sub-title">취득 정보</span>
-                            <dl class="corr-dl">
-                              <dt>취득일</dt><dd>2024-03-01</dd>
-                              <dt>신고 보험</dt><dd class="corr-dl__brand">건강보험, 국민연금, 고용보험</dd>
-                              <dt>월급여액</dt><dd>3,200,000 원</dd>
-                              <dt>주소정근로시간</dt><dd>40시간</dd>
-                              <dt>직종</dt><dd>사무직</dd>
-                            </dl>
+                            <div class="table-container corr-info-table">
+                              <table class="table table--info table--dense">
+                                <tbody class="table__body">
+                                  <tr class="table__row"><td class="table__cell corr-info-key">취득일</td><td class="table__cell">2024-03-01</td></tr>
+                                  <tr class="table__row"><td class="table__cell corr-info-key">신고 보험</td><td class="table__cell corr-info-brand">건강보험, 국민연금, 고용보험</td></tr>
+                                  <tr class="table__row"><td class="table__cell corr-info-key">월급여액</td><td class="table__cell">3,200,000 원</td></tr>
+                                  <tr class="table__row"><td class="table__cell corr-info-key">주소정근로시간</td><td class="table__cell">40시간</td></tr>
+                                  <tr class="table__row"><td class="table__cell corr-info-key">직종</td><td class="table__cell">사무직</td></tr>
+                                </tbody>
+                              </table>
+                            </div>
                           </div>
                           <div class="form-field">
                             <label class="form-field__label text-form-label" for="c1-cc-reason">취득취소 사유 <span class="form-field__required" aria-hidden="true">(필수)</span></label>
