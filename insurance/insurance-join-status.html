@@ -1755,5 +1755,33 @@ exits: report-acquire.html, report-loss.html, report-transfer.html, report-chang
 })();
 </script>
 
+<script>
+/* ── 신고 완료 후 목록 복귀 시 성공 토스트 (?submitted=<유형>) ── */
+(function () {
+  var m = /[?&]submitted=([^&]+)/.exec(location.search);
+  if (!m) return;
+  var LABEL = { acquire: '취득', loss: '상실', transfer: '사업장 이동', change: '보수변경', correction: '정정' };
+  var label = LABEL[m[1]] || '';
+  /* URL 정리 — 새로고침 시 토스트 중복 방지 */
+  if (history.replaceState) history.replaceState(null, '', location.pathname);
+  function show() {
+    if (typeof makeToast !== 'function') { setTimeout(show, 100); return; }
+    var stack = document.getElementById('app-toast-stack');
+    if (!stack) {
+      stack = document.createElement('div');
+      stack.id = 'app-toast-stack';
+      stack.setAttribute('aria-live', 'polite');
+      stack.style.cssText = 'position:fixed;bottom:var(--space-24);left:50%;transform:translateX(-50%);display:flex;flex-direction:column;gap:var(--space-gap-sm);z-index:2000;pointer-events:none;';
+      document.body.appendChild(stack);
+    }
+    var t = makeToast('success', null, (label ? label + ' ' : '') + '신고가 접수되었어요.');
+    t.style.pointerEvents = 'auto';
+    stack.appendChild(t);
+  }
+  /* 아이콘 sprite 주입(fetch)이 끝난 뒤 노출되도록 약간 지연 */
+  setTimeout(show, 400);
+})();
+</script>
+
 </body>
 </html>

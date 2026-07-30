@@ -206,8 +206,8 @@ exits: index.html
     <div class="proto-nav-divider" id="proto-nav-divider"></div>
 
     <nav class="proto-nav" id="proto-nav" aria-label="시나리오 선택">
-      <button class="proto-nav-btn is-active" data-scenario="작성-중" type="button">작성 중</button>
-      <button class="proto-nav-btn" data-scenario="첫-진입" type="button">첫 진입</button>
+      <button class="proto-nav-btn is-active" data-scenario="첫-진입" type="button">첫 진입</button>
+      <button class="proto-nav-btn" data-scenario="작성-중" type="button">작성 중</button>
       <button class="proto-nav-btn" data-scenario="로딩" type="button">로딩</button>
       <button class="proto-nav-btn" data-scenario="제약-케이스" type="button">이미 가입</button>
       <button class="proto-nav-btn" data-scenario="저장-실패" type="button">저장 실패</button>
@@ -219,7 +219,7 @@ exits: index.html
     <div id="pane-panels">
 
     <!-- ══════════════ 시나리오 1: 작성 중 (Figma 기본 상태) ══════════════ -->
-    <section class="scenario-panel" data-scenario="작성-중" data-step>
+    <section class="scenario-panel" data-scenario="작성-중" data-step hidden>
       <div class="page">
         <div class="modal" role="dialog" aria-modal="true" aria-labelledby="s1-title" style="width:958px;max-width:100%">
 
@@ -409,7 +409,7 @@ exits: index.html
     </section>
 
     <!-- ══════════════ 시나리오 2: 첫 진입 (빈 폼) ══════════════ -->
-    <section class="scenario-panel" data-scenario="첫-진입" data-step hidden>
+    <section class="scenario-panel" data-scenario="첫-진입" data-step>
       <div class="page">
         <div class="modal" role="dialog" aria-modal="true" aria-labelledby="s2-title" style="width:958px;max-width:100%">
 
@@ -1614,7 +1614,7 @@ exits: index.html
     setTimeout(function () {
       clearButtonLoading(btn);
       closeOverlay(document.getElementById('overlay-submit'));
-      location.href = 'insurance-join-status.html';
+      location.href = 'insurance-join-status.html?submitted=acquire';
     }, 1500);   /* 프로토타입 연출용 딜레이 */
   });
 
