@@ -69,10 +69,11 @@
     .corr-field-row .input { max-width: 200px; }
     .corr-field-arrow { flex: 0 0 auto; align-self: flex-start; margin-top: calc(var(--font-size-sm) + var(--space-gap-xs)); height: var(--height-base); display: inline-flex; align-items: center; color: var(--color-text-subtle); font-size: var(--font-size-lg); }
     /* 취득 정보 — 읽기 전용 참조 데이터. 데이터테이블 인포(table--info: 상하 구분선만) 형태로 가볍게 얹고,
-       내용 폭만큼만 차지하도록(fit-content) 가로를 줄여 입력(취득취소 사유)이 계속 주인공이 되게 한다. */
-    .corr-subsection { align-self: flex-start; max-width: 100%; }
-    .corr-sub-title { display: block; font-size: var(--font-size-sm); font-weight: var(--font-weight-medium); color: var(--color-text-subtle); margin-bottom: var(--space-gap-xs); }
-    .corr-info-table.table-container { border-left: 0; border-right: 0; border-radius: 0; width: fit-content; max-width: 100%; }
+       내용 폭만큼만 차지하도록(fit-content) 가로를 줄이고 카드 안에서 가운데 정렬한다. */
+    .corr-subsection { align-self: center; max-width: 100%; }
+    /* 소제목 라벨 — 같은 카드 안 다른 라벨(취득취소 사유)과 동일한 폼 라벨 톤(text-form-label: body색) */
+    .corr-sub-title { display: block; text-align: center; font-size: var(--font-size-sm); font-weight: var(--font-weight-body); color: var(--color-text-body); margin-bottom: var(--space-gap-xs); }
+    .corr-info-table.table-container { border-left: 0; border-right: 0; border-radius: 0; width: fit-content; max-width: 100%; margin-left: auto; margin-right: auto; }
     .corr-info-table .table__cell.corr-info-key { white-space: nowrap; color: var(--color-text-subtle); font-weight: var(--font-weight-medium); padding-right: var(--space-gap-2xl); }
     .corr-info-table .table__cell.corr-info-brand { color: var(--color-text-brand); font-weight: var(--font-weight-heading); }
 
