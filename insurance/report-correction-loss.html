@@ -107,6 +107,10 @@ exits: insurance-join-status.html, index.html
 
     <nav class="proto-nav" id="proto-nav" aria-label="시나리오 선택">
       <button class="proto-nav-btn is-active" data-scenario="첫-진입" type="button">첫 진입</button>
+      <button class="proto-nav-btn" data-scenario="성명-변경" type="button">성명 변경</button>
+      <button class="proto-nav-btn" data-scenario="상실일-정정" type="button">상실일 정정</button>
+      <button class="proto-nav-btn" data-scenario="상실사유-변경" type="button">상실사유 변경</button>
+      <button class="proto-nav-btn" data-scenario="상실-취소" type="button">상실 취소</button>
     </nav>
   </aside>
 
@@ -571,12 +575,14 @@ exits: insurance-join-status.html, index.html
       }
     });
   });
+  /* 정정신고는 단일 패널이라 패널을 교체하지 않고, 해당 항목을 선택한 프리셋 상태를 보여준다. */
   document.querySelectorAll('.proto-nav-btn').forEach(function(btn) {
     btn.addEventListener('click', function() {
       closeAllOverlays();
       var name = this.dataset.scenario;
-      protoPanels.forEach(function(p) { p.hidden = p.dataset.scenario !== name; });
       document.querySelectorAll('.proto-nav-btn').forEach(function(b) { b.classList.toggle('is-active', b.dataset.scenario === name); });
+      if (window.applyCorrScenario) window.applyCorrScenario(name);
+      else protoPanels.forEach(function(p) { p.hidden = p.dataset.scenario !== name; });
     });
   });
 
@@ -850,6 +856,50 @@ exits: insurance-join-status.html, index.html
     var cancelBtn = cancelOv.querySelector('.btn--secondary');
     if (cancelBtn) cancelBtn.addEventListener('click', function () { location.href = 'insurance-join-status.html'; });
   }
+
+  /* ── 시나리오 프리셋 — 단일 패널에서 항목을 선택한 모습을 보여준다(상실) ── */
+  function ddApply(ddId, label, placeholder) {
+    var dd = document.getElementById(ddId); if (!dd) return;
+    var target = null;
+    dd.querySelectorAll('.dropdown__option').forEach(function (o) {
+      var t = o.querySelector('.dropdown__option-label');
+      if (label && t && t.textContent.trim() === label) target = o;
+      o.classList.remove('dropdown__option--selected'); o.setAttribute('aria-selected', 'false');
+    });
+    var val = dd.querySelector('.dropdown__value');
+    if (target) { target.classList.add('dropdown__option--selected'); target.setAttribute('aria-selected', 'true'); if (val) { val.textContent = label; val.classList.remove('dropdown__value--placeholder'); } }
+    else if (val) { val.textContent = placeholder; val.classList.add('dropdown__value--placeholder'); }
+  }
+  function resetPanel(panel) {
+    itemChecks(panel).forEach(function (c) { c.checked = false; syncCard(c); });
+    ['c1-nc-after', 'c1-ld-after', 'c1-cc-reason'].forEach(function (id) {
+      var el = document.getElementById(id); if (!el) return;
+      el.value = '';
+      el.classList.remove('input--error', 'input--complete', 'input--success');
+      var f = el.closest('.form-field'); if (f) f.classList.remove('form-field--error');
+    });
+    ddApply('c1-lr-reason', null, '상실 사유 선택');
+    ddApply('c1-lr-detail', null, '구체적 사유 선택');
+    var lrf = document.getElementById('c1-lr-field'); if (lrf) lrf.classList.remove('form-field--error');
+    /* 상실 취소 대상 보험 기본값 복원(고용·산재·국민연금 선택, 건강 비활성) */
+    ['c1-cc-ins-emp', 'c1-cc-ins-acc', 'c1-cc-ins-pen'].forEach(function (id) { var c = document.getElementById(id); if (c) c.checked = true; });
+    var hea = document.getElementById('c1-cc-ins-hea'); if (hea) hea.checked = false;
+    var ccins = panel.querySelector('.corr-cc-ins'); if (ccins) ccins.classList.remove('form-field--error');
+    syncCancelIns(panel);
+    var up = panel.querySelector('.file-upload'); if (up) up.classList.remove('file-upload--error');
+    var items = panel.querySelector('.corr-items'); if (items) items.classList.remove('corr-items--error');
+    var hint = panel.querySelector('.corr-empty-hint'); if (hint) hint.textContent = '정정할 항목을 선택하면 입력란이 표시돼요.';
+  }
+  window.applyCorrScenario = function (name) {
+    var panel = document.querySelector('#pane-panels > .scenario-panel'); if (!panel) return;
+    resetPanel(panel);
+    function preset(checkId, val, valId) { var c = document.getElementById(checkId); if (c) { c.checked = true; syncCard(c); } if (valId && val != null) { var el = document.getElementById(valId); if (el) el.value = val; } }
+    if (name === '성명-변경') preset('c1-nc-check', '홍가영', 'c1-nc-after');
+    else if (name === '상실일-정정') preset('c1-ld-check', '2024-06-15', 'c1-ld-after');
+    else if (name === '상실사유-변경') { preset('c1-lr-check'); ddApply('c1-lr-reason', '자진 퇴사', '상실 사유 선택'); ddApply('c1-lr-detail', '이직', '구체적 사유 선택'); }
+    else if (name === '상실-취소') preset('c1-cc-check', '착오로 접수된 상실 신고를 취소합니다.', 'c1-cc-reason');
+    syncDoc(panel); syncEmptyHint(panel);
+  };
 
   /* 초기 상태 동기화 */
   Array.prototype.forEach.call(document.querySelectorAll('#pane-panels > .scenario-panel'), function (panel) {
