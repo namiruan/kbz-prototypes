@@ -155,6 +155,8 @@ exits: insurance-join-status.html, index.html
                   <!-- 2 area — 정정신고 항목 (카드 제목 체크박스 → 체크 시 입력란 노출) -->
                   <div class="corr-items" id="c1-items">
                     <span class="text-form-label" id="c1-items-label">정정신고 항목</span>
+                    <!-- 2-1 area — 선택된 정정신고 항목 없을 경우: 타이틀 라벨 바로 아래 안내 -->
+                    <p class="corr-empty-hint text-helper" id="c1-empty-hint">정정할 항목을 선택하면 입력란이 표시돼요.</p>
 
                     <div class="corr-cards" role="group" aria-labelledby="c1-items-label">
 
@@ -167,7 +169,7 @@ exits: insurance-join-status.html, index.html
                           <div class="corr-field-row">
                             <div class="form-field">
                               <label class="form-field__label text-form-label" for="c1-nc-before">변경 전</label>
-                              <div class="form-field__body"><input class="input" id="c1-nc-before" type="text" value="홍길동" readonly></div>
+                              <div class="form-field__body"><input class="input input--readonly" id="c1-nc-before" type="text" value="홍길동" readonly></div>
                             </div>
                             <div class="form-field">
                               <label class="form-field__label text-form-label" for="c1-nc-after">변경 후 <span class="form-field__required" aria-hidden="true">(필수)</span></label>
@@ -187,7 +189,7 @@ exits: insurance-join-status.html, index.html
                           <div class="corr-field-row">
                             <div class="form-field">
                               <label class="form-field__label text-form-label" for="c1-dc-before">변경 전</label>
-                              <div class="form-field__body"><input class="input" id="c1-dc-before" type="text" value="2025-01-01" readonly></div>
+                              <div class="form-field__body"><input class="input input--readonly" id="c1-dc-before" type="text" value="2025-01-01" readonly></div>
                             </div>
                             <div class="form-field">
                               <label class="form-field__label text-form-label" for="c1-dc-after">변경 후 <span class="form-field__required" aria-hidden="true">(필수)</span></label>
@@ -229,9 +231,6 @@ exits: insurance-join-status.html, index.html
                       </div>
 
                     </div>
-
-                    <!-- 2-1 area — 선택된 정정신고 항목 없을 경우 -->
-                    <p class="corr-empty-hint text-helper" id="c1-empty-hint">정정할 항목을 선택하면 입력란이 표시돼요.</p>
                   </div>
 
                   <!-- 5·8 area — 제출서류 안내 (체크된 항목별 행, Disclosure로 접기) -->
