@@ -17,8 +17,11 @@
     /* 모달 본문 2열 — 좌 첨부파일(Figma 314px) + 우 폼 */
     .acq-grid { display: grid; grid-template-columns: 314px 1fr; gap: var(--space-gap-2xl); align-items: stretch; }
     .acq-grid > .file-upload { height: 100%; }
-    .acq-grid > .file-upload .file-upload__dropzone { flex: 1 1 auto; }
-    /* 첨부파일 라벨 — 안내 문구·용량 제한은 라벨 옆 도움말(?) 툴팁으로 이동. 트리거를 라벨과 세로 중앙 정렬 */
+    /* 드롭존 — 안내 문구·버튼을 드래그 영역 가운데(가로·세로) 정렬 */
+    .acq-grid > .file-upload .file-upload__dropzone { flex: 1 1 auto; align-items: center; justify-content: center; }
+    /* 드래그 안내 문구 — 드롭 영역 안 가운데 정렬 */
+    .corr-drop-hint { margin: 0; max-width: 24em; text-align: center; color: var(--color-text-subtle); font-size: var(--font-size-sm); line-height: var(--line-height-reading); }
+    /* 첨부파일 라벨 — 용량 제한(*파일당 10MB…)은 라벨 옆 도움말(?) 툴팁으로. 트리거를 라벨과 세로 중앙 정렬 */
     .file-upload__label { display: inline-flex; align-items: center; gap: var(--space-gap-2xs); }
     /* 폼 세로 스택 — 섹션 간격을 넓게 */
     .acq-form { display: flex; flex-direction: column; gap: var(--space-gap-xl); }
@@ -131,10 +134,11 @@ exits: insurance-join-status.html, index.html
                 <div class="file-upload" id="c1-upload" data-max-mb="200">
                   <input type="file" id="c1-file-input" hidden multiple>
                   <div class="file-upload__header">
-                    <span class="text-form-label file-upload__label" style="font-weight:var(--font-weight-heading)">첨부파일 <span class="form-field__required" aria-hidden="true">(필수)</span><span class="tooltip-wrapper" onmouseenter="this.querySelector('.tooltip-panel').classList.add('tooltip-panel--visible')" onmouseleave="this.querySelector('.tooltip-panel').classList.remove('tooltip-panel--visible')"><button class="tooltip-trigger tooltip-trigger--sm" type="button" aria-label="첨부파일 안내" aria-describedby="c1-upload-tip" onfocus="this.closest('.tooltip-wrapper').querySelector('.tooltip-panel').classList.add('tooltip-panel--visible')" onblur="this.closest('.tooltip-wrapper').querySelector('.tooltip-panel').classList.remove('tooltip-panel--visible')"><svg aria-hidden="true"><use href="#icon-help"/></svg></button><div class="tooltip-panel elevation-tooltip tooltip-panel--bottom" id="c1-upload-tip" role="tooltip">파일을 마우스로 끌어다 놓거나, 추가하기 버튼을 사용해 직접 업로드해 보세요.<br>*파일당 10MB 이하 업로드 가능</div></span></span>
+                    <span class="text-form-label file-upload__label" style="font-weight:var(--font-weight-heading)">첨부파일 <span class="form-field__required" aria-hidden="true">(필수)</span><span class="tooltip-wrapper" onmouseenter="this.querySelector('.tooltip-panel').classList.add('tooltip-panel--visible')" onmouseleave="this.querySelector('.tooltip-panel').classList.remove('tooltip-panel--visible')"><button class="tooltip-trigger tooltip-trigger--sm" type="button" aria-label="첨부파일 안내" aria-describedby="c1-upload-tip" onfocus="this.closest('.tooltip-wrapper').querySelector('.tooltip-panel').classList.add('tooltip-panel--visible')" onblur="this.closest('.tooltip-wrapper').querySelector('.tooltip-panel').classList.remove('tooltip-panel--visible')"><svg aria-hidden="true"><use href="#icon-help"/></svg></button><div class="tooltip-panel elevation-tooltip tooltip-panel--bottom" id="c1-upload-tip" role="tooltip">*파일당 10MB 이하 업로드 가능</div></span></span>
                     <span class="text-form-label file-upload__usage">0MB / 200MB</span>
                   </div>
                   <div class="file-upload__dropzone">
+                    <p class="corr-drop-hint">파일을 마우스로 끌어다 놓거나, 추가하기 버튼을 사용해 직접 업로드해 보세요.</p>
                     <button class="btn btn--secondary btn--sm btn--icon-left" type="button">
                       <span class="icon icon--sm" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-plus"/></svg></span>추가하기
                     </button>
