@@ -36,9 +36,9 @@
     .corr-items--error .corr-empty-hint { color: var(--color-text-error); }
 
     /* ── 체크 항목 카드 — 카드 제목에 체크박스, 체크 시 입력란 노출 ──
-       활성/비활성은 테두리가 아니라 '배경색'으로 구분한다:
-       비활성(미선택) = 옅은 회색 채움(꺼진 느낌) · 활성(선택) = 브랜드 옅은 채움. */
-    .corr-card { border: var(--stroke-sm) solid var(--color-border-subtle); border-radius: var(--radius-md); overflow: hidden; background: var(--color-surface-subtle); transition: background var(--duration-fast) var(--easing-base); }
+       미니멀 스타일: 테두리·회색 채움 없이, 비활성은 평범한 체크박스 행,
+       활성(선택)일 때만 브랜드 옅은 채움 패널로 드러난다. */
+    .corr-card { border-radius: var(--radius-md); overflow: hidden; background: transparent; transition: background var(--duration-fast) var(--easing-base); }
     .corr-card--checked { background: var(--color-surface-brand-subtle); }
     /* 헤더 = 체크박스 전체 폭. 라벨(제목)까지 클릭하면 토글 */
     .corr-card__head { display: block; }
@@ -46,7 +46,7 @@
     .corr-card__head .checkbox__label { font-size: var(--font-size-base); font-weight: var(--font-weight-heading); color: var(--color-text-body); }
     .corr-card--checked .corr-card__head .checkbox__label { color: var(--color-text-brand); }
     /* 본문 — 체크 시에만 노출. 헤더와 구분선 */
-    .corr-card__body { padding: var(--space-inset-lg); padding-top: var(--space-gap-lg); border-top: var(--stroke-sm) solid var(--color-border-subtle); display: flex; flex-direction: column; gap: var(--space-gap-lg); }
+    .corr-card__body { padding: 0 var(--space-inset-lg) var(--space-inset-lg); display: flex; flex-direction: column; gap: var(--space-gap-lg); }
     .corr-card__body[hidden] { display: none; }
     /* 변경 전/후 가로 2필드 */
     .corr-field-row { display: flex; flex-wrap: wrap; align-items: flex-start; column-gap: var(--space-gap-lg); row-gap: var(--space-gap-md); }
