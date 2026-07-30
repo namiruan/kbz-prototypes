@@ -22,18 +22,26 @@
     /* 첨부파일 열 — 내용이 적으면 우측 폼 높이에 맞춰 늘어나(모달도 내용만큼만 줄어듦),
        많으면 보이는 영역(max-height)에서 멈추고 리스트만 내부 스크롤한다. sticky로 화면에 고정.
        (modal.md '첨부·조회 사이드 + 폼 2열 본문 레이아웃' 패턴) */
-    .acq-grid > .file-upload { position: sticky; top: 0; max-height: calc(90vh - 172px); min-height: 0; overflow: hidden; }
+    /* 안내 배너가 헤더 아래 고정 밴드로 빠져 콘텐츠 영역이 줄어든 만큼 상한을 더 크게 뺀다(밴드 ≈ 130px) */
+    .acq-grid > .file-upload { position: sticky; top: 0; max-height: calc(90vh - 300px); min-height: 0; overflow: hidden; }
     .acq-grid > .file-upload .file-upload__dropzone { flex: 1 1 auto; min-height: 240px; overflow: hidden; align-items: center; justify-content: center; }
     /* 파일이 있으면: 안내문 숨기고 상단 정렬 + 그리드만 세로 스크롤(썸네일 자연 높이 유지) */
     .acq-grid > .file-upload .file-upload__dropzone:has(.file-upload-item) { justify-content: flex-start; }
     .acq-grid > .file-upload .file-upload__dropzone:has(.file-upload-item) .file-upload__hint { display: none; }
     .acq-grid > .file-upload .file-upload__dropzone:has(.file-upload-item) .file-upload__grid { flex: 1 1 auto; min-height: 0; overflow-y: auto; align-content: start; grid-auto-rows: max-content; }
+    /* 첨부파일 필수(20%↑ & 국민연금 선택)인데 미첨부 시 에러 — 첨부파일 타이틀 아래 표기 */
+    .acq-upload-err { display: none; margin: 0; color: var(--color-text-error); font-size: var(--font-size-sm); }
+    .file-upload--error .acq-upload-err { display: block; }
     /* 첨부파일 신규 기본값(DS file-upload v0.4.0) — 안내문 드롭존 안 가운데 + 라벨 도움말(?) 툴팁 */
     .file-upload__label { display: inline-flex; align-items: center; gap: var(--space-gap-2xs); }
     .file-upload__hint { margin: 0; max-width: 28em; text-align: center; color: var(--color-text-subtle); font-size: var(--font-size-sm); line-height: var(--line-height-reading); word-break: keep-all; }
     /* 자격 안내 배너 묶음 — 헤더 아래 전체폭. 성격이 다른 두 안내를 독립 배너(아이콘·타이틀 1:1)로 스택 */
-    .acq-intro-banners { display: flex; flex-direction: column; gap: var(--space-gap-sm); margin-bottom: var(--space-gap-xl); }
-    .modal:not(.modal--lg) .modal__content:has(> .acq-intro-banners) { padding-top: 0; }
+    .acq-intro-banners { display: flex; flex-direction: column; gap: var(--space-gap-sm); }
+    /* 안내 배너를 헤더 아래 고정 밴드로 — modal__body를 세로 스택으로 바꿔 배너(고정) + 콘텐츠(스크롤).
+       배너는 항상 보이고, 아래 본문(첨부파일 sticky 열 포함)만 스크롤된다. */
+    .modal__body:has(> .acq-intro-banners) { flex-direction: column; }
+    /* 밴드 상하 패딩 0 — 타이틀과의 간격은 헤더 pad-bottom(≈16), 본문과의 간격은 content pad-top(≈16)이 담당 */
+    .modal__body > .acq-intro-banners { flex-shrink: 0; padding: 0 var(--space-inset-3xl); margin: 0; }
     /* 국민연금 변경신고 자격 조건 — a·b(알파벳) 순서 목록. 배너 본문 톤 유지 */
     .acq-elig-list { margin: 0; padding-left: var(--space-inset-xl); list-style: lower-alpha; display: flex; flex-direction: column; gap: var(--space-gap-2xs); font-size: var(--font-size-sm); line-height: var(--line-height-reading); }
     /* 조건 부연(적용 시점) — 한 톤 옅게 */
@@ -307,41 +315,40 @@ exits: index.html
           </div>
 
           <div class="modal__body">
-            <div class="modal__content">
-              <!-- 1 area — 신고 자격 안내. 성격이 다른 두 안내라 각각 독립 배너(아이콘·타이틀 1:1)로 둔다:
-                   ① 자진신고 사업장의 고용·산재 신고 제약, ② 국민연금 변경신고 가능 조건(a·b).
-                   ②는 조건 목록이 길어 Disclosure(icon-only)로 타이틀 옆에서 접고 펼칠 수 있게 한다.
-                   20% 변동에 따른 선택·증빙 고지는 b 조건에 속하므로 b 아래에 종속 표기. -->
-              <div class="acq-intro-banners">
-                <div class="banner acq-intro-banner" role="status">
-                  <span class="icon--md banner__icon" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-info"/></svg></span>
-                  <div class="text-description banner__body">
-                    <p class="banner__title">자진신고 사업장은 고용보험 및 산재보험 보수변경 신고를 할 수 없습니다</p>
-                  </div>
+            <!-- 1 area — 신고 자격 안내. 성격이 다른 두 안내라 각각 독립 배너(아이콘·타이틀 1:1)로 둔다:
+                 ① 자진신고 사업장의 고용·산재 신고 제약, ② 국민연금 변경신고 가능 조건(a·b).
+                 ②는 조건 목록이 길어 Disclosure(icon-only)로 타이틀 옆에서 접고 펼칠 수 있게 한다.
+                 20% 변동에 따른 선택·증빙 고지는 b 조건에 속하므로 b 아래에 종속 표기. -->
+            <div class="acq-intro-banners">
+              <div class="banner acq-intro-banner" role="status">
+                <span class="icon--md banner__icon" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-info"/></svg></span>
+                <div class="text-description banner__body">
+                  <p class="banner__title">자진신고 사업장은 고용보험 및 산재보험 보수변경 신고를 할 수 없습니다</p>
                 </div>
-                <div class="banner acq-intro-banner" role="status">
-                  <span class="icon--md banner__icon" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-info"/></svg></span>
-                  <div class="text-description banner__body">
-                    <div class="disclosure disclosure--icon-only disclosure--expanded acq-elig-disc" data-label-expand="국민연금 변경신고 조건 펼치기" data-label-collapse="국민연금 변경신고 조건 접기">
-                      <span class="disclosure__header">
-                        <span class="banner__title">국민연금 소득월액 변경신고는 다음 경우에만 가능합니다</span>
-                        <button class="disclosure__trigger" type="button" aria-expanded="true" aria-controls="p1-elig-body" aria-label="국민연금 변경신고 조건 접기">
-                          <span class="disclosure__label">접기</span><span class="icon-on--sm disclosure__icon" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-chevron-down"/></svg></span>
-                        </button>
-                      </span>
-                      <div class="disclosure__body" id="p1-elig-body">
-                        <ol class="acq-elig-list">
-                          <li>취득신고 시 보수를 잘못 신고한 경우 <span class="acq-elig-cond">(입사일 기준으로 적용)</span></li>
-                          <li>보수가 20% 이상 변동(인상·인하)된 경우 <span class="acq-elig-cond">(신고월 다음 달부터 적용)</span>
-                            <p class="acq-elig-note">※ 이 경우 국민연금 소득월액 변경신고는 의무가 아닌 <b>선택사항</b>이며, 신고 시 <b>증빙서류</b>를 반드시 첨부해야 합니다.</p>
-                          </li>
-                        </ol>
-                      </div>
+              </div>
+              <div class="banner acq-intro-banner" role="status">
+                <span class="icon--md banner__icon" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-info"/></svg></span>
+                <div class="text-description banner__body">
+                  <div class="disclosure disclosure--icon-only disclosure--expanded acq-elig-disc" data-label-expand="국민연금 변경신고 조건 펼치기" data-label-collapse="국민연금 변경신고 조건 접기">
+                    <span class="disclosure__header">
+                      <span class="banner__title">국민연금 소득월액 변경신고는 다음 경우에만 가능합니다</span>
+                      <button class="disclosure__trigger" type="button" aria-expanded="true" aria-controls="p1-elig-body" aria-label="국민연금 변경신고 조건 접기">
+                        <span class="disclosure__label">접기</span><span class="icon-on--sm disclosure__icon" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-chevron-down"/></svg></span>
+                      </button>
+                    </span>
+                    <div class="disclosure__body" id="p1-elig-body">
+                      <ol class="acq-elig-list">
+                        <li>취득신고 시 보수를 잘못 신고한 경우 <span class="acq-elig-cond">(입사일 기준으로 적용)</span></li>
+                        <li>보수가 20% 이상 변동(인상·인하)된 경우 <span class="acq-elig-cond">(신고월 다음 달부터 적용)</span>
+                          <p class="acq-elig-note">※ 이 경우 국민연금 소득월액 변경신고는 의무가 아닌 <b>선택사항</b>이며, 신고 시 <b>증빙서류</b>를 반드시 첨부해야 합니다.</p>
+                        </li>
+                      </ol>
                     </div>
                   </div>
                 </div>
               </div>
-
+            </div>
+            <div class="modal__content">
               <div class="acq-grid">
 
                 <div class="file-upload" id="p1-upload" data-max-mb="200">
@@ -350,6 +357,7 @@ exits: index.html
                     <span class="text-form-label file-upload__label" style="font-weight:var(--font-weight-heading)">첨부파일 <span class="form-field__required acq-file-req" aria-hidden="true" hidden>(필수)</span><span class="tooltip-wrapper" onmouseenter="this.querySelector('.tooltip-panel').classList.add('tooltip-panel--visible')" onmouseleave="this.querySelector('.tooltip-panel').classList.remove('tooltip-panel--visible')"><button class="tooltip-trigger tooltip-trigger--sm" type="button" aria-label="첨부파일 안내" aria-describedby="p1-upload-tip" onfocus="this.closest('.tooltip-wrapper').querySelector('.tooltip-panel').classList.add('tooltip-panel--visible')" onblur="this.closest('.tooltip-wrapper').querySelector('.tooltip-panel').classList.remove('tooltip-panel--visible')"><svg aria-hidden="true"><use href="#icon-help"/></svg></button><div class="tooltip-panel elevation-tooltip tooltip-panel--top" id="p1-upload-tip" role="tooltip">파일당 10MB 이하 업로드 가능</div></span></span>
                     <span class="text-form-label file-upload__usage">0MB / 200MB</span>
                   </div>
+                  <p class="acq-upload-err" role="alert">증빙 서류를 첨부해 주세요.</p>
                   <div class="file-upload__dropzone">
                     <p class="file-upload__hint">파일을 마우스로 끌어다 놓거나, 추가하기 버튼을 사용해 직접 업로드해 보세요.</p>
                     <button class="btn btn--secondary btn--sm btn--icon-left" type="button">
@@ -511,41 +519,40 @@ exits: index.html
           </div>
 
           <div class="modal__body">
-            <div class="modal__content">
-              <!-- 1 area — 신고 자격 안내. 성격이 다른 두 안내라 각각 독립 배너(아이콘·타이틀 1:1)로 둔다:
-                   ① 자진신고 사업장의 고용·산재 신고 제약, ② 국민연금 변경신고 가능 조건(a·b).
-                   ②는 조건 목록이 길어 Disclosure(icon-only)로 타이틀 옆에서 접고 펼칠 수 있게 한다.
-                   20% 변동에 따른 선택·증빙 고지는 b 조건에 속하므로 b 아래에 종속 표기. -->
-              <div class="acq-intro-banners">
-                <div class="banner acq-intro-banner" role="status">
-                  <span class="icon--md banner__icon" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-info"/></svg></span>
-                  <div class="text-description banner__body">
-                    <p class="banner__title">자진신고 사업장은 고용보험 및 산재보험 보수변경 신고를 할 수 없습니다</p>
-                  </div>
+            <!-- 1 area — 신고 자격 안내. 성격이 다른 두 안내라 각각 독립 배너(아이콘·타이틀 1:1)로 둔다:
+                 ① 자진신고 사업장의 고용·산재 신고 제약, ② 국민연금 변경신고 가능 조건(a·b).
+                 ②는 조건 목록이 길어 Disclosure(icon-only)로 타이틀 옆에서 접고 펼칠 수 있게 한다.
+                 20% 변동에 따른 선택·증빙 고지는 b 조건에 속하므로 b 아래에 종속 표기. -->
+            <div class="acq-intro-banners">
+              <div class="banner acq-intro-banner" role="status">
+                <span class="icon--md banner__icon" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-info"/></svg></span>
+                <div class="text-description banner__body">
+                  <p class="banner__title">자진신고 사업장은 고용보험 및 산재보험 보수변경 신고를 할 수 없습니다</p>
                 </div>
-                <div class="banner acq-intro-banner" role="status">
-                  <span class="icon--md banner__icon" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-info"/></svg></span>
-                  <div class="text-description banner__body">
-                    <div class="disclosure disclosure--icon-only disclosure--expanded acq-elig-disc" data-label-expand="국민연금 변경신고 조건 펼치기" data-label-collapse="국민연금 변경신고 조건 접기">
-                      <span class="disclosure__header">
-                        <span class="banner__title">국민연금 소득월액 변경신고는 다음 경우에만 가능합니다</span>
-                        <button class="disclosure__trigger" type="button" aria-expanded="true" aria-controls="p2-elig-body" aria-label="국민연금 변경신고 조건 접기">
-                          <span class="disclosure__label">접기</span><span class="icon-on--sm disclosure__icon" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-chevron-down"/></svg></span>
-                        </button>
-                      </span>
-                      <div class="disclosure__body" id="p2-elig-body">
-                        <ol class="acq-elig-list">
-                          <li>취득신고 시 보수를 잘못 신고한 경우 <span class="acq-elig-cond">(입사일 기준으로 적용)</span></li>
-                          <li>보수가 20% 이상 변동(인상·인하)된 경우 <span class="acq-elig-cond">(신고월 다음 달부터 적용)</span>
-                            <p class="acq-elig-note">※ 이 경우 국민연금 소득월액 변경신고는 의무가 아닌 <b>선택사항</b>이며, 신고 시 <b>증빙서류</b>를 반드시 첨부해야 합니다.</p>
-                          </li>
-                        </ol>
-                      </div>
+              </div>
+              <div class="banner acq-intro-banner" role="status">
+                <span class="icon--md banner__icon" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-info"/></svg></span>
+                <div class="text-description banner__body">
+                  <div class="disclosure disclosure--icon-only disclosure--expanded acq-elig-disc" data-label-expand="국민연금 변경신고 조건 펼치기" data-label-collapse="국민연금 변경신고 조건 접기">
+                    <span class="disclosure__header">
+                      <span class="banner__title">국민연금 소득월액 변경신고는 다음 경우에만 가능합니다</span>
+                      <button class="disclosure__trigger" type="button" aria-expanded="true" aria-controls="p2-elig-body" aria-label="국민연금 변경신고 조건 접기">
+                        <span class="disclosure__label">접기</span><span class="icon-on--sm disclosure__icon" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-chevron-down"/></svg></span>
+                      </button>
+                    </span>
+                    <div class="disclosure__body" id="p2-elig-body">
+                      <ol class="acq-elig-list">
+                        <li>취득신고 시 보수를 잘못 신고한 경우 <span class="acq-elig-cond">(입사일 기준으로 적용)</span></li>
+                        <li>보수가 20% 이상 변동(인상·인하)된 경우 <span class="acq-elig-cond">(신고월 다음 달부터 적용)</span>
+                          <p class="acq-elig-note">※ 이 경우 국민연금 소득월액 변경신고는 의무가 아닌 <b>선택사항</b>이며, 신고 시 <b>증빙서류</b>를 반드시 첨부해야 합니다.</p>
+                        </li>
+                      </ol>
                     </div>
                   </div>
                 </div>
               </div>
-
+            </div>
+            <div class="modal__content">
               <div class="acq-grid">
 
                 <div class="file-upload" id="p2-upload" data-max-mb="200">
@@ -554,6 +561,7 @@ exits: index.html
                     <span class="text-form-label file-upload__label" style="font-weight:var(--font-weight-heading)">첨부파일 <span class="form-field__required acq-file-req" aria-hidden="true" hidden>(필수)</span><span class="tooltip-wrapper" onmouseenter="this.querySelector('.tooltip-panel').classList.add('tooltip-panel--visible')" onmouseleave="this.querySelector('.tooltip-panel').classList.remove('tooltip-panel--visible')"><button class="tooltip-trigger tooltip-trigger--sm" type="button" aria-label="첨부파일 안내" aria-describedby="p2-upload-tip" onfocus="this.closest('.tooltip-wrapper').querySelector('.tooltip-panel').classList.add('tooltip-panel--visible')" onblur="this.closest('.tooltip-wrapper').querySelector('.tooltip-panel').classList.remove('tooltip-panel--visible')"><svg aria-hidden="true"><use href="#icon-help"/></svg></button><div class="tooltip-panel elevation-tooltip tooltip-panel--top" id="p2-upload-tip" role="tooltip">파일당 10MB 이하 업로드 가능</div></span></span>
                     <span class="text-form-label file-upload__usage">0MB / 200MB</span>
                   </div>
+                  <p class="acq-upload-err" role="alert">증빙 서류를 첨부해 주세요.</p>
                   <div class="file-upload__dropzone">
                     <p class="file-upload__hint">파일을 마우스로 끌어다 놓거나, 추가하기 버튼을 사용해 직접 업로드해 보세요.</p>
                     <button class="btn btn--secondary btn--sm btn--icon-left" type="button">
@@ -715,41 +723,40 @@ exits: index.html
           </div>
 
           <div class="modal__body">
-            <div class="modal__content">
-              <!-- 1 area — 신고 자격 안내. 성격이 다른 두 안내라 각각 독립 배너(아이콘·타이틀 1:1)로 둔다:
-                   ① 자진신고 사업장의 고용·산재 신고 제약, ② 국민연금 변경신고 가능 조건(a·b).
-                   ②는 조건 목록이 길어 Disclosure(icon-only)로 타이틀 옆에서 접고 펼칠 수 있게 한다.
-                   20% 변동에 따른 선택·증빙 고지는 b 조건에 속하므로 b 아래에 종속 표기. -->
-              <div class="acq-intro-banners">
-                <div class="banner acq-intro-banner" role="status">
-                  <span class="icon--md banner__icon" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-info"/></svg></span>
-                  <div class="text-description banner__body">
-                    <p class="banner__title">자진신고 사업장은 고용보험 및 산재보험 보수변경 신고를 할 수 없습니다</p>
-                  </div>
+            <!-- 1 area — 신고 자격 안내. 성격이 다른 두 안내라 각각 독립 배너(아이콘·타이틀 1:1)로 둔다:
+                 ① 자진신고 사업장의 고용·산재 신고 제약, ② 국민연금 변경신고 가능 조건(a·b).
+                 ②는 조건 목록이 길어 Disclosure(icon-only)로 타이틀 옆에서 접고 펼칠 수 있게 한다.
+                 20% 변동에 따른 선택·증빙 고지는 b 조건에 속하므로 b 아래에 종속 표기. -->
+            <div class="acq-intro-banners">
+              <div class="banner acq-intro-banner" role="status">
+                <span class="icon--md banner__icon" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-info"/></svg></span>
+                <div class="text-description banner__body">
+                  <p class="banner__title">자진신고 사업장은 고용보험 및 산재보험 보수변경 신고를 할 수 없습니다</p>
                 </div>
-                <div class="banner acq-intro-banner" role="status">
-                  <span class="icon--md banner__icon" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-info"/></svg></span>
-                  <div class="text-description banner__body">
-                    <div class="disclosure disclosure--icon-only disclosure--expanded acq-elig-disc" data-label-expand="국민연금 변경신고 조건 펼치기" data-label-collapse="국민연금 변경신고 조건 접기">
-                      <span class="disclosure__header">
-                        <span class="banner__title">국민연금 소득월액 변경신고는 다음 경우에만 가능합니다</span>
-                        <button class="disclosure__trigger" type="button" aria-expanded="true" aria-controls="p3-elig-body" aria-label="국민연금 변경신고 조건 접기">
-                          <span class="disclosure__label">접기</span><span class="icon-on--sm disclosure__icon" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-chevron-down"/></svg></span>
-                        </button>
-                      </span>
-                      <div class="disclosure__body" id="p3-elig-body">
-                        <ol class="acq-elig-list">
-                          <li>취득신고 시 보수를 잘못 신고한 경우 <span class="acq-elig-cond">(입사일 기준으로 적용)</span></li>
-                          <li>보수가 20% 이상 변동(인상·인하)된 경우 <span class="acq-elig-cond">(신고월 다음 달부터 적용)</span>
-                            <p class="acq-elig-note">※ 이 경우 국민연금 소득월액 변경신고는 의무가 아닌 <b>선택사항</b>이며, 신고 시 <b>증빙서류</b>를 반드시 첨부해야 합니다.</p>
-                          </li>
-                        </ol>
-                      </div>
+              </div>
+              <div class="banner acq-intro-banner" role="status">
+                <span class="icon--md banner__icon" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-info"/></svg></span>
+                <div class="text-description banner__body">
+                  <div class="disclosure disclosure--icon-only disclosure--expanded acq-elig-disc" data-label-expand="국민연금 변경신고 조건 펼치기" data-label-collapse="국민연금 변경신고 조건 접기">
+                    <span class="disclosure__header">
+                      <span class="banner__title">국민연금 소득월액 변경신고는 다음 경우에만 가능합니다</span>
+                      <button class="disclosure__trigger" type="button" aria-expanded="true" aria-controls="p3-elig-body" aria-label="국민연금 변경신고 조건 접기">
+                        <span class="disclosure__label">접기</span><span class="icon-on--sm disclosure__icon" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-chevron-down"/></svg></span>
+                      </button>
+                    </span>
+                    <div class="disclosure__body" id="p3-elig-body">
+                      <ol class="acq-elig-list">
+                        <li>취득신고 시 보수를 잘못 신고한 경우 <span class="acq-elig-cond">(입사일 기준으로 적용)</span></li>
+                        <li>보수가 20% 이상 변동(인상·인하)된 경우 <span class="acq-elig-cond">(신고월 다음 달부터 적용)</span>
+                          <p class="acq-elig-note">※ 이 경우 국민연금 소득월액 변경신고는 의무가 아닌 <b>선택사항</b>이며, 신고 시 <b>증빙서류</b>를 반드시 첨부해야 합니다.</p>
+                        </li>
+                      </ol>
                     </div>
                   </div>
                 </div>
               </div>
-
+            </div>
+            <div class="modal__content">
               <div class="acq-grid">
 
                 <div class="file-upload" id="p3-upload" data-max-mb="200">
@@ -758,6 +765,7 @@ exits: index.html
                     <span class="text-form-label file-upload__label" style="font-weight:var(--font-weight-heading)">첨부파일 <span class="form-field__required acq-file-req" aria-hidden="true" hidden>(필수)</span><span class="tooltip-wrapper" onmouseenter="this.querySelector('.tooltip-panel').classList.add('tooltip-panel--visible')" onmouseleave="this.querySelector('.tooltip-panel').classList.remove('tooltip-panel--visible')"><button class="tooltip-trigger tooltip-trigger--sm" type="button" aria-label="첨부파일 안내" aria-describedby="p3-upload-tip" onfocus="this.closest('.tooltip-wrapper').querySelector('.tooltip-panel').classList.add('tooltip-panel--visible')" onblur="this.closest('.tooltip-wrapper').querySelector('.tooltip-panel').classList.remove('tooltip-panel--visible')"><svg aria-hidden="true"><use href="#icon-help"/></svg></button><div class="tooltip-panel elevation-tooltip tooltip-panel--top" id="p3-upload-tip" role="tooltip">파일당 10MB 이하 업로드 가능</div></span></span>
                     <span class="text-form-label file-upload__usage">0MB / 200MB</span>
                   </div>
+                  <p class="acq-upload-err" role="alert">증빙 서류를 첨부해 주세요.</p>
                   <div class="file-upload__dropzone">
                     <p class="file-upload__hint">파일을 마우스로 끌어다 놓거나, 추가하기 버튼을 사용해 직접 업로드해 보세요.</p>
                     <button class="btn btn--secondary btn--sm btn--icon-left" type="button">
@@ -919,41 +927,40 @@ exits: index.html
           </div>
 
           <div class="modal__body">
-            <div class="modal__content">
-              <!-- 1 area — 신고 자격 안내. 성격이 다른 두 안내라 각각 독립 배너(아이콘·타이틀 1:1)로 둔다:
-                   ① 자진신고 사업장의 고용·산재 신고 제약, ② 국민연금 변경신고 가능 조건(a·b).
-                   ②는 조건 목록이 길어 Disclosure(icon-only)로 타이틀 옆에서 접고 펼칠 수 있게 한다.
-                   20% 변동에 따른 선택·증빙 고지는 b 조건에 속하므로 b 아래에 종속 표기. -->
-              <div class="acq-intro-banners">
-                <div class="banner acq-intro-banner" role="status">
-                  <span class="icon--md banner__icon" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-info"/></svg></span>
-                  <div class="text-description banner__body">
-                    <p class="banner__title">자진신고 사업장은 고용보험 및 산재보험 보수변경 신고를 할 수 없습니다</p>
-                  </div>
+            <!-- 1 area — 신고 자격 안내. 성격이 다른 두 안내라 각각 독립 배너(아이콘·타이틀 1:1)로 둔다:
+                 ① 자진신고 사업장의 고용·산재 신고 제약, ② 국민연금 변경신고 가능 조건(a·b).
+                 ②는 조건 목록이 길어 Disclosure(icon-only)로 타이틀 옆에서 접고 펼칠 수 있게 한다.
+                 20% 변동에 따른 선택·증빙 고지는 b 조건에 속하므로 b 아래에 종속 표기. -->
+            <div class="acq-intro-banners">
+              <div class="banner acq-intro-banner" role="status">
+                <span class="icon--md banner__icon" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-info"/></svg></span>
+                <div class="text-description banner__body">
+                  <p class="banner__title">자진신고 사업장은 고용보험 및 산재보험 보수변경 신고를 할 수 없습니다</p>
                 </div>
-                <div class="banner acq-intro-banner" role="status">
-                  <span class="icon--md banner__icon" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-info"/></svg></span>
-                  <div class="text-description banner__body">
-                    <div class="disclosure disclosure--icon-only disclosure--expanded acq-elig-disc" data-label-expand="국민연금 변경신고 조건 펼치기" data-label-collapse="국민연금 변경신고 조건 접기">
-                      <span class="disclosure__header">
-                        <span class="banner__title">국민연금 소득월액 변경신고는 다음 경우에만 가능합니다</span>
-                        <button class="disclosure__trigger" type="button" aria-expanded="true" aria-controls="p4-elig-body" aria-label="국민연금 변경신고 조건 접기">
-                          <span class="disclosure__label">접기</span><span class="icon-on--sm disclosure__icon" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-chevron-down"/></svg></span>
-                        </button>
-                      </span>
-                      <div class="disclosure__body" id="p4-elig-body">
-                        <ol class="acq-elig-list">
-                          <li>취득신고 시 보수를 잘못 신고한 경우 <span class="acq-elig-cond">(입사일 기준으로 적용)</span></li>
-                          <li>보수가 20% 이상 변동(인상·인하)된 경우 <span class="acq-elig-cond">(신고월 다음 달부터 적용)</span>
-                            <p class="acq-elig-note">※ 이 경우 국민연금 소득월액 변경신고는 의무가 아닌 <b>선택사항</b>이며, 신고 시 <b>증빙서류</b>를 반드시 첨부해야 합니다.</p>
-                          </li>
-                        </ol>
-                      </div>
+              </div>
+              <div class="banner acq-intro-banner" role="status">
+                <span class="icon--md banner__icon" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-info"/></svg></span>
+                <div class="text-description banner__body">
+                  <div class="disclosure disclosure--icon-only disclosure--expanded acq-elig-disc" data-label-expand="국민연금 변경신고 조건 펼치기" data-label-collapse="국민연금 변경신고 조건 접기">
+                    <span class="disclosure__header">
+                      <span class="banner__title">국민연금 소득월액 변경신고는 다음 경우에만 가능합니다</span>
+                      <button class="disclosure__trigger" type="button" aria-expanded="true" aria-controls="p4-elig-body" aria-label="국민연금 변경신고 조건 접기">
+                        <span class="disclosure__label">접기</span><span class="icon-on--sm disclosure__icon" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-chevron-down"/></svg></span>
+                      </button>
+                    </span>
+                    <div class="disclosure__body" id="p4-elig-body">
+                      <ol class="acq-elig-list">
+                        <li>취득신고 시 보수를 잘못 신고한 경우 <span class="acq-elig-cond">(입사일 기준으로 적용)</span></li>
+                        <li>보수가 20% 이상 변동(인상·인하)된 경우 <span class="acq-elig-cond">(신고월 다음 달부터 적용)</span>
+                          <p class="acq-elig-note">※ 이 경우 국민연금 소득월액 변경신고는 의무가 아닌 <b>선택사항</b>이며, 신고 시 <b>증빙서류</b>를 반드시 첨부해야 합니다.</p>
+                        </li>
+                      </ol>
                     </div>
                   </div>
                 </div>
               </div>
-
+            </div>
+            <div class="modal__content">
               <div class="acq-grid">
 
                 <div class="file-upload" id="p4-upload" data-max-mb="200">
@@ -962,6 +969,7 @@ exits: index.html
                     <span class="text-form-label file-upload__label" style="font-weight:var(--font-weight-heading)">첨부파일 <span class="form-field__required acq-file-req" aria-hidden="true" hidden>(필수)</span><span class="tooltip-wrapper" onmouseenter="this.querySelector('.tooltip-panel').classList.add('tooltip-panel--visible')" onmouseleave="this.querySelector('.tooltip-panel').classList.remove('tooltip-panel--visible')"><button class="tooltip-trigger tooltip-trigger--sm" type="button" aria-label="첨부파일 안내" aria-describedby="p4-upload-tip" onfocus="this.closest('.tooltip-wrapper').querySelector('.tooltip-panel').classList.add('tooltip-panel--visible')" onblur="this.closest('.tooltip-wrapper').querySelector('.tooltip-panel').classList.remove('tooltip-panel--visible')"><svg aria-hidden="true"><use href="#icon-help"/></svg></button><div class="tooltip-panel elevation-tooltip tooltip-panel--top" id="p4-upload-tip" role="tooltip">파일당 10MB 이하 업로드 가능</div></span></span>
                     <span class="text-form-label file-upload__usage">0MB / 200MB</span>
                   </div>
+                  <p class="acq-upload-err" role="alert">증빙 서류를 첨부해 주세요.</p>
                   <div class="file-upload__dropzone">
                     <p class="file-upload__hint">파일을 마우스로 끌어다 놓거나, 추가하기 버튼을 사용해 직접 업로드해 보세요.</p>
                     <button class="btn btn--secondary btn--sm btn--icon-left" type="button">
@@ -1573,6 +1581,9 @@ exits: index.html
       if (e.pensionDoc) e.pensionDoc.hidden = true;
       if (e.fileReq) e.fileReq.hidden = true;
     }
+    /* 첨부 필수가 해제되면 남아있던 미첨부 에러도 정리 */
+    var fu = panel.querySelector('.file-upload');
+    if (fu && e.fileReq && e.fileReq.hidden) fu.classList.remove('file-upload--error');
   }
 
   /* 변경사유 선택 시 — 변경년월 모드 전환(고정/선택가능/비활성) 후 재동기화 */
@@ -1682,6 +1693,12 @@ exits: index.html
     if (ev.target.type === 'checkbox' && /-ins-/.test(ev.target.id || '')) {
       refresh(ev.target.closest('.scenario-panel'));
     }
+    /* 파일 첨부되면 미첨부 에러 해제 */
+    if (ev.target.type === 'file') {
+      setTimeout(function () {
+        root.querySelectorAll('.file-upload').forEach(function (up) { if (up.querySelector('.file-upload-item')) up.classList.remove('file-upload--error'); });
+      }, 0);
+    }
   });
 
   /* ── 검증 ── */
@@ -1702,6 +1719,15 @@ exits: index.html
     if (num(e.newpay.value) <= 0) {
       markNewpay(panel, 'error', '변경 후 보수월액을 입력해 주세요.');
       invalid.push(e.newpay.closest('.form-field')); firstBad = firstBad || e.newpay;
+    }
+
+    /* 첨부파일 필수(20%↑ & 국민연금 선택)인데 미첨부 시 에러 */
+    var up = panel.querySelector('.file-upload');
+    if (e.fileReq && !e.fileReq.hidden && up && !up.querySelector('.file-upload-item')) {
+      up.classList.add('file-upload--error');
+      invalid.push(up); firstBad = firstBad || up.querySelector('.file-upload__dropzone .btn');
+    } else if (up) {
+      up.classList.remove('file-upload--error');
     }
 
     if (invalid.length) {
