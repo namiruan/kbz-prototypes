@@ -76,8 +76,9 @@
     .acq-doc-eg { color: var(--color-text-subtle); font-size: var(--font-size-sm); }
     .acq-doc-notes { margin: var(--space-gap-sm) 0 0; padding-left: var(--space-inset-lg); list-style: disc; display: flex; flex-direction: column; gap: var(--space-gap-2xs); color: var(--color-text-subtle); font-size: var(--font-size-sm); }
     .acq-doc-row[hidden] { display: none; }
-    /* 첨부파일 필수 에러 */
-    .corr-upload-err { display: none; margin-top: var(--space-gap-sm); color: var(--color-text-error); font-size: var(--font-size-sm); }
+    /* 첨부파일 필수 에러 — 추가하기 버튼 바로 아래(드롭존 안). 파일 목록이 길어도
+       스크롤 없이 보이도록 그리드 위에 배치한다. */
+    .corr-upload-err { display: none; margin: 0; color: var(--color-text-error); font-size: var(--font-size-sm); }
     .file-upload--error .corr-upload-err { display: block; }
   </style>
 </head>
@@ -139,9 +140,9 @@ exits: insurance-join-status.html, index.html
                     <button class="btn btn--secondary btn--sm btn--icon-left" type="button">
                       <span class="icon icon--sm" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-plus"/></svg></span>추가하기
                     </button>
+                    <p class="corr-upload-err" id="c1-upload-err" role="alert">증빙 서류를 첨부해 주세요.</p>
                     <div class="file-upload__grid"></div>
                   </div>
-                  <p class="corr-upload-err" id="c1-upload-err" role="alert">증빙 서류를 첨부해 주세요.</p>
                 </div>
 
                 <div class="acq-form">
