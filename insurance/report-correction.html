@@ -60,15 +60,17 @@
     .corr-card__head .checkbox { width: 100%; box-sizing: border-box; padding: var(--space-inset-md) var(--space-inset-lg); gap: var(--space-gap-sm); }
     .corr-card__head .checkbox__label { font-size: var(--font-size-base); font-weight: var(--font-weight-heading); color: var(--color-text-body); }
     .corr-card--checked .corr-card__head .checkbox__label { color: var(--color-text-brand); }
-    /* 본문 — 체크 시에만 노출. 헤더와 구분선 */
-    .corr-card__body { padding: 0 var(--space-inset-lg) var(--space-inset-lg); display: flex; flex-direction: column; gap: var(--space-gap-lg); }
+    /* 본문 — 체크 시에만 노출. 헤더와 하단 구분선으로 나누고, 콘텐츠에 상하 여백을 넉넉히 준다. */
+    .corr-card--checked .corr-card__head { border-bottom: var(--stroke-sm) solid var(--color-border-subtle); }
+    .corr-card__body { padding: var(--space-inset-lg); display: flex; flex-direction: column; gap: var(--space-gap-lg); }
     .corr-card__body[hidden] { display: none; }
-    /* 변경 전/후 가로 2필드 */
-    .corr-field-row { display: flex; flex-wrap: wrap; align-items: flex-start; column-gap: var(--space-gap-lg); row-gap: var(--space-gap-md); }
-    .corr-field-row > .form-field { display: flex; flex-direction: column; gap: var(--space-gap-xs); flex: 0 1 auto; }
+    /* 변경 전 → 변경 후 — 가운데 정렬 + 가운데 화살표. 화살표는 라벨 아래 입력창 줄 높이에 맞춘다. */
+    .corr-field-row { display: flex; flex-wrap: wrap; justify-content: center; align-items: flex-start; column-gap: var(--space-gap-lg); row-gap: var(--space-gap-md); }
+    .corr-field-row > .form-field { display: flex; flex-direction: column; gap: var(--space-gap-xs); flex: 0 1 200px; }
     .corr-field-row .input { max-width: 200px; }
-    /* 취득 정보 — 읽기 전용 정의 목록 (라벨 · 값 2열) */
-    .corr-sub-title { display: block; font-weight: var(--font-weight-heading); color: var(--color-text-brand); margin-bottom: var(--space-gap-sm); }
+    .corr-field-arrow { flex: 0 0 auto; align-self: flex-start; margin-top: calc(var(--font-size-sm) + var(--space-gap-xs)); height: var(--height-base); display: inline-flex; align-items: center; color: var(--color-text-subtle); font-size: var(--font-size-lg); }
+    /* 취득 정보 — 읽기 전용 정의 목록 (라벨 · 값 2열). 제목은 카드 헤더(브랜드·semibold·14px)와 구분되게 옅은 소제목 라벨로 */
+    .corr-sub-title { display: block; font-size: var(--font-size-sm); font-weight: var(--font-weight-medium); color: var(--color-text-subtle); margin-bottom: var(--space-gap-sm); }
     .corr-dl { display: grid; grid-template-columns: max-content 1fr; column-gap: var(--space-gap-2xl); row-gap: var(--space-gap-sm); margin: 0; }
     .corr-dl dt { color: var(--color-text-subtle); }
     .corr-dl dd { margin: 0; color: var(--color-text-body); }
@@ -187,6 +189,7 @@ exits: insurance-join-status.html, index.html
                               <label class="form-field__label text-form-label" for="c1-nc-before">변경 전</label>
                               <div class="form-field__body"><input class="input input--readonly" id="c1-nc-before" type="text" value="홍길동" readonly></div>
                             </div>
+                            <span class="corr-field-arrow" aria-hidden="true">→</span>
                             <div class="form-field">
                               <label class="form-field__label text-form-label" for="c1-nc-after">변경 후 <span class="form-field__required" aria-hidden="true">(필수)</span></label>
                               <div class="form-field__body"><input class="input" id="c1-nc-after" type="text" placeholder="변경할 성명 입력"></div>
@@ -207,6 +210,7 @@ exits: insurance-join-status.html, index.html
                               <label class="form-field__label text-form-label" for="c1-dc-before">변경 전</label>
                               <div class="form-field__body"><input class="input input--readonly" id="c1-dc-before" type="text" value="2025-01-01" readonly></div>
                             </div>
+                            <span class="corr-field-arrow" aria-hidden="true">→</span>
                             <div class="form-field">
                               <label class="form-field__label text-form-label" for="c1-dc-after">변경 후 <span class="form-field__required" aria-hidden="true">(필수)</span></label>
                               <div class="form-field__body"><input class="input" id="c1-dc-after" type="text" placeholder="YYYY-MM-DD" inputmode="numeric" maxlength="10"></div>
