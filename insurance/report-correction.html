@@ -663,13 +663,29 @@ exits: insurance-join-status.html, index.html
     });
   });
 
-  /* 입력 시 에러 해제 */
-  ['c1-nc-after', 'c1-dc-after'].forEach(function (id) {
-    var el = document.getElementById(id);
+  /* 성명(변경 후) — 입력 시 에러 해제 */
+  (function () {
+    var el = document.getElementById('c1-nc-after');
     if (el) el.addEventListener('input', function () {
-      if (this.value.trim()) { var f = this.closest('.form-field'); if (f && f.classList.contains('form-field--error')) clearFieldState(f.id || (f.id = id + '-field'), id + '-err'); }
+      if (this.value.trim()) { var f = this.closest('.form-field'); if (f && f.classList.contains('form-field--error')) clearFieldState(f.id || (f.id = 'c1-nc-after-field'), 'c1-nc-after-err'); }
     });
-  });
+  })();
+  /* 취득일(변경 후) — 숫자만(YYYY-MM-DD 자동 하이픈), 숫자 외 문자 입력 시 '숫자만' 에러 */
+  (function () {
+    var el = document.getElementById('c1-dc-after');
+    if (!el) return;
+    el.addEventListener('input', function () {
+      var raw = this.value;
+      var d = raw.replace(/[^0-9]/g, '').slice(0, 8);
+      var out = d;
+      if (d.length > 6) out = d.slice(0, 4) + '-' + d.slice(4, 6) + '-' + d.slice(6);
+      else if (d.length > 4) out = d.slice(0, 4) + '-' + d.slice(4);
+      this.value = out;
+      var f = this.closest('.form-field'); var fid = f.id || (f.id = 'c1-dc-after-field');
+      if (/[^0-9-]/.test(raw)) { setFieldError(fid, 'c1-dc-after-err', '숫자만 입력해 주세요.'); return; }
+      if (this.value.trim() && f.classList.contains('form-field--error')) clearFieldState(fid, 'c1-dc-after-err');
+    });
+  })();
   var ccReason = document.getElementById('c1-cc-reason');
   if (ccReason) ccReason.addEventListener('input', function () {
     if (this.value.trim()) { var f = this.closest('.form-field'); if (f) clearFieldState(f.id || (f.id = 'c1-cc-reason-field'), 'c1-cc-reason-err'); }
