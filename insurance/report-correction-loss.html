@@ -53,8 +53,9 @@
     .corr-field-arrow { flex: 0 0 auto; align-self: flex-start; margin-top: calc(var(--font-size-sm) + var(--space-gap-xs)); height: var(--height-base); display: inline-flex; align-items: center; color: var(--color-text-subtle); font-size: var(--font-size-lg); }
     /* 상실사유 변경 — 상실사유 + 구체적 사유 2단 셀렉트(세로 스택) */
     .corr-lr-selects { display: flex; flex-direction: column; gap: var(--space-gap-sm); }
-    /* 상실 취소 대상 보험 — 체크박스 가로 나열 */
-    .corr-ins-checks { display: flex; flex-wrap: wrap; gap: var(--space-gap-lg); }
+    /* 상실 취소 대상 보험 — 체크박스 가로 나열, 상실 정보와 맞춰 가운데 정렬 */
+    .corr-ins-checks { display: flex; flex-wrap: wrap; gap: var(--space-gap-lg); justify-content: center; }
+    .corr-cc-ins .form-field__label { text-align: center; }
     /* 상실 정보 — 읽기 전용 데이터테이블 인포(내용 폭만큼, 가운데 정렬) */
     .corr-subsection { align-self: center; max-width: 100%; }
     .corr-sub-title { display: block; text-align: center; font-size: var(--font-size-sm); font-weight: var(--font-weight-body); color: var(--color-text-body); margin-bottom: var(--space-gap-xs); }
@@ -241,7 +242,7 @@ exits: insurance-join-status.html, index.html
                         </div>
                         <div class="corr-card__body" id="c1-cc-body" hidden>
                           <!-- 8 area — 상실 취소 대상 보험 (상실된 보험만 선택 가능, 기본 모두 선택. 취득중·미가입은 disabled) -->
-                          <div class="form-field">
+                          <div class="form-field corr-cc-ins">
                             <span class="form-field__label text-form-label" id="c1-cc-ins-label">상실 취소 대상 보험</span>
                             <div class="form-field__body">
                               <div class="corr-ins-checks" role="group" aria-labelledby="c1-cc-ins-label">
