@@ -896,6 +896,28 @@ exits: index.html
 
   /* 초기 연금 동기화 */
   Array.prototype.forEach.call(document.querySelectorAll('#pane-panels > .scenario-panel'), syncPension);
+  /* 첨부파일 세로 높이 — '보이는 본문 영역'(modal__content clientHeight - 세로패딩)에 맞춘다.
+     고정 안내 밴드·내용에 따라 가변이라 calc 매직넘버 대신 실측한다. 내용이 길면 꽉 차고(리스트 내부 스크롤),
+     짧으면 자연 축소된다. content는 flex로 크기가 정해져 자식 높이 영향을 받지 않으므로 루프 없음. */
+  function syncUploadHeight(panel) {
+    if (!panel) return;
+    var content = panel.querySelector('.modal__content');
+    var fu = panel.querySelector('.acq-grid > .file-upload');
+    if (!content || !fu) return;
+    var cs = getComputedStyle(content);
+    var inner = content.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+    if (inner > 0) fu.style.maxHeight = inner + 'px';
+  }
+  function syncAllUploadHeights() {
+    Array.prototype.forEach.call(document.querySelectorAll('#pane-panels > .scenario-panel'), syncUploadHeight);
+  }
+  if (window.ResizeObserver) {
+    document.querySelectorAll('#pane-panels .modal__content').forEach(function (c) {
+      new ResizeObserver(function () { syncUploadHeight(c.closest('.scenario-panel')); }).observe(c);
+    });
+  }
+  window.addEventListener('resize', syncAllUploadHeights);
+  if (window.requestAnimationFrame) requestAnimationFrame(syncAllUploadHeights); else syncAllUploadHeights();
 })();
 </script>
 

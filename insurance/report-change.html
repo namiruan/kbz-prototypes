@@ -42,8 +42,6 @@
     .modal__body:has(> .acq-intro-banners) { flex-direction: column; }
     /* 밴드 상하 패딩 0 — 타이틀과의 간격은 헤더 pad-bottom(≈16), 본문과의 간격은 content pad-top(≈16)이 담당 */
     .modal__body > .acq-intro-banners { flex-shrink: 0; padding: 0 var(--space-inset-3xl); margin: 0; }
-    /* 첫 진입 — 변경사유 미선택 시 세그먼트 슬라이더 숨김(어떤 항목도 강조하지 않음) */
-    .acq-reason-seg:not(:has(.segment__item--selected)) .segment__slider { opacity: 0; }
     /* 국민연금 변경신고 자격 조건 — a·b(알파벳) 순서 목록. 배너 본문 톤 유지 */
     .acq-elig-list { margin: 0; padding-left: var(--space-inset-xl); list-style: lower-alpha; display: flex; flex-direction: column; gap: var(--space-gap-2xs); font-size: var(--font-size-sm); line-height: var(--line-height-reading); }
     /* 조건 부연(적용 시점) — 한 톤 옅게 */
@@ -380,7 +378,7 @@ exits: index.html
                     <div class="form-field__body">
                       <div class="segment segment--lg segment--full acq-reason-seg" role="radiogroup" aria-labelledby="p0-reason-label" id="p0-reason">
                         <span class="segment__slider" aria-hidden="true"></span>
-                        <button class="segment__item" role="radio" aria-checked="false" type="button" data-reason="보수인상">보수인상</button>
+                        <button class="segment__item segment__item--selected" role="radio" aria-checked="true" type="button" data-reason="보수인상">보수인상</button>
                         <button class="segment__item" role="radio" aria-checked="false" type="button" data-reason="보수인하">보수인하</button>
                         <button class="segment__item" role="radio" aria-checked="false" type="button" data-reason="착오정정">착오정정</button>
                       </div>
@@ -393,7 +391,7 @@ exits: index.html
                       <span class="form-field__label text-form-label" id="p0-month-label">변경년월 <span class="form-field__required" aria-hidden="true">(필수)</span></span>
                       <div class="form-field__body">
                         <div class="dropdown dropdown--button dropdown--menu acq-change-dd" id="p0-month">
-                          <button class="dropdown__trigger" type="button" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="p0-month-label"><span class="dropdown__value">2026-03</span><span class="dropdown__chevron" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-chevron-down"/></svg></span></button>
+                          <button class="dropdown__trigger" type="button" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="p0-month-label"><span class="dropdown__value dropdown__value--placeholder">선택</span><span class="dropdown__chevron" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-chevron-down"/></svg></span></button>
                           <div class="dropdown__panel"><ul class="dropdown__list" role="listbox" aria-label="변경년월">
                             <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">2026-01</span></li>
                             <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">2026-02</span></li>
@@ -2004,6 +2002,31 @@ exits: index.html
       new ResizeObserver(function () { resyncSeg(seg); }).observe(seg);
     });
   }
+
+  /* 첨부파일 세로 높이 — '보이는 본문 영역'에 정확히 맞춘다.
+     헤더 고정 안내 밴드는 높이가 가변(디스클로저 접기/펼치기·텍스트 줄바꿈)이라 calc(90vh - 매직넘버)로는
+     어떤 상태에선 넘쳐서 잘리고 어떤 상태에선 짧아져 빈다. modal__content는 flex로 크기가 정해지고 내부에서
+     스크롤되므로 그 clientHeight - 세로패딩이 곧 보이는 영역. sticky 사이드를 이 값으로 상한하면
+     내용이 길 땐 꽉 차고(리스트 내부 스크롤) 짧을 땐 자연 축소된다. content가 자식 높이에 영향받지 않아 루프 없음. */
+  function syncUploadHeight(panel) {
+    if (!panel) return;
+    var content = panel.querySelector('.modal__content');
+    var fu = panel.querySelector('.acq-grid > .file-upload');
+    if (!content || !fu) return;
+    var cs = getComputedStyle(content);
+    var inner = content.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+    if (inner > 0) fu.style.maxHeight = inner + 'px';
+  }
+  function syncAllUploadHeights() {
+    Array.prototype.forEach.call(document.querySelectorAll('#pane-panels > .scenario-panel'), syncUploadHeight);
+  }
+  if (window.ResizeObserver) {
+    document.querySelectorAll('#pane-panels .modal__content').forEach(function (c) {
+      new ResizeObserver(function () { syncUploadHeight(c.closest('.scenario-panel')); }).observe(c);
+    });
+  }
+  window.addEventListener('resize', syncAllUploadHeights);
+  if (window.requestAnimationFrame) requestAnimationFrame(syncAllUploadHeights); else syncAllUploadHeights();
 })();
 </script>
 
