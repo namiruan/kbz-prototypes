@@ -28,7 +28,9 @@
     /* 파일이 있으면: 안내문 숨기고 상단 정렬 + 그리드만 세로 스크롤 (열 높이는 우측 콘텐츠 기준 유지) */
     .acq-grid > .file-upload .file-upload__dropzone:has(.file-upload-item) { justify-content: flex-start; }
     .acq-grid > .file-upload .file-upload__dropzone:has(.file-upload-item) .file-upload__hint { display: none; }
-    .acq-grid > .file-upload .file-upload__dropzone:has(.file-upload-item) .file-upload__grid { flex: 1 1 auto; min-height: 0; overflow-y: auto; align-content: start; }
+    /* grid-auto-rows: max-content — 행을 썸네일 자연 높이로 고정. 없으면 고정 높이 그리드가
+       행을 압축해 파일이 늘수록 썸네일이 찌그러진다. 대신 넘치면 그리드가 내부 스크롤된다. */
+    .acq-grid > .file-upload .file-upload__dropzone:has(.file-upload-item) .file-upload__grid { flex: 1 1 auto; min-height: 0; overflow-y: auto; align-content: start; grid-auto-rows: max-content; }
     /* 드래그 안내 문구 — 드롭 영역 안 가운데 정렬 (DS file-upload v0.4.0 .file-upload__hint) */
     .file-upload__hint { margin: 0; max-width: 28em; text-align: center; color: var(--color-text-subtle); font-size: var(--font-size-sm); line-height: var(--line-height-reading); word-break: keep-all; }
     /* 첨부파일 라벨 — 용량 제한(*파일당 10MB…)은 라벨 옆 도움말(?) 툴팁으로. 트리거를 라벨과 세로 중앙 정렬 */
