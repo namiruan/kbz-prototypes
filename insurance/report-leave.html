@@ -39,6 +39,9 @@
     /* 시작일·종료(예정)일(데이트피커) 한 줄 — 입력창 하단 정렬 */
     .lv-date-row { display: flex; flex-wrap: wrap; align-items: flex-end; column-gap: var(--space-gap-lg); row-gap: var(--space-gap-md); }
     .lv-date-row > .form-field { flex: 1 1 150px; min-width: 140px; }
+    /* 에러 메시지가 떠도 같은 행의 다른 필드 라벨이 밀리지 않도록, 에러 영역 높이를 항상 확보(하단 정렬 유지) */
+    .lv-reason-row .form-field__footer,
+    .lv-date-row .form-field__footer { min-height: 0.75rem; }
     /* 신고 대상 보험 — 보수변경 모달처럼 푸터 좌측에 상시 노출(항상 비활성, 휴직사유로 자동 결정) */
     .acq-target-footer { margin-right: auto; display: flex; align-items: center; gap: var(--space-gap-md); min-width: 0; }
     .acq-target-footer__label { flex-shrink: 0; color: var(--color-text-brand); font-size: var(--font-size-lg); font-weight: var(--font-weight-heading); line-height: var(--line-height-ui); }
@@ -523,12 +526,19 @@ exits: insurance-join-status.html, index.html
     }, 0);
   });
 
-  /* 날짜 값 읽기 — 완성된 'YYYY-MM-DD'만 반환, 아니면 '' */
-  function dpVal(id) {
-    var el = $(id); if (!el) return '';
-    var v = el.value.trim();
-    return /^\d{4}-\d{2}-\d{2}$/.test(v) ? v : '';
+  /* 실제 달력상 유효한 날짜인지(월 1~12, 일수, 윤년 반영) */
+  function isValidDate(s) {
+    var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s || '');
+    if (!m) return false;
+    var y = +m[1], mo = +m[2], d = +m[3];
+    if (mo < 1 || mo > 12 || d < 1 || d > 31) return false;
+    var dt = new Date(y, mo - 1, d);
+    return dt.getFullYear() === y && dt.getMonth() === (mo - 1) && dt.getDate() === d;
   }
+  /* 형식이 완성됐는지(YYYY-MM-DD 8자리) */
+  function dpComplete(id) { var el = $(id); return el ? /^\d{4}-\d{2}-\d{2}$/.test(el.value.trim()) : false; }
+  /* 유효한 날짜 값만 반환(순서 비교용), 아니면 '' */
+  function dpVal(id) { var el = $(id); if (!el) return ''; return isValidDate(el.value.trim()) ? el.value.trim() : ''; }
   function dpFieldError(id, msg) {
     var el = $(id); if (!el) return;
     var field = el.closest('.form-field'), err = $(id + '-err');
@@ -551,7 +561,10 @@ exits: insurance-join-status.html, index.html
   }
   /* 실시간 순서 검증 — 한쪽 날짜가 이미 있으면, 다음 입력이 완성되는 즉시 시작<종료를 검증해 에러 표시/해제 */
   function liveValidateDates(changedId) {
+    /* 형식은 완성됐는데 실제 날짜가 아니면(예: 2222-22-22) 즉시 에러 */
+    if (dpComplete(changedId) && !dpVal(changedId)) { dpFieldError(changedId, '올바른 날짜를 입력해 주세요.'); return; }
     if (dpVal(changedId)) dpFieldError(changedId, null);
+    /* 두 날짜가 모두 유효할 때만 순서 검증 */
     var sv = dpVal('lv-start'), ev = dpVal('lv-end');
     if (sv && ev) {
       if (sv >= ev) {
@@ -597,13 +610,17 @@ exits: insurance-join-status.html, index.html
     if (!reason) { rf.classList.add('form-field--error'); var re = $('lv-reason-err'); if (re) re.removeAttribute('hidden'); shake(rf); firstBad = firstBad || $('lv-reason').querySelector('.dropdown__trigger'); ok = false; }
     else { rf.classList.remove('form-field--error'); }
     /* 시작일·종료일 (데이트피커) */
-    var sv = dpVal('lv-start'), ev = dpVal('lv-end');
     var sf = $('lv-start').closest('.form-field'), ef = $('lv-end').closest('.form-field');
-    if (!sv) { dpFieldError('lv-start', '시작일을 입력해 주세요.'); shake(sf); firstBad = firstBad || $('lv-start'); ok = false; }
+    /* 시작일 — 미입력 / 형식·날짜 오류 구분 */
+    if (!$('lv-start').value.trim()) { dpFieldError('lv-start', '시작일을 입력해 주세요.'); shake(sf); firstBad = firstBad || $('lv-start'); ok = false; }
+    else if (!dpVal('lv-start')) { dpFieldError('lv-start', '올바른 날짜를 입력해 주세요.'); shake(sf); firstBad = firstBad || $('lv-start'); ok = false; }
     else dpFieldError('lv-start', null);
-    if (!ev) { dpFieldError('lv-end', '종료일을 입력해 주세요.'); shake(ef); firstBad = firstBad || $('lv-end'); ok = false; }
+    /* 종료일 — 미입력 / 형식·날짜 오류 구분 */
+    if (!$('lv-end').value.trim()) { dpFieldError('lv-end', '종료일을 입력해 주세요.'); shake(ef); firstBad = firstBad || $('lv-end'); ok = false; }
+    else if (!dpVal('lv-end')) { dpFieldError('lv-end', '올바른 날짜를 입력해 주세요.'); shake(ef); firstBad = firstBad || $('lv-end'); ok = false; }
     else dpFieldError('lv-end', null);
-    /* 시작일은 종료일보다 빨라야 함 — 같거나 이후면 불가(start < end 강제) */
+    /* 시작일은 종료일보다 빨라야 함 — 둘 다 유효할 때만(같거나 이후면 불가, start < end 강제) */
+    var sv = dpVal('lv-start'), ev = dpVal('lv-end');
     if (sv && ev && sv >= ev) {
       dpFieldError('lv-start', '휴직 시작일은 종료일보다 빨라야 합니다.');
       dpFieldError('lv-end', '휴직 종료일은 시작일보다 늦어야 합니다.');
