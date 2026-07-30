@@ -68,11 +68,10 @@
     .corr-field-row > .form-field { display: flex; flex-direction: column; gap: var(--space-gap-xs); flex: 0 1 200px; }
     .corr-field-row .input { max-width: 200px; }
     .corr-field-arrow { flex: 0 0 auto; align-self: flex-start; margin-top: calc(var(--font-size-sm) + var(--space-gap-xs)); height: var(--height-base); display: inline-flex; align-items: center; color: var(--color-text-subtle); font-size: var(--font-size-lg); }
-    /* 취득 정보 — 읽기 전용 참조 데이터. 브랜드 옅은 카드 안에서 흰 패널로 묶어 입력(취득취소 사유)과 구분·정돈.
+    /* 취득 정보 — 읽기 전용 참조 데이터. 입력(취득취소 사유)이 주인공이므로 패널·배경 없이 조용하게 둔다.
        제목은 카드 헤더(브랜드·semibold·14px)와 구분되게 옅은 소제목 라벨로. */
-    .corr-subsection { background: var(--color-surface-base); border: var(--stroke-sm) solid var(--color-border-subtle); border-radius: var(--radius-md); padding: var(--space-inset-lg); }
-    .corr-sub-title { display: block; font-size: var(--font-size-sm); font-weight: var(--font-weight-medium); color: var(--color-text-subtle); margin-bottom: var(--space-gap-md); }
-    .corr-dl { display: grid; grid-template-columns: max-content 1fr; column-gap: var(--space-gap-2xl); row-gap: var(--space-gap-md); margin: 0; }
+    .corr-sub-title { display: block; font-size: var(--font-size-sm); font-weight: var(--font-weight-medium); color: var(--color-text-subtle); margin-bottom: var(--space-gap-sm); }
+    .corr-dl { display: grid; grid-template-columns: max-content 1fr; column-gap: var(--space-gap-2xl); row-gap: var(--space-gap-sm); margin: 0; }
     .corr-dl dt { color: var(--color-text-subtle); }
     .corr-dl dd { margin: 0; color: var(--color-text-body); }
     .corr-dl dd.corr-dl__brand { color: var(--color-text-brand); font-weight: var(--font-weight-heading); }
