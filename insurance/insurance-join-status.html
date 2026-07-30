@@ -1766,17 +1766,17 @@ exits: report-acquire.html, report-loss.html, report-transfer.html, report-chang
   if (history.replaceState) history.replaceState(null, '', location.pathname);
   function show() {
     if (typeof makeToast !== 'function') { setTimeout(show, 100); return; }
-    var stack = document.getElementById('app-toast-stack');
+    /* DS toast 규칙 — .toast-stack(우상단 고정·z-toast·pointer-events:none), 최신 toast는 상단 prepend */
+    var stack = document.querySelector('.toast-stack');
     if (!stack) {
       stack = document.createElement('div');
-      stack.id = 'app-toast-stack';
+      stack.className = 'toast-stack';
       stack.setAttribute('aria-live', 'polite');
-      stack.style.cssText = 'position:fixed;bottom:var(--space-24);left:50%;transform:translateX(-50%);display:flex;flex-direction:column;gap:var(--space-gap-sm);z-index:2000;pointer-events:none;';
+      stack.setAttribute('aria-atomic', 'false');
       document.body.appendChild(stack);
     }
     var t = makeToast('success', null, (label ? label + ' ' : '') + '신고가 접수되었어요.');
-    t.style.pointerEvents = 'auto';
-    stack.appendChild(t);
+    stack.insertBefore(t, stack.firstChild);
   }
   /* 아이콘 sprite 주입(fetch)이 끝난 뒤 노출되도록 약간 지연 */
   setTimeout(show, 400);
