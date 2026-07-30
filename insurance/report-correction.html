@@ -81,8 +81,11 @@
     .acq-doc-eg { color: var(--color-text-subtle); font-size: var(--font-size-sm); }
     .acq-doc-notes { margin: var(--space-gap-sm) 0 0; padding-left: var(--space-inset-lg); list-style: disc; display: flex; flex-direction: column; gap: var(--space-gap-2xs); color: var(--color-text-subtle); font-size: var(--font-size-sm); }
     .acq-doc-row[hidden] { display: none; }
-    /* 첨부파일 필수 에러 — 추가하기 버튼 바로 아래(드롭존 안). 파일 목록이 길어도
-       스크롤 없이 보이도록 그리드 위에 배치한다. */
+    /* 마지막 '보이는' 행의 셀 하단 border 제거 — 컨테이너 하단 border와 겹쳐 바닥선이
+       두꺼워지는 것 방지(실제 마지막 DOM 행이 아니라 hidden 제외 마지막 행 기준) */
+    .acq-doc-table .table__body .table__row.acq-doc-row--lastvis .table__cell { border-bottom: none; }
+    /* 첨부파일 필수 에러 — 첨부파일 타이틀 바로 아래(헤더와 드롭존 사이)에 표기해
+       파일 목록 길이·스크롤과 무관하게 항상 보이도록 한다. */
     .corr-upload-err { display: none; margin: 0; color: var(--color-text-error); font-size: var(--font-size-sm); }
     .file-upload--error .corr-upload-err { display: block; }
   </style>
@@ -137,12 +140,12 @@ exits: insurance-join-status.html, index.html
                     <span class="text-form-label file-upload__label" style="font-weight:var(--font-weight-heading)">첨부파일 <span class="form-field__required" aria-hidden="true">(필수)</span><span class="tooltip-wrapper" onmouseenter="this.querySelector('.tooltip-panel').classList.add('tooltip-panel--visible')" onmouseleave="this.querySelector('.tooltip-panel').classList.remove('tooltip-panel--visible')"><button class="tooltip-trigger tooltip-trigger--sm" type="button" aria-label="첨부파일 안내" aria-describedby="c1-upload-tip" onfocus="this.closest('.tooltip-wrapper').querySelector('.tooltip-panel').classList.add('tooltip-panel--visible')" onblur="this.closest('.tooltip-wrapper').querySelector('.tooltip-panel').classList.remove('tooltip-panel--visible')"><svg aria-hidden="true"><use href="#icon-help"/></svg></button><div class="tooltip-panel elevation-tooltip tooltip-panel--bottom" id="c1-upload-tip" role="tooltip">*파일당 10MB 이하 업로드 가능</div></span></span>
                     <span class="text-form-label file-upload__usage">0MB / 200MB</span>
                   </div>
+                  <p class="corr-upload-err" id="c1-upload-err" role="alert">증빙 서류를 첨부해 주세요.</p>
                   <div class="file-upload__dropzone">
                     <p class="corr-drop-hint">파일을 마우스로 끌어다 놓거나, 추가하기 버튼을 사용해 직접 업로드해 보세요.</p>
                     <button class="btn btn--secondary btn--sm btn--icon-left" type="button">
                       <span class="icon icon--sm" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-plus"/></svg></span>추가하기
                     </button>
-                    <p class="corr-upload-err" id="c1-upload-err" role="alert">증빙 서류를 첨부해 주세요.</p>
                     <div class="file-upload__grid"></div>
                   </div>
                 </div>
@@ -599,6 +602,13 @@ exits: insurance-join-status.html, index.html
       if (chk.checked) anyChecked = true;
     });
     doc.hidden = !anyChecked;
+    /* 마지막으로 '보이는' 행 표시 — 행을 hidden으로 토글하면 DS의 :last-child 하단 border
+       제거가 '숨은 마지막 행'에 적용돼, 실제 마지막 보이는 행의 셀 border가 컨테이너 하단
+       border와 겹쳐 두 줄(두꺼운 선)로 보인다. 마지막 보이는 행에 클래스를 부여해 그 border 제거. */
+    var rows = Array.prototype.slice.call(doc.querySelectorAll('.acq-doc-row'));
+    var visible = rows.filter(function (r) { return !r.hidden; });
+    rows.forEach(function (r) { r.classList.remove('acq-doc-row--lastvis'); });
+    if (visible.length) visible[visible.length - 1].classList.add('acq-doc-row--lastvis');
   }
 
   /* 미선택 힌트 — 아무 항목도 없을 때만 노출 */
