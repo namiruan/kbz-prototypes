@@ -18,6 +18,8 @@
     .acq-grid { display: grid; grid-template-columns: 314px 1fr; gap: var(--space-gap-2xl); align-items: stretch; }
     .acq-grid > .file-upload { height: 100%; }
     .acq-grid > .file-upload .file-upload__dropzone { flex: 1 1 auto; }
+    /* 첨부파일 라벨 — 안내 문구·용량 제한은 라벨 옆 도움말(?) 툴팁으로 이동. 트리거를 라벨과 세로 중앙 정렬 */
+    .file-upload__label { display: inline-flex; align-items: center; gap: var(--space-gap-2xs); }
     /* 폼 세로 스택 — 섹션 간격을 넓게 */
     .acq-form { display: flex; flex-direction: column; gap: var(--space-gap-xl); }
     /* ── 조회 정보 카드 — 이름·주민번호는 입력이 아니라 조회 정보이므로 카드형(라벨 위·값 아래)으로 노출.
@@ -129,12 +131,8 @@ exits: insurance-join-status.html, index.html
                 <div class="file-upload" id="c1-upload" data-max-mb="200">
                   <input type="file" id="c1-file-input" hidden multiple>
                   <div class="file-upload__header">
-                    <span class="text-form-label file-upload__label" style="font-weight:var(--font-weight-heading)">첨부파일 <span class="form-field__required" aria-hidden="true">(필수)</span></span>
+                    <span class="text-form-label file-upload__label" style="font-weight:var(--font-weight-heading)">첨부파일 <span class="form-field__required" aria-hidden="true">(필수)</span><span class="tooltip-wrapper" onmouseenter="this.querySelector('.tooltip-panel').classList.add('tooltip-panel--visible')" onmouseleave="this.querySelector('.tooltip-panel').classList.remove('tooltip-panel--visible')"><button class="tooltip-trigger tooltip-trigger--sm" type="button" aria-label="첨부파일 안내" aria-describedby="c1-upload-tip" onfocus="this.closest('.tooltip-wrapper').querySelector('.tooltip-panel').classList.add('tooltip-panel--visible')" onblur="this.closest('.tooltip-wrapper').querySelector('.tooltip-panel').classList.remove('tooltip-panel--visible')"><svg aria-hidden="true"><use href="#icon-help"/></svg></button><div class="tooltip-panel elevation-tooltip tooltip-panel--bottom" id="c1-upload-tip" role="tooltip">파일을 마우스로 끌어다 놓거나, 추가하기 버튼을 사용해 직접 업로드해 보세요.<br>*파일당 10MB 이하 업로드 가능</div></span></span>
                     <span class="text-form-label file-upload__usage">0MB / 200MB</span>
-                  </div>
-                  <div class="file-upload__meta">
-                    <p class="text-body file-upload__description">파일을 마우스로 끌어다 놓거나, 추가하기 버튼을 사용해 직접 업로드해 보세요.</p>
-                    <p class="text-body file-upload__constraint">*파일당 10MB 이하 업로드 가능</p>
                   </div>
                   <div class="file-upload__dropzone">
                     <button class="btn btn--secondary btn--sm btn--icon-left" type="button">
