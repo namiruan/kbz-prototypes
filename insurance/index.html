@@ -164,12 +164,22 @@ exits: insurance-join-status.html
           <tr class="table__row">
             <td class="table__cell">
               <span class="hub-name">
-                <a class="link" href="report-correction.html">정정</a>
+                <a class="link" href="report-correction.html">정정 (취득)</a>
                 <span class="badge badge--success">작성 완료</span>
               </span>
             </td>
             <td class="table__cell">report-correction.html</td>
-            <td class="table__cell">정정신고 (취득/상실 상태 분기)</td>
+            <td class="table__cell">정정신고 — 취득 자격: 성명 변경 · 취득일 정정 · 취득 취소</td>
+          </tr>
+          <tr class="table__row">
+            <td class="table__cell">
+              <span class="hub-name">
+                <a class="link" href="report-correction-loss.html">정정 (상실)</a>
+                <span class="badge badge--success">작성 완료</span>
+              </span>
+            </td>
+            <td class="table__cell">report-correction-loss.html</td>
+            <td class="table__cell">정정신고 — 상실 자격: 성명 변경 · 상실일 정정 · 상실사유 변경 · 상실 취소</td>
           </tr>
           <tr class="table__row">
             <td class="table__cell">
@@ -206,7 +216,7 @@ exits: insurance-join-status.html
         <li>중첩 모달(직종 검색 등)은 부모 모달과 같은 파일에 둡니다.</li>
         <li>각 파일이 만들어지는 대로 링크를 활성화합니다.</li>
         <li>사업장 선택 모달은 취득·사업장 이동 두 흐름이 공유하므로 가입현황에 남겼습니다.</li>
-        <li>정정 신고는 드롭다운 값이 「정정」 하나뿐이라, 행의 자격 상태(취득/상실)로 대상 파일을 나눴습니다. 확인이 필요합니다.</li>
+        <li>정정 신고는 드롭다운 값이 「정정」 하나뿐이라, 행의 자격 상태(취득/상실)로 대상 파일을 나눴습니다 — 취득=report-correction.html, 상실=report-correction-loss.html (가입현황에서 자동 분기).</li>
         <li>신고 내용 조회 · 상세보기는 「신고대상&amp;진행현황」 탭 소속이며, 해당 탭은 아직 범위 밖입니다.</li>
         <li>Figma 「tree」의 접수증 Layer Modal은 프리미엄 섹션에 대응 프레임이 없어 제외했습니다.</li>
         <li>전입/전출 신고는 사업장 이동 신고로 개칭된 것으로 보고 변경 그룹에 넣었습니다.</li>

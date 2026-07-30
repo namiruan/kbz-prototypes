@@ -1505,8 +1505,8 @@ exits: report-acquire.html, report-loss.html, report-transfer.html, report-chang
      파일 분리 구조. 아직 만들지 않은 파일로 보내면 404가 나므로,
      BUILT에 등록된 파일만 실제 이동하고 나머지는 안내 Alert을 띄운다.
      파일을 새로 만들면 BUILT에 한 줄 추가하는 것으로 전환된다. */
-  /* Figma 분류 — 신고 유형별 Layer Modal은 각각 별도 파일. 정정신고는 한 파일에서
-     자격상태(취득/상실)에 따라 항목만 달라지는 단일 모달이다. */
+  /* Figma 분류 — 신고 유형별 Layer Modal은 각각 별도 파일. 정정신고는 자격상태(취득/상실)에 따라
+     항목이 달라 파일이 둘로 나뉜다: 취득=report-correction.html, 상실=report-correction-loss.html. */
   var REPORT_FILE = {
     '취득':      'report-acquire.html',
     '상실':      'report-loss.html',
@@ -1517,9 +1517,15 @@ exits: report-acquire.html, report-loss.html, report-transfer.html, report-chang
     '복직':      'report-return.html'
   };
   /* 작성 완료된 신고 파일만 실제 이동. 나머지는 안내 Alert. */
-  var BUILT = { 'report-acquire.html': true, 'report-loss.html': true, 'report-transfer.html': true, 'report-change.html': true };
+  var BUILT = { 'report-acquire.html': true, 'report-loss.html': true, 'report-transfer.html': true, 'report-change.html': true, 'report-correction.html': true, 'report-correction-loss.html': true };
 
   function reportFile(kind, row) {
+    /* 정정신고는 근로자 자격상태에 따라 취득용/상실용 모달로 분기 */
+    if (kind === '정정') {
+      var st = row && row.querySelector('[data-overlay-open="overlay-insurance-detail"] .badge');
+      var isLoss = st && /상실/.test(st.textContent);
+      return isLoss ? 'report-correction-loss.html' : 'report-correction.html';
+    }
     return REPORT_FILE[kind] || 'index.html';
   }
 
@@ -1561,8 +1567,8 @@ exits: report-acquire.html, report-loss.html, report-transfer.html, report-chang
     var kind = opt.dataset.report;
     var mock = MOCK[baseRows.indexOf(row)] || {};
 
-    /* 12. 상실 대상자 + '상실' 선택 → Step-5 예외 */
-    if (mock.step5 && kind === '상실') { goToReport('상실', row); return; }
+    /* 12. 상실 대상자 + '상실'·'정정' 선택 → Step-5 예외(정정은 상실용 정정 모달로 분기) */
+    if (mock.step5 && (kind === '상실' || kind === '정정')) { goToReport(kind, row); return; }
 
     var hit = ['step1', 'step2', 'step3', 'step4', 'step5'].filter(function (k) { return mock[k]; })[0];
     if (hit) { openOverlay(STEP_OVERLAY[hit]); return; }                                     /* 9 */

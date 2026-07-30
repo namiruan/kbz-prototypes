@@ -1,13 +1,13 @@
 <!-- design-system: v0.5.1 -->
-<!-- prototype: 4대보험 정정신고(취득) Layer Modal (report-correction.html) -->
-<!-- 취득 자격 근로자용 정정신고. 항목: 성명 변경 · 취득일 정정 · 취득 취소.
-     상실 자격은 별도 파일(report-correction-loss.html). 진입: insurance-join-status.html(취득 행) -->
+<!-- prototype: 4대보험 정정신고(상실) Layer Modal (report-correction-loss.html) -->
+<!-- 상실 자격 근로자용 정정신고. 취득용(report-correction.html)과 항목이 다르다:
+     성명 변경 · 상실일 정정 · 상실사유 변경 · 상실 취소. 진입: insurance-join-status.html(상실 행) -->
 <!DOCTYPE html>
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>4대보험 정정신고(취득)</title>
+  <title>4대보험 정정신고(상실)</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
   <link rel="stylesheet" href="https://namiruan.github.io/kbz_3.0_ui_stytem/tokens.css">
   <link rel="stylesheet" href="https://namiruan.github.io/kbz_3.0_ui_stytem/components.css">
@@ -17,77 +17,59 @@
     .proto-hub-link { display: block; padding: var(--space-inset-squish-sm); font-size: var(--font-size-sm); }
     /* 모달 본문 2열 — 좌 첨부파일(Figma 314px) + 우 폼 */
     .acq-grid { display: grid; grid-template-columns: 314px 1fr; gap: var(--space-gap-2xl); align-items: stretch; }
-    /* 첨부파일 열 — 내용이 적으면 우측 폼 높이에 맞춰 늘어나(모달도 내용만큼만 줄어듦),
-       내용이 많으면 보이는 영역(max-height)에서 멈추고 리스트는 내부 스크롤한다.
-       stretch로 폼 높이에 맞추되 max-height로 상한을 두고, overflow로 긴 리스트가 행을 밀어올리지 않게 한다.
-       모달 전체는 평소처럼 자연스럽게 스크롤되며, 첨부파일은 sticky로 화면에 고정된다. */
     .acq-grid > .file-upload { position: sticky; top: 0; max-height: calc(90vh - 172px); min-height: 0; overflow: hidden; }
-    /* 드롭존 — 안내 문구·버튼을 드래그 영역 가운데(가로·세로) 정렬. 빈 상태에도 넉넉한 드롭 영역 유지 */
     .acq-grid > .file-upload .file-upload__dropzone { flex: 1 1 auto; min-height: 240px; overflow: hidden; align-items: center; justify-content: center; }
-    /* 파일이 있으면: 안내문 숨기고 상단 정렬 + 그리드만 세로 스크롤 (열 높이는 우측 콘텐츠 기준 유지) */
     .acq-grid > .file-upload .file-upload__dropzone:has(.file-upload-item) { justify-content: flex-start; }
     .acq-grid > .file-upload .file-upload__dropzone:has(.file-upload-item) .file-upload__hint { display: none; }
-    /* grid-auto-rows: max-content — 행을 썸네일 자연 높이로 고정. 없으면 고정 높이 그리드가
-       행을 압축해 파일이 늘수록 썸네일이 찌그러진다. 대신 넘치면 그리드가 내부 스크롤된다. */
     .acq-grid > .file-upload .file-upload__dropzone:has(.file-upload-item) .file-upload__grid { flex: 1 1 auto; min-height: 0; overflow-y: auto; align-content: start; grid-auto-rows: max-content; }
-    /* 드래그 안내 문구 — 드롭 영역 안 가운데 정렬 (DS file-upload v0.4.0 .file-upload__hint) */
     .file-upload__hint { margin: 0; max-width: 28em; text-align: center; color: var(--color-text-subtle); font-size: var(--font-size-sm); line-height: var(--line-height-reading); word-break: keep-all; }
-    /* 첨부파일 라벨 — 용량 제한(*파일당 10MB…)은 라벨 옆 도움말(?) 툴팁으로. 트리거를 라벨과 세로 중앙 정렬 */
     .file-upload__label { display: inline-flex; align-items: center; gap: var(--space-gap-2xs); }
-    /* 폼 세로 스택 — 섹션 간격을 넓게 */
     .acq-form { display: flex; flex-direction: column; gap: var(--space-gap-xl); }
-    /* ── 조회 정보 카드 — 이름·주민번호는 입력이 아니라 조회 정보이므로 카드형(라벨 위·값 아래)으로 노출.
-       타 신고 모달(취득·상실·보수변경·이동)과 동일한 .acq-info-card 컴포넌트를 사용해 일관성 유지. ── */
+    /* 조회 정보 카드 — 타 신고 모달과 동일 */
     .acq-info-card { display: flex; border: var(--stroke-sm) solid var(--color-border-default); border-radius: var(--radius-md); background: var(--color-surface-subtle); overflow: hidden; }
     .acq-info-card__item { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; align-items: center; text-align: center; gap: var(--space-gap-2xs); padding: var(--space-inset-lg); }
     .acq-info-card__item + .acq-info-card__item { border-left: var(--stroke-sm) solid var(--color-border-default); }
     .acq-info-card__label { font-size: var(--font-size-sm); color: var(--color-text-subtle); }
     .acq-info-card__value { font-size: var(--font-size-base); font-weight: var(--font-weight-heading); color: var(--color-text-body); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    /* 정정신고 항목 섹션 — 라벨 + 카드 스택 (섹션 라벨은 타 모달과 동일하게 text-form-label 기본 굵기) */
+    /* 정정신고 항목 섹션 */
     .corr-items { display: flex; flex-direction: column; gap: var(--space-gap-sm); }
     .corr-cards { display: flex; flex-direction: column; gap: var(--space-gap-md); }
-    /* 미선택 안내 — 아무 항목도 체크하지 않았을 때 카드 아래 힌트 */
     .corr-empty-hint { color: var(--color-text-subtle); }
     .corr-empty-hint[hidden] { display: none; }
     .corr-items--error .corr-empty-hint { color: var(--color-text-error); }
-
-    /* ── 체크 항목 카드 — 카드 제목에 체크박스, 체크 시 입력란 노출 ──
-       미니멀 스타일: 테두리·회색 채움 없이, 비활성은 평범한 체크박스 행,
-       활성(선택)일 때만 브랜드 옅은 채움 패널로 드러난다. */
+    /* 체크 항목 카드 — 카드 제목 체크박스, 체크 시 입력란 노출(활성 시 브랜드 옅은 채움) */
     .corr-card { border-radius: var(--radius-md); overflow: hidden; background: transparent; transition: background var(--duration-fast) var(--easing-base); }
     .corr-card--checked { background: var(--color-surface-brand-subtle); }
-    /* 헤더 = 체크박스 전체 폭. 라벨(제목)까지 클릭하면 토글 */
     .corr-card__head { display: block; }
     .corr-card__head .checkbox { width: 100%; box-sizing: border-box; padding: var(--space-inset-md) var(--space-inset-lg); gap: var(--space-gap-sm); }
     .corr-card__head .checkbox__label { font-size: var(--font-size-base); font-weight: var(--font-weight-heading); color: var(--color-text-body); }
     .corr-card--checked .corr-card__head .checkbox__label { color: var(--color-text-brand); }
-    /* 본문 — 체크 시에만 노출. 헤더와 여백으로 구분하고, 콘텐츠에 상하 여백을 넉넉히 준다. */
     .corr-card__body { padding: var(--space-inset-lg); display: flex; flex-direction: column; gap: var(--space-gap-lg); }
     .corr-card__body[hidden] { display: none; }
-    /* 변경 전 → 변경 후 — 가운데 정렬 + 가운데 화살표. 화살표는 라벨 아래 입력창 줄 높이에 맞춘다. */
+    /* 변경 전 → 변경 후 — 가운데 정렬 + 가운데 화살표 */
     .corr-field-row { display: flex; flex-wrap: wrap; justify-content: center; align-items: flex-start; column-gap: var(--space-gap-lg); row-gap: var(--space-gap-md); }
     .corr-field-row > .form-field { display: flex; flex-direction: column; gap: var(--space-gap-xs); flex: 0 1 200px; }
     .corr-field-row .input { max-width: 200px; }
     .corr-field-arrow { flex: 0 0 auto; align-self: flex-start; margin-top: calc(var(--font-size-sm) + var(--space-gap-xs)); height: var(--height-base); display: inline-flex; align-items: center; color: var(--color-text-subtle); font-size: var(--font-size-lg); }
-    /* 취득 정보 — 읽기 전용 참조 데이터. 데이터테이블 인포(table--info: 상하 구분선만) 형태로 가볍게 얹고,
-       내용 폭만큼만 차지하도록(fit-content) 가로를 줄이고 카드 안에서 가운데 정렬한다. */
+    /* 상실사유 변경 — 상실사유 + 구체적 사유 2단 셀렉트(세로 스택) */
+    .corr-lr-selects { display: flex; flex-direction: column; gap: var(--space-gap-sm); }
+    /* 상실 취소 대상 보험 — 체크박스 가로 나열 */
+    .corr-ins-checks { display: flex; flex-wrap: wrap; gap: var(--space-gap-lg); }
+    /* 상실 정보 — 읽기 전용 데이터테이블 인포(내용 폭만큼, 가운데 정렬) */
     .corr-subsection { align-self: center; max-width: 100%; }
-    /* 소제목 라벨 — 같은 카드 안 다른 라벨(취득취소 사유)과 동일한 폼 라벨 톤(text-form-label: body색) */
     .corr-sub-title { display: block; text-align: center; font-size: var(--font-size-sm); font-weight: var(--font-weight-body); color: var(--color-text-body); margin-bottom: var(--space-gap-xs); }
     .corr-info-table.table-container { border-left: 0; border-right: 0; border-radius: 0; width: fit-content; max-width: 100%; margin-left: auto; margin-right: auto; }
     .corr-info-table .table__cell.corr-info-key { white-space: nowrap; color: var(--color-text-subtle); font-weight: var(--font-weight-medium); padding-right: var(--space-gap-2xl); }
     .corr-info-table .table__cell.corr-info-brand { color: var(--color-text-brand); font-weight: var(--font-weight-heading); }
-
-    /* ── 제출서류 안내 — 체크된 항목이 있을 때만 노출, Disclosure로 접기 ── */
+    /* 제출서류 안내 */
     .corr-doc[hidden] { display: none; }
     .acq-doc-disc { display: flex; flex-direction: column; align-items: stretch; width: 100%; }
     .acq-doc-disc .disclosure__header { display: flex; align-items: center; gap: var(--space-gap-sm); }
     .acq-doc-title { flex: 1 1 auto; min-width: 0; font-weight: var(--font-weight-heading); color: var(--color-text-body); }
     .acq-doc-disc.disclosure--expanded .disclosure__body { color: inherit; }
-    /* 제출서류 테이블 — 라운드·좌우 테두리 제거(상/하 구분선만) */
     .acq-doc-table.table-container { border-left: 0; border-right: 0; border-radius: 0; }
     .acq-doc-table .table__cell.acq-doc-key,
-    .acq-doc-table .table__head-cell:first-child { width: 96px; white-space: nowrap; }
+    .acq-doc-table .table__head-cell:first-child { width: 128px; white-space: nowrap; }
     .acq-doc-table .table__cell.acq-doc-key { vertical-align: middle; color: var(--color-text-body); font-weight: var(--font-weight-heading); }
     .acq-doc-list { margin: 0; padding-left: var(--space-inset-xl); list-style: decimal; display: flex; flex-direction: column; gap: var(--space-gap-2xs); }
     .acq-doc-list li { color: var(--color-text-body); }
@@ -95,18 +77,15 @@
     .acq-doc-eg { color: var(--color-text-subtle); font-size: var(--font-size-sm); }
     .acq-doc-notes { margin: var(--space-gap-sm) 0 0; padding-left: var(--space-inset-lg); list-style: disc; display: flex; flex-direction: column; gap: var(--space-gap-2xs); color: var(--color-text-subtle); font-size: var(--font-size-sm); }
     .acq-doc-row[hidden] { display: none; }
-    /* 마지막 '보이는' 행의 셀 하단 border 제거 — 컨테이너 하단 border와 겹쳐 바닥선이
-       두꺼워지는 것 방지(실제 마지막 DOM 행이 아니라 hidden 제외 마지막 행 기준) */
     .acq-doc-table .table__body .table__row.acq-doc-row--lastvis .table__cell { border-bottom: none; }
-    /* 첨부파일 필수 에러 — 첨부파일 타이틀 바로 아래(헤더와 드롭존 사이)에 표기해
-       파일 목록 길이·스크롤과 무관하게 항상 보이도록 한다. */
+    /* 첨부파일 필수 에러 — 타이틀 바로 아래 */
     .corr-upload-err { display: none; margin: 0; color: var(--color-text-error); font-size: var(--font-size-sm); }
     .file-upload--error .corr-upload-err { display: block; }
   </style>
 </head>
 <body>
 <!-- @flow
-title: 정정신고
+title: 정정신고(상실)
 exits: insurance-join-status.html, index.html
 -->
 
@@ -114,7 +93,6 @@ exits: insurance-join-status.html, index.html
 <div class="proto-layout">
 
   <aside class="proto-sidebar" id="proto-sidebar">
-    <!-- 허브 복귀 — 파일 분리 구조 -->
     <a class="link proto-hub-link" href="index.html">← 화면 목록</a>
 
     <div class="segment segment--md" role="radiogroup" aria-label="보기 모드" id="mode-segment">
@@ -166,7 +144,7 @@ exits: insurance-join-status.html, index.html
 
                 <div class="acq-form">
 
-                  <!-- 1 area — 근로자 정보 (이름·주민번호 조회 정보 카드, 타 신고 모달과 동일) -->
+                  <!-- 1 area — 근로자 정보 -->
                   <div class="acq-info-card">
                     <div class="acq-info-card__item"><span class="acq-info-card__label">이름</span><span class="acq-info-card__value">유가영</span></div>
                     <div class="acq-info-card__item"><span class="acq-info-card__label">주민번호</span><span class="acq-info-card__value">123456-1234567</span></div>
@@ -175,7 +153,6 @@ exits: insurance-join-status.html, index.html
                   <!-- 2 area — 정정신고 항목 (카드 제목 체크박스 → 체크 시 입력란 노출) -->
                   <div class="corr-items" id="c1-items">
                     <span class="text-form-label" id="c1-items-label">정정신고 항목</span>
-                    <!-- 2-1 area — 선택된 정정신고 항목 없을 경우: 타이틀 라벨 바로 아래 안내 -->
                     <p class="corr-empty-hint text-helper" id="c1-empty-hint">정정할 항목을 선택하면 입력란이 표시돼요.</p>
 
                     <div class="corr-cards" role="group" aria-labelledby="c1-items-label">
@@ -201,56 +178,106 @@ exits: insurance-join-status.html, index.html
                         </div>
                       </div>
 
-                      <!-- 취득일 정정 -->
-                      <div class="corr-card" data-item="date">
+                      <!-- 상실일 정정 -->
+                      <div class="corr-card" data-item="lossdate">
                         <div class="corr-card__head">
-                          <label class="checkbox"><input type="checkbox" id="c1-dc-check" data-corr-check><span class="checkbox__control" aria-hidden="true"><span class="checkbox__icon-check"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span><span class="checkbox__label">취득일 정정</span></label>
+                          <label class="checkbox"><input type="checkbox" id="c1-ld-check" data-corr-check><span class="checkbox__control" aria-hidden="true"><span class="checkbox__icon-check"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span><span class="checkbox__label">상실일 정정</span></label>
                         </div>
-                        <div class="corr-card__body" id="c1-dc-body" hidden>
+                        <div class="corr-card__body" id="c1-ld-body" hidden>
                           <div class="corr-field-row">
                             <div class="form-field">
-                              <label class="form-field__label text-form-label" for="c1-dc-before">변경 전</label>
-                              <div class="form-field__body"><input class="input input--readonly" id="c1-dc-before" type="text" value="2025-01-01" readonly></div>
+                              <label class="form-field__label text-form-label" for="c1-ld-before">변경 전</label>
+                              <div class="form-field__body"><input class="input input--readonly" id="c1-ld-before" type="text" value="2024-05-31" readonly></div>
                             </div>
                             <span class="corr-field-arrow" aria-hidden="true">→</span>
                             <div class="form-field">
-                              <label class="form-field__label text-form-label" for="c1-dc-after">변경 후 <span class="form-field__required" aria-hidden="true">(필수)</span></label>
-                              <div class="form-field__body"><input class="input" id="c1-dc-after" type="text" placeholder="YYYY-MM-DD" inputmode="numeric" maxlength="10"></div>
-                              <div class="form-field__footer"><p class="form-field__error text-helper" id="c1-dc-after-err" role="alert">변경 후 취득일을 입력해 주세요.</p></div>
+                              <label class="form-field__label text-form-label" for="c1-ld-after">변경 후 <span class="form-field__required" aria-hidden="true">(필수)</span></label>
+                              <div class="form-field__body"><input class="input" id="c1-ld-after" type="text" placeholder="YYYY-MM-DD" inputmode="numeric" maxlength="10"></div>
+                              <div class="form-field__footer"><p class="form-field__error text-helper" id="c1-ld-after-err" role="alert">변경 후 상실일을 입력해 주세요.</p></div>
                             </div>
                           </div>
                         </div>
                       </div>
 
-                      <!-- 취득 취소 (단독 선택) -->
+                      <!-- 상실사유 변경 -->
+                      <div class="corr-card" data-item="lossreason">
+                        <div class="corr-card__head">
+                          <label class="checkbox"><input type="checkbox" id="c1-lr-check" data-corr-check><span class="checkbox__control" aria-hidden="true"><span class="checkbox__icon-check"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span><span class="checkbox__label">상실사유 변경</span></label>
+                        </div>
+                        <div class="corr-card__body" id="c1-lr-body" hidden>
+                          <div class="form-field" id="c1-lr-field">
+                            <span class="form-field__label text-form-label" id="c1-lr-label">변경 상실사유 <span class="form-field__required" aria-hidden="true">(필수)</span></span>
+                            <div class="form-field__body corr-lr-selects">
+                              <div class="dropdown dropdown--button dropdown--menu" id="c1-lr-reason">
+                                <button class="dropdown__trigger" type="button" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="c1-lr-label"><span class="dropdown__value dropdown__value--placeholder">상실 사유 선택</span><span class="dropdown__chevron" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-chevron-down"/></svg></span></button>
+                                <div class="dropdown__panel"><ul class="dropdown__list" role="listbox" aria-label="상실 사유">
+                                  <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">자진 퇴사</span></li>
+                                  <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">계약 만료</span></li>
+                                  <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">정년 퇴직</span></li>
+                                  <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">경영상 필요·회사 사정</span></li>
+                                  <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">기타</span></li>
+                                </ul></div>
+                              </div>
+                              <div class="dropdown dropdown--button dropdown--menu" id="c1-lr-detail">
+                                <button class="dropdown__trigger" type="button" aria-haspopup="listbox" aria-expanded="false" aria-label="구체적 상실 사유"><span class="dropdown__value dropdown__value--placeholder">구체적 사유 선택</span><span class="dropdown__chevron" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-chevron-down"/></svg></span></button>
+                                <div class="dropdown__panel"><ul class="dropdown__list" role="listbox" aria-label="구체적 상실 사유">
+                                  <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">개인 사정</span></li>
+                                  <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">이직</span></li>
+                                  <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">질병·부상</span></li>
+                                  <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">사업장 이전·폐업</span></li>
+                                  <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">기타</span></li>
+                                </ul></div>
+                              </div>
+                            </div>
+                            <div class="form-field__footer"><p class="form-field__error text-helper" id="c1-lr-err" role="alert">변경할 상실사유를 선택해 주세요.</p></div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- 상실 취소 (단독 선택) -->
                       <div class="corr-card" data-item="cancel">
                         <div class="corr-card__head">
-                          <label class="checkbox"><input type="checkbox" id="c1-cc-check" data-corr-check data-corr-exclusive><span class="checkbox__control" aria-hidden="true"><span class="checkbox__icon-check"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span><span class="checkbox__label">취득 취소</span></label>
+                          <label class="checkbox"><input type="checkbox" id="c1-cc-check" data-corr-check data-corr-exclusive><span class="checkbox__control" aria-hidden="true"><span class="checkbox__icon-check"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span><span class="checkbox__label">상실 취소</span></label>
                         </div>
                         <div class="corr-card__body" id="c1-cc-body" hidden>
+                          <!-- 8 area — 상실 취소 대상 보험 (상실된 보험만 선택 가능, 기본 모두 선택. 취득중·미가입은 disabled) -->
+                          <div class="form-field">
+                            <span class="form-field__label text-form-label" id="c1-cc-ins-label">상실 취소 대상 보험</span>
+                            <div class="form-field__body">
+                              <div class="corr-ins-checks" role="group" aria-labelledby="c1-cc-ins-label">
+                                <label class="checkbox"><input type="checkbox" id="c1-cc-ins-emp" checked><span class="checkbox__control" aria-hidden="true"><span class="checkbox__icon-check"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span><span class="checkbox__label">고용보험</span></label>
+                                <label class="checkbox"><input type="checkbox" id="c1-cc-ins-acc" checked><span class="checkbox__control" aria-hidden="true"><span class="checkbox__icon-check"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span><span class="checkbox__label">산재보험</span></label>
+                                <label class="checkbox checkbox--disabled"><input type="checkbox" id="c1-cc-ins-hea" disabled aria-disabled="true"><span class="checkbox__control" aria-hidden="true"><span class="checkbox__icon-check"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span><span class="checkbox__label">건강보험</span></label>
+                                <label class="checkbox"><input type="checkbox" id="c1-cc-ins-pen" checked><span class="checkbox__control" aria-hidden="true"><span class="checkbox__icon-check"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span><span class="checkbox__label">국민연금</span></label>
+                              </div>
+                            </div>
+                          </div>
+                          <!-- 7 area — 상실 정보 (읽기 전용) -->
                           <div class="corr-subsection">
-                            <span class="corr-sub-title">취득 정보</span>
+                            <span class="corr-sub-title">상실 정보</span>
                             <div class="table-container corr-info-table">
                               <table class="table table--info table--dense">
                                 <tbody class="table__body">
-                                  <tr class="table__row"><td class="table__cell corr-info-key">취득일</td><td class="table__cell">2024-03-01</td></tr>
-                                  <tr class="table__row"><td class="table__cell corr-info-key">신고 보험</td><td class="table__cell corr-info-brand">건강보험, 국민연금, 고용보험</td></tr>
-                                  <tr class="table__row"><td class="table__cell corr-info-key">월급여액</td><td class="table__cell">3,200,000 원</td></tr>
-                                  <tr class="table__row"><td class="table__cell corr-info-key">주소정근로시간</td><td class="table__cell">40시간</td></tr>
-                                  <tr class="table__row"><td class="table__cell corr-info-key">직종</td><td class="table__cell">사무직</td></tr>
+                                  <tr class="table__row"><td class="table__cell corr-info-key">퇴사일</td><td class="table__cell">2024-05-30</td></tr>
+                                  <tr class="table__row"><td class="table__cell corr-info-key">상실일</td><td class="table__cell">2024-05-31</td></tr>
+                                  <tr class="table__row"><td class="table__cell corr-info-key">신고 보험</td><td class="table__cell corr-info-brand">고용보험, 산재보험, 국민연금</td></tr>
+                                  <tr class="table__row"><td class="table__cell corr-info-key">전년도 보수총액/산정월수</td><td class="table__cell">2,800,000 원 / 10 개월</td></tr>
+                                  <tr class="table__row"><td class="table__cell corr-info-key">당해년도 보수총액/산정월수</td><td class="table__cell">3,200,000 원 / 12 개월</td></tr>
+                                  <tr class="table__row"><td class="table__cell corr-info-key">상실사유</td><td class="table__cell">자진 퇴사 / 개인 사정</td></tr>
                                 </tbody>
                               </table>
                             </div>
                           </div>
+                          <!-- 9 area — 상실취소 사유 (필수) -->
                           <div class="form-field">
-                            <label class="form-field__label text-form-label" for="c1-cc-reason">취득취소 사유 <span class="form-field__required" aria-hidden="true">(필수)</span></label>
+                            <label class="form-field__label text-form-label" for="c1-cc-reason">상실취소 사유 <span class="form-field__required" aria-hidden="true">(필수)</span></label>
                             <div class="form-field__body">
                               <div class="textarea-wrap textarea-wrap--char-count">
                                 <textarea class="textarea" id="c1-cc-reason" rows="4" maxlength="200" placeholder="접수와 관련하여 담당자에게 요청할 추가내용을 기재해주세요."></textarea>
                                 <span class="textarea-char-count" aria-hidden="true">0/200</span>
                               </div>
                             </div>
-                            <div class="form-field__footer"><p class="form-field__error text-helper" id="c1-cc-reason-err" role="alert">취득취소 사유를 입력해 주세요.</p></div>
+                            <div class="form-field__footer"><p class="form-field__error text-helper" id="c1-cc-reason-err" role="alert">상실취소 사유를 입력해 주세요.</p></div>
                           </div>
                         </div>
                       </div>
@@ -258,7 +285,7 @@ exits: insurance-join-status.html, index.html
                     </div>
                   </div>
 
-                  <!-- 5·8 area — 제출서류 안내 (체크된 항목별 행, Disclosure로 접기) -->
+                  <!-- 제출서류 안내 (체크된 항목별 행, Disclosure로 접기) -->
                   <div class="corr-doc" id="c1-doc" hidden>
                     <div class="disclosure disclosure--icon-only disclosure--expanded acq-doc-disc" data-label-expand="제출서류 안내 펼치기" data-label-collapse="제출서류 안내 접기">
                       <span class="disclosure__header">
@@ -286,28 +313,34 @@ exits: insurance-join-status.html, index.html
                                   </ol>
                                 </td>
                               </tr>
-                              <tr class="table__row acq-doc-row" data-doc="date" hidden>
-                                <td class="table__cell acq-doc-key">취득일 정정</td>
+                              <tr class="table__row acq-doc-row" data-doc="losschange" hidden>
+                                <td class="table__cell acq-doc-key">상실일/상실사유 변경</td>
                                 <td class="table__cell">
                                   <ol class="acq-doc-list">
-                                    <li>정정 사유서 <button class="icon-on--sm acq-doc-dl" type="button" aria-label="정정 사유서 양식 다운로드"><svg aria-hidden="true"><use href="#icon-download"/></svg></button> <span class="acq-doc-eg">(정정사유서 예시 <button class="icon-on--sm acq-doc-dl" type="button" aria-label="정정사유서 예시 다운로드"><svg aria-hidden="true"><use href="#icon-download"/></svg></button>)</span></li>
-                                    <li>사실관계 입증 서류(근로계약서 등)</li>
+                                    <li>정정 사유서 <button class="icon-on--sm acq-doc-dl" type="button" aria-label="정정 사유서 양식 다운로드"><svg aria-hidden="true"><use href="#icon-download"/></svg></button></li>
+                                    <li>상실사유 정정 확인서 <button class="icon-on--sm acq-doc-dl" type="button" aria-label="상실사유 정정 확인서 양식 다운로드"><svg aria-hidden="true"><use href="#icon-download"/></svg></button></li>
                                   </ol>
                                   <ul class="acq-doc-notes">
-                                    <li>신고된 취득일을 실제 근무 시작일로 정정하는 절차입니다.</li>
-                                    <li>정정 사유서와 실제 근무 시작일을 입증할 수 있는 증빙 서류를 첨부해주세요.</li>
+                                    <li>정정신고에 대한 ‘정정 사유서’와 사실관계를 입증할 수 있는 증빙서류를 첨부해주세요.</li>
+                                    <li>상실사유 정정의 경우 “상실사유 정정확인서”의 기재사항을 모두 작성해주세요.
+                                      <ul class="acq-doc-notes" style="margin-top:var(--space-gap-2xs)">
+                                        <li>사업주: [고용보험 과태료 부과기준 안내] 내용 확인 후 서명</li>
+                                        <li>퇴사근로자: [퇴사 근로자 확인서] 자필로 작성 후 서명 + 신분증 사본</li>
+                                      </ul>
+                                    </li>
                                   </ul>
                                 </td>
                               </tr>
                               <tr class="table__row acq-doc-row" data-doc="cancel" hidden>
-                                <td class="table__cell acq-doc-key">취득 취소</td>
+                                <td class="table__cell acq-doc-key">상실 취소</td>
                                 <td class="table__cell">
                                   <ol class="acq-doc-list">
-                                    <li>사실관계 입증 서류(입사 취소 통지서, 근로계약 미체결 확인서, 급여 미지급 확인서 등)</li>
+                                    <li>상실 취소 사유서</li>
+                                    <li>사실관계 입증 서류</li>
                                   </ol>
                                   <ul class="acq-doc-notes">
-                                    <li>잘못 신고된 취득 건을 회수하는 절차입니다.</li>
-                                    <li>취득 취소 사유서와 사실관계를 입증할 수 있는 증빙 서류를 첨부해주세요.</li>
+                                    <li>잘못 신고된 상실 건을 회수하는 절차입니다.</li>
+                                    <li>상실 취소 사유서와 사실관계를 입증할 수 있는 증빙 서류를 첨부해주세요.</li>
                                   </ul>
                                 </td>
                               </tr>
@@ -382,7 +415,7 @@ exits: insurance-join-status.html, index.html
   </div>
 </div>
 
-<!-- ══════════════ 10 area — 취소 확인 (Alert) ══════════════ -->
+<!-- ══════════════ 취소 확인 (Alert) ══════════════ -->
 <div id="overlay-cancel" data-overlay>
   <div class="alert" role="alertdialog" aria-modal="true" aria-labelledby="cancel-title" aria-describedby="cancel-body">
     <div class="alert__header">
@@ -399,7 +432,7 @@ exits: insurance-join-status.html, index.html
   </div>
 </div>
 
-<!-- ══════════════ 11 area — 임시저장 확인 (Alert) ══════════════ -->
+<!-- ══════════════ 임시저장 확인 (Alert) ══════════════ -->
 <div id="overlay-draft" data-overlay>
   <div class="alert" role="alertdialog" aria-modal="true" aria-labelledby="draft-title" aria-describedby="draft-body">
     <div class="alert__header">
@@ -416,7 +449,7 @@ exits: insurance-join-status.html, index.html
   </div>
 </div>
 
-<!-- ══════════════ 12 area — 신고요청 확인 (Alert) ══════════════ -->
+<!-- ══════════════ 신고요청 확인 (Alert) ══════════════ -->
 <div id="overlay-submit" data-overlay>
   <div class="alert" role="alertdialog" aria-modal="true" aria-labelledby="submit-title" aria-describedby="submit-body">
     <div class="alert__header">
@@ -433,16 +466,28 @@ exits: insurance-join-status.html, index.html
   </div>
 </div>
 
+<!-- ══════════════ 상실사유 변경 경고 (실업급여 부정수급) — 상실사유 변경 포함 시 신고요청 전 노출 ══════════════ -->
+<div id="overlay-warn" data-overlay data-overlay-static>
+  <div class="alert" role="alertdialog" aria-modal="true" aria-labelledby="warn-title" aria-describedby="warn-body">
+    <div class="alert__header">
+      <p class="text-card-title alert__title" id="warn-title">4대보험 정정신고를 진행하시겠습니까?</p>
+      <button class="icon-on--sm alert__close" type="button" aria-label="닫기" data-overlay-close><svg aria-hidden="true"><use href="#icon-close"/></svg></button>
+    </div>
+    <div class="alert__body" id="warn-body">
+      <p class="text-description alert__description">실제 퇴사 사유와 다르게 상실사유를 변경할 경우 <b>실업급여 부정수급</b>에 해당할 수 있습니다. 적발 시 실업급여 전액 반환, 최대 5배 추가 징수, 형사처벌(3년 이하 징역 또는 3천만원 이하 벌금) 대상이 될 수 있습니다.<br><br>계속 진행하시겠습니까?</p>
+    </div>
+    <div class="alert__footer">
+      <button class="btn btn--ghost btn--md" type="button" data-overlay-close>취소</button>
+      <button class="btn btn--primary btn--md" type="button" id="warn-confirm">신고요청</button>
+    </div>
+  </div>
+</div>
+
 <script>
-  /* ── 아이콘 sprite fetch 주입 — 로컬 참조(#icon-*)로 Safari·file:// 차단 회피 ── */
+  /* ── 아이콘 sprite fetch 주입 ── */
   fetch('https://namiruan.github.io/kbz_3.0_ui_stytem/icons/sprite.svg')
     .then(function(r) { return r.text(); })
-    .then(function(t) {
-      var d = document.createElement('div');
-      d.style.display = 'none';
-      d.innerHTML = t;
-      document.body.insertBefore(d, document.body.firstChild);
-    });
+    .then(function(t) { var d = document.createElement('div'); d.style.display = 'none'; d.innerHTML = t; document.body.insertBefore(d, document.body.firstChild); });
 
   /* ── 컴포넌트 초기화 스캐폴드 ── */
   function _initComponents(root) {
@@ -457,7 +502,7 @@ exits: insurance-join-status.html, index.html
   }
   _initComponents();
 
-  /* ── 인터랙티브 보기 폼 검증·버튼 로딩 ── */
+  /* ── 폼 상태 헬퍼 ── */
   function setFieldError(fieldId, errId, msg) {
     var field = document.getElementById(fieldId), err = document.getElementById(errId);
     if (!field || !err) return;
@@ -509,16 +554,14 @@ exits: insurance-join-status.html, index.html
   var protoPanels = Array.prototype.slice.call(document.querySelectorAll('#pane-panels > .scenario-panel'));
   function showOnlyPanel(target) { protoPanels.forEach(function(p) { p.hidden = p !== target; }); }
 
-  /* ── 보기 모드 전환 (시나리오 ↔ 인터랙티브) ── */
   document.querySelectorAll('#mode-segment .segment__item').forEach(function(btn) {
     btn.addEventListener('click', function() {
       var interactive = this.dataset.mode === 'interactive';
       document.getElementById('proto-nav').hidden = interactive;
       document.getElementById('proto-nav-divider').hidden = interactive;
       closeAllOverlays();
-      if (interactive) {
-        if (protoPanels[0]) { showOnlyPanel(protoPanels[0]); _initComponents(protoPanels[0]); }
-      } else {
+      if (interactive) { if (protoPanels[0]) { showOnlyPanel(protoPanels[0]); _initComponents(protoPanels[0]); } }
+      else {
         var active = document.querySelector('.proto-nav-btn.is-active');
         var name = active ? active.dataset.scenario : (protoPanels[0] && protoPanels[0].dataset.scenario);
         var target = protoPanels.filter(function(p) { return p.dataset.scenario === name; })[0] || protoPanels[0];
@@ -526,8 +569,6 @@ exits: insurance-join-status.html, index.html
       }
     });
   });
-
-  /* ── 시나리오 네비게이션 전환 (점프) ── */
   document.querySelectorAll('.proto-nav-btn').forEach(function(btn) {
     btn.addEventListener('click', function() {
       closeAllOverlays();
@@ -541,9 +582,7 @@ exits: insurance-join-status.html, index.html
   var _FOCUSABLE = 'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
   var _overlayStack = [];
   function _topOverlay() { return _overlayStack[_overlayStack.length - 1]; }
-  function _visibleFocusable(ov) {
-    return Array.prototype.filter.call(ov.querySelectorAll(_FOCUSABLE), function(el) { return el.offsetParent !== null; });
-  }
+  function _visibleFocusable(ov) { return Array.prototype.filter.call(ov.querySelectorAll(_FOCUSABLE), function(el) { return el.offsetParent !== null; }); }
   function openOverlay(id) {
     var ov = document.getElementById(id);
     if (!ov || ov.classList.contains('is-open')) return;
@@ -556,15 +595,12 @@ exits: insurance-join-status.html, index.html
   }
   function closeOverlay(ov) {
     if (!ov || !ov.classList.contains('is-open')) return;
-    ov.classList.remove('is-open');
-    ov.style.zIndex = '';
-    var i = _overlayStack.indexOf(ov);
-    if (i > -1) _overlayStack.splice(i, 1);
+    ov.classList.remove('is-open'); ov.style.zIndex = '';
+    var i = _overlayStack.indexOf(ov); if (i > -1) _overlayStack.splice(i, 1);
     if (ov._returnFocus && ov._returnFocus.focus) ov._returnFocus.focus();
     ov._returnFocus = null;
   }
   function closeAllOverlays() { _overlayStack.slice().reverse().forEach(closeOverlay); }
-
   document.querySelectorAll('[data-overlay-open]').forEach(function(el) {
     el.addEventListener('click', function(e) { e.preventDefault(); openOverlay(this.dataset.overlayOpen); });
   });
@@ -572,17 +608,13 @@ exits: insurance-join-status.html, index.html
     if (e.target.closest('[data-overlay-close]')) closeOverlay(e.target.closest('[data-overlay]'));
   });
   document.querySelectorAll('[data-overlay]').forEach(function(ov) {
-    ov.addEventListener('mousedown', function(e) {
-      if (e.target === ov && !ov.hasAttribute('data-overlay-static')) closeOverlay(ov);
-    });
+    ov.addEventListener('mousedown', function(e) { if (e.target === ov && !ov.hasAttribute('data-overlay-static')) closeOverlay(ov); });
   });
   document.addEventListener('keydown', function(e) {
-    var top = _topOverlay();
-    if (!top) return;
+    var top = _topOverlay(); if (!top) return;
     if (e.key === 'Escape' && !top.hasAttribute('data-overlay-static')) { e.preventDefault(); closeOverlay(top); return; }
     if (e.key !== 'Tab') return;
-    var f = _visibleFocusable(top);
-    if (!f.length) return;
+    var f = _visibleFocusable(top); if (!f.length) return;
     var first = f[0], last = f[f.length - 1];
     if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
     else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
@@ -590,47 +622,38 @@ exits: insurance-join-status.html, index.html
 </script>
 
 <script>
-/* ══════════════ 정정신고 인터랙션 ══════════════ */
+/* ══════════════ 정정신고(상실) 인터랙션 ══════════════ */
 (function () {
   var root = document.getElementById('pane-panels');
   if (!root) return;
 
   function shake(el) { if (!el) return; el.classList.remove('motion-shake'); void el.offsetWidth; el.classList.add('motion-shake'); }
-
   function cardOf(input) { return input.closest('.corr-card'); }
   function bodyOf(card) { return card.querySelector('.corr-card__body'); }
-  function itemChecks(panel) { return Array.prototype.slice.call(panel.querySelectorAll('[data-corr-check]')); }
+  function itemChecks(panel) { return Array.prototype.slice.call(panel.querySelectorAll('.corr-cards [data-corr-check]')); }
 
-  /* 카드 체크 상태 → 본문 노출 + 카드 강조 */
+  /* 카드 체크 → 본문 노출 + 강조 */
   function syncCard(input) {
     var card = cardOf(input), body = bodyOf(card);
     card.classList.toggle('corr-card--checked', input.checked);
     if (body) body.hidden = !input.checked;
   }
 
-  /* 제출서류 안내 — 체크된 항목 행만 노출, 하나도 없으면 섹션 전체 숨김 */
-  var DOC_KEY = { name: 'name', date: 'date', cancel: 'cancel' };
+  /* 제출서류 안내 — 항목→문서행 매핑(상실일·상실사유 변경은 한 행 공유) */
+  var ITEM_DOC = { name: 'name', lossdate: 'losschange', lossreason: 'losschange', cancel: 'cancel' };
   function syncDoc(panel) {
-    var doc = panel.querySelector('.corr-doc');
-    if (!doc) return;
+    var doc = panel.querySelector('.corr-doc'); if (!doc) return;
+    var on = {};
+    itemChecks(panel).forEach(function (chk) { if (chk.checked) { var d = ITEM_DOC[cardOf(chk).dataset.item]; if (d) on[d] = true; } });
     var anyChecked = false;
-    itemChecks(panel).forEach(function (chk) {
-      var item = cardOf(chk).dataset.item;
-      var row = doc.querySelector('.acq-doc-row[data-doc="' + item + '"]');
-      if (row) row.hidden = !chk.checked;
-      if (chk.checked) anyChecked = true;
-    });
+    doc.querySelectorAll('.acq-doc-row').forEach(function (row) { var show = !!on[row.dataset.doc]; row.hidden = !show; if (show) anyChecked = true; });
     doc.hidden = !anyChecked;
-    /* 마지막으로 '보이는' 행 표시 — 행을 hidden으로 토글하면 DS의 :last-child 하단 border
-       제거가 '숨은 마지막 행'에 적용돼, 실제 마지막 보이는 행의 셀 border가 컨테이너 하단
-       border와 겹쳐 두 줄(두꺼운 선)로 보인다. 마지막 보이는 행에 클래스를 부여해 그 border 제거. */
     var rows = Array.prototype.slice.call(doc.querySelectorAll('.acq-doc-row'));
     var visible = rows.filter(function (r) { return !r.hidden; });
     rows.forEach(function (r) { r.classList.remove('acq-doc-row--lastvis'); });
     if (visible.length) visible[visible.length - 1].classList.add('acq-doc-row--lastvis');
   }
 
-  /* 미선택 힌트 — 아무 항목도 없을 때만 노출 */
   function syncEmptyHint(panel) {
     var anyChecked = itemChecks(panel).some(function (c) { return c.checked; });
     var hint = panel.querySelector('.corr-empty-hint');
@@ -638,11 +661,9 @@ exits: insurance-join-status.html, index.html
     if (anyChecked) panel.querySelector('.corr-items').classList.remove('corr-items--error');
   }
 
-  /* 취득 취소 단독 선택 규칙:
-     - 취득 취소 체크 → 성명 변경·취득일 정정 자동 해제
-     - 성명 변경·취득일 정정 체크 → 취득 취소 자동 해제 */
+  /* 상실 취소 단독 선택 */
   function applyExclusive(panel, changed) {
-    var exclusive = panel.querySelector('[data-corr-exclusive]');
+    var exclusive = panel.querySelector('.corr-cards [data-corr-exclusive]');
     if (!exclusive) return;
     if (changed === exclusive && exclusive.checked) {
       itemChecks(panel).forEach(function (c) { if (c !== exclusive && c.checked) { c.checked = false; syncCard(c); } });
@@ -661,8 +682,8 @@ exits: insurance-join-status.html, index.html
     });
   });
 
-  /* 입력 시 에러 해제 */
-  ['c1-nc-after', 'c1-dc-after'].forEach(function (id) {
+  /* 입력 시 에러 해제 — 텍스트 필드 */
+  ['c1-nc-after', 'c1-ld-after'].forEach(function (id) {
     var el = document.getElementById(id);
     if (el) el.addEventListener('input', function () {
       if (this.value.trim()) { var f = this.closest('.form-field'); if (f && f.classList.contains('form-field--error')) clearFieldState(f.id || (f.id = id + '-field'), id + '-err'); }
@@ -672,9 +693,21 @@ exits: insurance-join-status.html, index.html
   if (ccReason) ccReason.addEventListener('input', function () {
     if (this.value.trim()) { var f = this.closest('.form-field'); if (f) clearFieldState(f.id || (f.id = 'c1-cc-reason-field'), 'c1-cc-reason-err'); }
   });
+  /* 상실사유 드롭다운 선택 시 에러 해제 */
+  root.addEventListener('click', function (e) {
+    var opt = e.target.closest('#c1-lr-reason .dropdown__option, #c1-lr-detail .dropdown__option');
+    if (!opt) return;
+    setTimeout(function () {
+      var f = document.getElementById('c1-lr-field');
+      if (f && ddSelected(document.getElementById('c1-lr-reason'))) { f.classList.remove('form-field--error'); var err = document.getElementById('c1-lr-err'); if (err) err.setAttribute('hidden',''); }
+    }, 0);
+  });
 
-  /* 첨부파일 있으면 에러 해제 */
   function upHasFile(panel) { return !!panel.querySelector('.file-upload-item, .file-upload__item'); }
+  function ddSelected(dd) { if (!dd) return false; var v = dd.querySelector('.dropdown__value'); return !!v && !v.classList.contains('dropdown__value--placeholder'); }
+  function lossreasonChecked(panel) {
+    return itemChecks(panel).some(function (c) { return c.checked && cardOf(c).dataset.item === 'lossreason'; });
+  }
 
   /* ── 검증 ── */
   function validate(panel) {
@@ -682,7 +715,6 @@ exits: insurance-join-status.html, index.html
     var checks = itemChecks(panel);
     var checked = checks.filter(function (c) { return c.checked; });
 
-    /* 최소 1개 항목 선택 */
     if (!checked.length) {
       var items = panel.querySelector('.corr-items');
       items.classList.add('corr-items--error');
@@ -698,16 +730,22 @@ exits: insurance-join-status.html, index.html
       if (item === 'name') {
         var el = document.getElementById('c1-nc-after');
         if (!el.value.trim()) { setFieldError(el.closest('.form-field').id || (el.closest('.form-field').id = 'c1-nc-after-field'), 'c1-nc-after-err', '변경 후 성명을 입력해 주세요.'); shake(el.closest('.form-field')); firstBad = firstBad || el; ok = false; }
-      } else if (item === 'date') {
-        var d = document.getElementById('c1-dc-after');
-        if (!d.value.trim()) { setFieldError(d.closest('.form-field').id || (d.closest('.form-field').id = 'c1-dc-after-field'), 'c1-dc-after-err', '변경 후 취득일을 입력해 주세요.'); shake(d.closest('.form-field')); firstBad = firstBad || d; ok = false; }
+      } else if (item === 'lossdate') {
+        var d = document.getElementById('c1-ld-after');
+        if (!d.value.trim()) { setFieldError(d.closest('.form-field').id || (d.closest('.form-field').id = 'c1-ld-after-field'), 'c1-ld-after-err', '변경 후 상실일을 입력해 주세요.'); shake(d.closest('.form-field')); firstBad = firstBad || d; ok = false; }
+      } else if (item === 'lossreason') {
+        var f = document.getElementById('c1-lr-field');
+        if (!ddSelected(document.getElementById('c1-lr-reason'))) {
+          f.classList.add('form-field--error');
+          var err = document.getElementById('c1-lr-err'); if (err) err.removeAttribute('hidden');
+          shake(f); firstBad = firstBad || document.querySelector('#c1-lr-reason .dropdown__trigger'); ok = false;
+        }
       } else if (item === 'cancel') {
         var r = document.getElementById('c1-cc-reason');
-        if (!r.value.trim()) { setFieldError(r.closest('.form-field').id || (r.closest('.form-field').id = 'c1-cc-reason-field'), 'c1-cc-reason-err', '취득취소 사유를 입력해 주세요.'); shake(r.closest('.form-field')); firstBad = firstBad || r; ok = false; }
+        if (!r.value.trim()) { setFieldError(r.closest('.form-field').id || (r.closest('.form-field').id = 'c1-cc-reason-field'), 'c1-cc-reason-err', '상실취소 사유를 입력해 주세요.'); shake(r.closest('.form-field')); firstBad = firstBad || r; ok = false; }
       }
     });
 
-    /* 첨부파일 필수 (항목이 하나라도 선택된 경우) */
     if (checked.length && !upHasFile(panel)) {
       var up = panel.querySelector('.file-upload');
       if (up) { up.classList.add('file-upload--error'); shake(up); }
@@ -719,36 +757,37 @@ exits: insurance-join-status.html, index.html
     return ok;
   }
 
-  /* 첨부 발생 시 업로드 에러 해제 */
   root.addEventListener('change', function (e) {
     if (e.target && e.target.type === 'file') {
-      setTimeout(function () {
-        root.querySelectorAll('.file-upload').forEach(function (up) { if (up.querySelector('.file-upload-item, .file-upload__item')) up.classList.remove('file-upload--error'); });
-      }, 0);
+      setTimeout(function () { root.querySelectorAll('.file-upload').forEach(function (up) { if (up.querySelector('.file-upload-item, .file-upload__item')) up.classList.remove('file-upload--error'); }); }, 0);
     }
   });
 
-  /* 신고요청 → 검증 후 확인 Alert */
+  /* 신고요청 → 검증 후, 상실사유 변경 포함 시 경고 Alert, 아니면 바로 확인 Alert */
   root.addEventListener('click', function (e) {
     var btn = e.target.closest('button');
     if (!btn || !btn.id || !/-submit$/.test(btn.id)) return;
-    if (!validate(btn.closest('.scenario-panel'))) return;
-    openOverlay('overlay-submit');
+    var panel = btn.closest('.scenario-panel');
+    if (!validate(panel)) return;
+    if (lossreasonChecked(panel)) openOverlay('overlay-warn');
+    else openOverlay('overlay-submit');
   });
 
-  /* 확인 Alert의 신고요청 → 전송 연출 후 목록 복귀 */
-  var submitConfirm = document.getElementById('submit-confirm');
-  if (submitConfirm) submitConfirm.addEventListener('click', function () {
-    var btn = this;
+  /* 전송 연출 → 목록 복귀 */
+  function doSubmit(btn) {
     setButtonLoading(btn, '전송 중...');
     setTimeout(function () {
       clearButtonLoading(btn);
-      closeOverlay(document.getElementById('overlay-submit'));
+      closeAllOverlays();
       location.href = 'insurance-join-status.html';
     }, 1500);
-  });
+  }
+  var submitConfirm = document.getElementById('submit-confirm');
+  if (submitConfirm) submitConfirm.addEventListener('click', function () { doSubmit(this); });
+  var warnConfirm = document.getElementById('warn-confirm');
+  if (warnConfirm) warnConfirm.addEventListener('click', function () { doSubmit(this); });
 
-  /* 임시저장 → 저장 연출 후 화면 유지 */
+  /* 임시저장 */
   var draftOv = document.getElementById('overlay-draft');
   if (draftOv) {
     var draftBtn = draftOv.querySelector('.btn--primary');
@@ -760,7 +799,7 @@ exits: insurance-join-status.html, index.html
     });
   }
 
-  /* 취소 → 작성 내용 있으면 확인 알럿, 없으면 바로 목록 */
+  /* 취소 → 작성 내용 있으면 확인 알럿 */
   function panelHasInput(panel) {
     if (!panel) return false;
     if (itemChecks(panel).some(function (c) { return c.checked; })) return true;
@@ -787,9 +826,8 @@ exits: insurance-join-status.html, index.html
     syncDoc(panel);
     syncEmptyHint(panel);
   });
-  /* 첨부파일 세로 높이 — '보이는 본문 영역'(modal__content clientHeight - 세로패딩)에 맞춘다.
-     고정 안내 밴드·내용에 따라 가변이라 calc 매직넘버 대신 실측한다. 내용이 길면 꽉 차고(리스트 내부 스크롤),
-     짧으면 자연 축소된다. content는 flex로 크기가 정해져 자식 높이 영향을 받지 않으므로 루프 없음. */
+
+  /* 첨부파일 세로 높이 — 보이는 본문 영역에 맞춤(실측) */
   function syncUploadHeight(panel) {
     if (!panel) return;
     var content = panel.querySelector('.modal__content');
@@ -799,9 +837,7 @@ exits: insurance-join-status.html, index.html
     var inner = content.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
     if (inner > 0) fu.style.maxHeight = inner + 'px';
   }
-  function syncAllUploadHeights() {
-    Array.prototype.forEach.call(document.querySelectorAll('#pane-panels > .scenario-panel'), syncUploadHeight);
-  }
+  function syncAllUploadHeights() { Array.prototype.forEach.call(document.querySelectorAll('#pane-panels > .scenario-panel'), syncUploadHeight); }
   if (window.ResizeObserver) {
     document.querySelectorAll('#pane-panels .modal__content').forEach(function (c) {
       new ResizeObserver(function () { syncUploadHeight(c.closest('.scenario-panel')); }).observe(c);
