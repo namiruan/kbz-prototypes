@@ -30,14 +30,16 @@
     .acq-info-card__item + .acq-info-card__item { border-left: var(--stroke-sm) solid var(--color-border-default); }
     .acq-info-card__label { font-size: var(--font-size-sm); color: var(--color-text-subtle); }
     .acq-info-card__value { font-size: var(--font-size-base); font-weight: var(--font-weight-heading); color: var(--color-text-body); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    /* 휴직사유 — 단독 행, 드롭다운 꽉차게 */
+    /* 휴직사유 + 육아휴직 대상자녀 한 줄 — 드롭다운 꽉차게, 입력창 하단 정렬.
+       대상자녀 숨김 시 휴직사유가 행 전체를 채운다(flex:1). */
+    .lv-reason-row { display: flex; flex-wrap: wrap; align-items: flex-end; column-gap: var(--space-gap-lg); row-gap: var(--space-gap-md); }
+    .lv-reason-row > .form-field { flex: 1 1 240px; min-width: 200px; }
     .lv-reason-field .dropdown,
     .lv-reason-field .dropdown__trigger { width: 100%; }
-    /* 시작일·종료(예정)일(데이트피커) + 육아휴직 대상자녀 한 줄 — 입력창 하단 정렬 */
+    /* 시작일·종료(예정)일(데이트피커) 한 줄 — 입력창 하단 정렬 */
     .lv-date-row { display: flex; flex-wrap: wrap; align-items: flex-end; column-gap: var(--space-gap-lg); row-gap: var(--space-gap-md); }
     .lv-date-row > .form-field { flex: 1 1 150px; min-width: 140px; }
-    .lv-date-row > .lv-child-field { flex: 1.5 1 240px; }
-    /* 휴직 항목 — 보수변경 모달처럼 푸터 좌측에 상시 노출(항상 비활성, 휴직사유로 자동 결정) */
+    /* 신고 대상 보험 — 보수변경 모달처럼 푸터 좌측에 상시 노출(항상 비활성, 휴직사유로 자동 결정) */
     .acq-target-footer { margin-right: auto; display: flex; align-items: center; gap: var(--space-gap-md); min-width: 0; }
     .acq-target-footer__label { flex-shrink: 0; color: var(--color-text-brand); font-size: var(--font-size-lg); font-weight: var(--font-weight-heading); line-height: var(--line-height-ui); }
     .acq-target-checks { display: flex; flex-wrap: wrap; gap: var(--space-gap-md); }
@@ -128,24 +130,32 @@ exits: insurance-join-status.html, index.html
                     <div class="acq-info-card__item"><span class="acq-info-card__label">주민번호</span><span class="acq-info-card__value">123456-1234567</span></div>
                   </div>
 
-                  <!-- 2-1 area — 휴직사유 (단독 행) -->
-                  <div class="form-field lv-reason-field">
-                    <span class="form-field__label text-form-label" id="lv-reason-label">휴직사유 <span class="form-field__required" aria-hidden="true">(필수)</span></span>
-                    <div class="form-field__body">
-                      <div class="dropdown dropdown--button dropdown--menu" id="lv-reason">
-                        <button class="dropdown__trigger" type="button" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="lv-reason-label"><span class="dropdown__value dropdown__value--placeholder">선택</span><span class="dropdown__chevron" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-chevron-down"/></svg></span></button>
-                        <div class="dropdown__panel"><ul class="dropdown__list" role="listbox" aria-label="휴직사유">
-                          <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">육아휴직</span></li>
-                          <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">출산전후휴가</span></li>
-                          <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">산재휴직</span></li>
-                          <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">기타</span></li>
-                        </ul></div>
+                  <!-- 2-1 area — 휴직사유 + 육아휴직 대상자녀(육아휴직 시) 한 줄 -->
+                  <div class="lv-reason-row">
+                    <div class="form-field lv-reason-field">
+                      <span class="form-field__label text-form-label" id="lv-reason-label">휴직사유 <span class="form-field__required" aria-hidden="true">(필수)</span></span>
+                      <div class="form-field__body">
+                        <div class="dropdown dropdown--button dropdown--menu" id="lv-reason">
+                          <button class="dropdown__trigger" type="button" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="lv-reason-label"><span class="dropdown__value dropdown__value--placeholder">선택</span><span class="dropdown__chevron" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-chevron-down"/></svg></span></button>
+                          <div class="dropdown__panel"><ul class="dropdown__list" role="listbox" aria-label="휴직사유">
+                            <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">육아휴직</span></li>
+                            <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">출산전후휴가</span></li>
+                            <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">산재휴직</span></li>
+                            <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">기타</span></li>
+                          </ul></div>
+                        </div>
                       </div>
+                      <div class="form-field__footer"><p class="form-field__error text-helper" id="lv-reason-err" role="alert">휴직사유를 선택해 주세요.</p></div>
                     </div>
-                    <div class="form-field__footer"><p class="form-field__error text-helper" id="lv-reason-err" role="alert">휴직사유를 선택해 주세요.</p></div>
+                    <!-- 육아휴직 대상자녀 주민등록 번호(앞 7자리) — 휴직사유 '육아휴직'일 때만 노출 -->
+                    <div class="form-field lv-child-field" hidden>
+                      <label class="form-field__label text-form-label" for="lv-child">육아휴직 대상자녀 주민등록 번호(앞 7자리) <span class="form-field__required" aria-hidden="true">(필수)</span></label>
+                      <div class="form-field__body"><input class="input" type="text" id="lv-child" placeholder="숫자만 입력" inputmode="numeric" maxlength="8"></div>
+                      <div class="form-field__footer"><p class="form-field__error text-helper" id="lv-child-err" role="alert">대상자녀 주민등록 번호를 입력해 주세요.</p></div>
+                    </div>
                   </div>
 
-                  <!-- 2-2·2-3 area — 휴직 시작일 · 종료(예정)일(데이트피커) + 육아휴직 대상자녀(육아휴직 시) 한 줄 -->
+                  <!-- 2-2 area — 휴직 시작일 · 종료(예정)일(데이트피커) 한 줄 -->
                   <div class="lv-date-row">
                     <div class="form-field">
                       <label class="form-field__label text-form-label" for="lv-start-yr">휴직 시작일 <span class="form-field__required" aria-hidden="true">(필수)</span></label>
@@ -156,12 +166,6 @@ exits: insurance-join-status.html, index.html
                       <label class="form-field__label text-form-label" for="lv-end-yr">휴직 종료(예정)일 <span class="form-field__required" aria-hidden="true">(필수)</span></label>
                       <div class="form-field__body"><div class="dp acq-date-dp" id="lv-end-dp"><div class="dp__trigger" aria-haspopup="dialog" aria-label="휴직 종료(예정)일 선택"><div class="dp__value-group"><input class="dp__value-part dp__value-part--year" id="lv-end-yr" type="text" inputmode="numeric" placeholder="YYYY" maxlength="4" aria-label="연도" autocomplete="off" value=""><span class="dp__value-sep" aria-hidden="true">.</span><input class="dp__value-part dp__value-part--md" id="lv-end-mo" type="text" inputmode="numeric" placeholder="MM" maxlength="2" aria-label="월" autocomplete="off" value=""><span class="dp__value-sep" aria-hidden="true">.</span><input class="dp__value-part dp__value-part--md" id="lv-end-dy" type="text" inputmode="numeric" placeholder="DD" maxlength="2" aria-label="일" autocomplete="off" value=""></div><span class="dp__chevron" aria-hidden="true"><span class="icon icon--sm"><svg aria-hidden="true"><use href="#icon-calendar"/></svg></span></span></div></div></div>
                       <div class="form-field__footer"><p class="form-field__error text-helper" id="lv-end-err" role="alert">종료일을 입력해 주세요.</p></div>
-                    </div>
-                    <!-- 육아휴직 대상자녀 주민등록 번호(앞 7자리) — 휴직사유 '육아휴직'일 때만 노출 -->
-                    <div class="form-field lv-child-field" hidden>
-                      <label class="form-field__label text-form-label" for="lv-child">육아휴직 대상자녀 주민등록 번호(앞 7자리) <span class="form-field__required" aria-hidden="true">(필수)</span></label>
-                      <div class="form-field__body"><input class="input" type="text" id="lv-child" placeholder="숫자만 입력" inputmode="numeric" maxlength="8"></div>
-                      <div class="form-field__footer"><p class="form-field__error text-helper" id="lv-child-err" role="alert">대상자녀 주민등록 번호를 입력해 주세요.</p></div>
                     </div>
                   </div>
 
@@ -224,9 +228,9 @@ exits: insurance-join-status.html, index.html
           </div>
 
           <div class="modal__footer">
-            <!-- 휴직 항목 — 보수변경 모달처럼 푸터 좌측에 상시 노출. 휴직사유에 따라 자동 선택되며 항상 비활성 -->
+            <!-- 신고 대상 보험 — 보수변경 모달처럼 푸터 좌측에 상시 노출. 휴직사유에 따라 자동 선택되며 항상 비활성 -->
             <div class="acq-target-footer" role="group" aria-labelledby="lv-ins-label">
-              <span class="text-form-label acq-target-footer__label" id="lv-ins-label">휴직 항목</span>
+              <span class="text-form-label acq-target-footer__label" id="lv-ins-label">신고 대상 보험</span>
               <div class="acq-target-checks">
                 <label class="checkbox checkbox--disabled"><input type="checkbox" id="lv-ins-emp" disabled aria-disabled="true"><span class="checkbox__control" aria-hidden="true"><span class="checkbox__icon-check"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span><span class="checkbox__label">고용보험</span></label>
                 <label class="checkbox checkbox--disabled"><input type="checkbox" id="lv-ins-acc" disabled aria-disabled="true"><span class="checkbox__control" aria-hidden="true"><span class="checkbox__icon-check"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span><span class="checkbox__label">산재보험</span></label>
