@@ -577,9 +577,10 @@ exits: insurance-join-status.html, report-acquire.html, report-loss.html, report
       case 'request':    /* 신고 요청 — 취득: [사업장 선택 Modal] 먼저(6-1 CASE-1), 상실: 상실 신고 Modal 바로(CASE-2) */
         if (kind === '취득') { openOverlay('overlay-worksite'); } else { location.href = file; }
         break;
+      case 'detail':     /* 상세 보기 — 신고서를 조회(readonly) 모드로 출력(5-5). 접수완료면 수정하기 노출(editable=1), 처리중은 미노출 */
+        location.href = file + '&mode=view' + (row.dataset.status === '접수완료' ? '&editable=1' : ''); break;
       case 'continue':   /* 이어서 작성 — 작성중 신고서 모달 */
       case 'rewrite':    /* 다시 작성 — 이전 내용 유지 신고서 */
-      case 'detail':     /* 상세 보기 — readonly 신고서 */
         location.href = file; break;
       case 'delete':      pendingRow = row; openOverlay('overlay-delete'); break;
       case 'exclude':

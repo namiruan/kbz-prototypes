@@ -963,5 +963,61 @@ exits: insurance-join-status.html, index.html
 })();
 </script>
 
+<!-- 상세보기 모드 — ?mode=view 진입 시 조회(readonly)/수정 전환 (신고대상&진행현황 5-5, node 14878-5872) -->
+<style>
+  body.view-mode .modal__content > * { pointer-events: none; }
+  body.view-mode .modal__content input:not([type=checkbox]):not([type=radio]):not([type=file]),
+  body.view-mode .modal__content .textarea,
+  body.view-mode .modal__content .dropdown__trigger { background: var(--color-surface-disabled); color: var(--color-text-body); }
+  /* 상세보기: 원래 신고 버튼(취소/임시저장/신고요청)을 숨기고 상세보기 전용 버튼으로 대체 */
+  body.detail-mode .modal__footer > .btn { display: none; }
+  .detail-actions { display: inline-flex; gap: var(--space-gap-sm); }
+</style>
+<script>
+(function () {
+  var params = new URLSearchParams(location.search);
+  if (params.get('mode') !== 'view') return;
+  var editable = params.get('editable') === '1';   /* 진행상태 '접수완료'일 때만 수정하기 노출(처리중은 미노출) */
+  function toast(msg) {
+    if (typeof makeToast !== 'function') return;
+    var st = document.querySelector('.toast-stack');
+    if (!st) { st = document.createElement('div'); st.className = 'toast-stack'; st.setAttribute('aria-live', 'polite'); document.body.appendChild(st); }
+    st.insertBefore(makeToast('success', null, msg), st.firstChild);
+  }
+  function setActions(html) {
+    document.querySelectorAll('.modal__footer').forEach(function (f) {
+      var old = f.querySelector('.detail-actions'); if (old) old.remove();
+      var w = document.createElement('div'); w.className = 'detail-actions'; w.innerHTML = html; f.appendChild(w);
+    });
+    document.querySelectorAll('.detail-actions [data-vd]').forEach(function (b) {
+      b.onclick = function () {
+        var a = b.dataset.vd;
+        if (a === 'confirm') location.href = returnPage();
+        else if (a === 'edit') enterEdit();
+        else if (a === 'cancel') enterView();
+        else if (a === 'submit') { toast('수정 내용이 재접수되었어요.'); enterView(); }
+      };
+    });
+  }
+  function enterView() {
+    document.body.classList.add('view-mode');
+    setActions('<button class="btn btn--secondary btn--solid btn--md" type="button" data-vd="confirm">확인</button>' +
+               (editable ? '<button class="btn btn--primary btn--md" type="button" data-vd="edit">수정하기</button>' : ''));
+  }
+  function enterEdit() {
+    document.body.classList.remove('view-mode');
+    setActions('<button class="btn btn--secondary btn--solid btn--md" type="button" data-vd="cancel">취소</button>' +
+               '<button class="btn btn--primary btn--md" type="button" data-vd="submit">수정 및 제출</button>');
+  }
+  function init() {
+    document.body.classList.add('detail-mode');
+    document.querySelectorAll('.modal__header [data-acq-cancel]').forEach(function (x) {
+      x.addEventListener('click', function (e) { e.stopPropagation(); e.preventDefault(); location.href = returnPage(); }, true);
+    });
+    enterView();
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
+})();
+</script>
 </body>
 </html>
