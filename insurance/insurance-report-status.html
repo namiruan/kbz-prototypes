@@ -1,0 +1,580 @@
+<!-- design-system: v0.5.1 -->
+<!-- prototype: 4대보험 관리 — 신고대상 & 진행현황 tab -->
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>4대보험 관리 — 신고대상 & 진행현황</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+  <link rel="stylesheet" href="https://namiruan.github.io/kbz_3.0_ui_stytem/tokens.css">
+  <link rel="stylesheet" href="https://namiruan.github.io/kbz_3.0_ui_stytem/components.css">
+  <script src="https://namiruan.github.io/kbz_3.0_ui_stytem/components.js"></script>
+  <style>
+    .proto-hub-link { display: block; padding: var(--space-inset-squish-sm); font-size: var(--font-size-sm); }
+    .page > .tab-group { margin-bottom: var(--space-stack-lg); }
+    /* 진행 상태 헤더 도움말 아이콘 — 라벨 옆 인라인 */
+    .rs-help { display: inline-flex; align-items: center; gap: var(--space-gap-2xs); }
+    .rs-help .tooltip-trigger { line-height: 0; }
+    /* 진행 상태 셀 — 반려는 배지 + 돋보기(사유 hover) */
+    .rs-status { display: inline-flex; align-items: center; gap: var(--space-gap-2xs); }
+    .rs-status .icon { color: var(--color-text-error); }
+    /* 관리 열 — 버튼 가로 배치, 줄바꿈 방지 */
+    .rs-actions { display: inline-flex; align-items: center; gap: var(--space-gap-xs); white-space: nowrap; }
+    .rs-actions .btn { flex-shrink: 0; }
+    /* 접수일 '-' 는 옅게 */
+    .rs-date-none { color: var(--color-text-subtle); }
+    /* 진행상태 안내 툴팁 — 넉넉한 폭 + 좌측 정렬 */
+    .rs-status-tip { max-width: 320px; text-align: left; white-space: normal; line-height: var(--line-height-reading); }
+    .rs-status-tip dt { font-weight: var(--font-weight-heading); margin-top: var(--space-gap-xs); }
+    .rs-status-tip dt:first-child { margin-top: 0; }
+    .rs-status-tip dd { margin: 0 0 var(--space-gap-2xs); color: var(--color-text-inverse); opacity: .82; }
+  </style>
+</head>
+<body>
+<!-- @flow
+title: 신고대상 & 진행현황
+exits: insurance-join-status.html, report-acquire.html, report-loss.html, report-transfer.html, report-change.html, report-correction.html, report-leave.html, report-return.html, index.html
+-->
+
+
+<div class="proto-layout">
+
+  <aside class="proto-sidebar" id="proto-sidebar">
+    <a class="link proto-hub-link" href="index.html">← 화면 목록</a>
+
+    <div class="segment segment--md" role="radiogroup" aria-label="보기 모드" id="mode-segment">
+      <span class="segment__slider" aria-hidden="true"></span>
+      <button class="segment__item segment__item--selected" role="radio" aria-checked="true" type="button" data-mode="scenario">시나리오</button>
+      <button class="segment__item" role="radio" aria-checked="false" type="button" data-mode="interactive">인터랙티브</button>
+    </div>
+
+    <div class="proto-nav-divider" id="proto-nav-divider"></div>
+
+    <nav class="proto-nav" id="proto-nav" aria-label="시나리오 선택">
+      <button class="proto-nav-btn is-active" data-scenario="데이터-있음" type="button">데이터 있음</button>
+      <button class="proto-nav-btn" data-scenario="검색-결과-없음" type="button">검색 결과 없음</button>
+      <button class="proto-nav-btn" data-scenario="데이터-없음" type="button">데이터 없음</button>
+    </nav>
+  </aside>
+
+  <main class="proto-content">
+    <div id="pane-panels">
+
+      <section class="scenario-panel" data-scenario="데이터-있음" data-step>
+        <div class="page">
+
+          <div class="tab-group" role="tablist" aria-label="4대보험 관리">
+            <span class="tab-group__slider" aria-hidden="true"></span>
+            <button class="tab" role="tab" aria-selected="false" tabindex="-1" type="button" id="tab-join" onclick="location.href='insurance-join-status.html'">
+              <span class="tab__label">가입현황</span>
+            </button>
+            <button class="tab tab--selected" role="tab" aria-selected="true" tabindex="0" type="button" id="tab-report" aria-controls="panel-report">
+              <span class="tab__label">신고대상&amp;진행현황</span>
+              <span class="badge badge--brand badge--pill badge--line" id="rs-tab-count" aria-hidden="true">9</span>
+            </button>
+          </div>
+
+          <div class="tab-panel" role="tabpanel" id="panel-report" aria-labelledby="tab-report">
+
+            <!-- ── 조회 필터 (1 area) ── -->
+            <div class="filter-bar" id="rs-fb">
+              <div class="filter-bar__bar" role="toolbar" aria-label="데이터 필터">
+
+                <div class="dropdown dropdown--button dropdown--ghost dropdown--multi" data-placeholder="모든 부서" id="rs-dept">
+                  <button class="dropdown__trigger" type="button" aria-haspopup="listbox" aria-expanded="false" aria-label="부서 선택">
+                    <span class="dropdown__value dropdown__value--placeholder">모든 부서</span>
+                    <span class="dropdown__count" hidden></span>
+                    <span class="dropdown__chevron" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-chevron-down"/></svg></span>
+                  </button>
+                  <div class="dropdown__panel">
+                    <ul class="dropdown__list" role="listbox" aria-label="부서" aria-multiselectable="true">
+                      <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-checkbox" aria-hidden="true"><span class="dropdown__option-checkbox__icon"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span><span class="dropdown__option-label">전략기획팀</span></li>
+                      <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-checkbox" aria-hidden="true"><span class="dropdown__option-checkbox__icon"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span><span class="dropdown__option-label">ABC팀</span></li>
+                    </ul>
+                  </div>
+                </div>
+
+                <div class="dropdown dropdown--button dropdown--ghost dropdown--multi" data-placeholder="모든 진행상태" id="rs-status">
+                  <button class="dropdown__trigger" type="button" aria-haspopup="listbox" aria-expanded="false" aria-label="진행상태 선택">
+                    <span class="dropdown__value dropdown__value--placeholder">모든 진행상태</span>
+                    <span class="dropdown__count" hidden></span>
+                    <span class="dropdown__chevron" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-chevron-down"/></svg></span>
+                  </button>
+                  <div class="dropdown__panel">
+                    <ul class="dropdown__list" role="listbox" aria-label="진행상태" aria-multiselectable="true">
+                      <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-checkbox" aria-hidden="true"><span class="dropdown__option-checkbox__icon"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span><span class="dropdown__option-label">임시저장</span></li>
+                      <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-checkbox" aria-hidden="true"><span class="dropdown__option-checkbox__icon"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span><span class="dropdown__option-label">신고대상</span></li>
+                      <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-checkbox" aria-hidden="true"><span class="dropdown__option-checkbox__icon"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span><span class="dropdown__option-label">접수완료</span></li>
+                      <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-checkbox" aria-hidden="true"><span class="dropdown__option-checkbox__icon"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span><span class="dropdown__option-label">처리중</span></li>
+                      <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-checkbox" aria-hidden="true"><span class="dropdown__option-checkbox__icon"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span><span class="dropdown__option-label">반려</span></li>
+                    </ul>
+                  </div>
+                </div>
+
+                <div class="filter-bar__search">
+                  <div class="input-wrap">
+                    <input class="input input--ghost" type="search" placeholder="이름 또는 주민번호를 입력해주세요." aria-label="이름 또는 주민번호 검색" id="rs-search">
+                    <button class="input-clear icon-on--badge" type="button" aria-label="지우기" hidden>
+                      <svg aria-hidden="true"><use href="#icon-close"/></svg>
+                    </button>
+                  </div>
+                  <button class="icon-on--md" type="button" aria-label="검색">
+                    <svg aria-hidden="true"><use href="#icon-search"/></svg>
+                  </button>
+                </div>
+
+                <div class="filter-bar__reset-wrap">
+                  <span class="tooltip-wrapper" onmouseenter="this.querySelector('.tooltip-panel').classList.add('tooltip-panel--visible')" onmouseleave="this.querySelector('.tooltip-panel').classList.remove('tooltip-panel--visible')">
+                    <button class="icon-on--md" type="button" aria-label="검색초기화" id="rs-reset">
+                      <svg aria-hidden="true"><use href="#icon-refresh"/></svg>
+                    </button>
+                    <div class="tooltip-panel elevation-tooltip tooltip-panel--bottom" role="tooltip">검색초기화</div>
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div class="table-container">
+              <div class="table__toolbar">
+                <div class="table__title-group">
+                  <span class="table__count" aria-live="polite">총 <b class="table__count-value" id="rs-count">9</b>건</span>
+                  <div class="table__title" id="rs-tbl-title">내 탐색 결과</div>
+                </div>
+                <div class="table__toolbar-actions">
+                  <span class="tooltip-wrapper" onmouseenter="this.querySelector('.tooltip-panel').classList.add('tooltip-panel--visible')" onmouseleave="this.querySelector('.tooltip-panel').classList.remove('tooltip-panel--visible')">
+                    <button class="icon-on--lg" type="button" aria-label="엑셀 다운로드" onfocus="this.closest('.tooltip-wrapper').querySelector('.tooltip-panel').classList.add('tooltip-panel--visible')" onblur="this.closest('.tooltip-wrapper').querySelector('.tooltip-panel').classList.remove('tooltip-panel--visible')"><svg aria-hidden="true"><use href="#icon-excel"/></svg></button>
+                    <div class="tooltip-panel elevation-tooltip tooltip-panel--left" role="tooltip">엑셀 다운로드</div>
+                  </span>
+                </div>
+              </div>
+
+              <table class="table" aria-labelledby="rs-tbl-title" id="rs-table">
+                <thead class="table__head">
+                  <tr>
+                    <th class="table__head-cell" scope="col">부서</th>
+                    <th class="table__head-cell" scope="col">근로자명</th>
+                    <th class="table__head-cell" scope="col">주민번호</th>
+                    <th class="table__head-cell" scope="col">신고 종류</th>
+                    <th class="table__head-cell" scope="col">
+                      <span class="rs-help">진행 상태<span class="tooltip-wrapper" onmouseenter="this.querySelector('.tooltip-panel').classList.add('tooltip-panel--visible')" onmouseleave="this.querySelector('.tooltip-panel').classList.remove('tooltip-panel--visible')"><button class="tooltip-trigger tooltip-trigger--sm" type="button" aria-label="진행 상태 안내" onfocus="this.closest('.tooltip-wrapper').querySelector('.tooltip-panel').classList.add('tooltip-panel--visible')" onblur="this.closest('.tooltip-wrapper').querySelector('.tooltip-panel').classList.remove('tooltip-panel--visible')"><svg aria-hidden="true"><use href="#icon-help"/></svg></button><div class="tooltip-panel elevation-tooltip tooltip-panel--bottom rs-status-tip" role="tooltip"><dl><dt>임시저장</dt><dd>작성 중인 신고서가 저장된 상태</dd><dt>신고대상</dt><dd>신고가 필요하지만 아직 작성 전인 상태</dd><dt>접수완료</dt><dd>플래너 접수 완료, 공단 신고 전(수정 가능)</dd><dt>처리중</dt><dd>공단에 신고 처리 중(수정 불가)</dd><dt>반려</dt><dd>신고가 반려된 상태</dd></dl></div></span></span>
+                    </th>
+                    <th class="table__head-cell" scope="col">접수일</th>
+                    <th class="table__head-cell table__cell--fit" scope="col">관리</th>
+                  </tr>
+                </thead>
+                <tbody class="table__body" id="rs-tbody">
+
+                  <tr class="table__row" data-dept="전략기획팀" data-status="임시저장" data-kind="보수변경">
+                    <td class="table__cell">전략기획팀</td>
+                    <td class="table__cell">홍길동</td>
+                    <td class="table__cell">123456-1234567</td>
+                    <td class="table__cell">보수변경</td>
+                    <td class="table__cell"><span class="badge badge--neutral">임시저장</span></td>
+                    <td class="table__cell rs-date-none">-</td>
+                    <td class="table__cell table__cell--fit"><span class="rs-actions">
+                      <button class="btn btn--secondary btn--solid btn--sm" type="button" data-action="continue">이어서 작성</button>
+                      <button class="btn btn--secondary btn--solid btn--sm" type="button" data-action="delete">삭제</button>
+                    </span></td>
+                  </tr>
+
+                  <tr class="table__row" data-dept="전략기획팀" data-status="신고대상" data-kind="취득">
+                    <td class="table__cell">전략기획팀</td>
+                    <td class="table__cell">김철수</td>
+                    <td class="table__cell">987654-7654321</td>
+                    <td class="table__cell">취득</td>
+                    <td class="table__cell"><span class="badge badge--caution">신고대상</span></td>
+                    <td class="table__cell rs-date-none">-</td>
+                    <td class="table__cell table__cell--fit"><span class="rs-actions">
+                      <button class="btn btn--secondary btn--solid btn--sm" type="button" data-action="request">신고 요청</button>
+                      <button class="btn btn--secondary btn--solid btn--sm" type="button" data-action="exclude">신고 제외</button>
+                    </span></td>
+                  </tr>
+
+                  <tr class="table__row" data-dept="전략기획팀" data-status="신고대상" data-kind="상실">
+                    <td class="table__cell">전략기획팀</td>
+                    <td class="table__cell">이영희</td>
+                    <td class="table__cell">456789-9876543</td>
+                    <td class="table__cell">상실</td>
+                    <td class="table__cell"><span class="badge badge--caution">신고대상</span></td>
+                    <td class="table__cell rs-date-none">-</td>
+                    <td class="table__cell table__cell--fit"><span class="rs-actions">
+                      <button class="btn btn--secondary btn--solid btn--sm" type="button" data-action="request">신고 요청</button>
+                      <button class="btn btn--secondary btn--solid btn--sm" type="button" data-action="exclude">신고 제외</button>
+                    </span></td>
+                  </tr>
+
+                  <tr class="table__row" data-dept="전략기획팀" data-status="신고대상" data-kind="상실">
+                    <td class="table__cell">전략기획팀</td>
+                    <td class="table__cell">이영희</td>
+                    <td class="table__cell">456789-9876543</td>
+                    <td class="table__cell">상실</td>
+                    <td class="table__cell"><span class="badge badge--caution">신고대상</span></td>
+                    <td class="table__cell rs-date-none">-</td>
+                    <td class="table__cell table__cell--fit"><span class="rs-actions">
+                      <button class="btn btn--secondary btn--solid btn--sm" type="button" data-action="request">신고 요청</button>
+                      <button class="btn btn--secondary btn--solid btn--sm" type="button" data-action="exclude">신고 제외</button>
+                    </span></td>
+                  </tr>
+
+                  <tr class="table__row" data-dept="ABC팀" data-status="접수완료" data-kind="사업장 이동">
+                    <td class="table__cell">ABC팀</td>
+                    <td class="table__cell">이영희</td>
+                    <td class="table__cell">456789-9876543</td>
+                    <td class="table__cell">사업장 이동</td>
+                    <td class="table__cell"><span class="badge badge--success">접수완료</span></td>
+                    <td class="table__cell">2026-04-15 12:15</td>
+                    <td class="table__cell table__cell--fit"><span class="rs-actions">
+                      <button class="btn btn--secondary btn--solid btn--sm" type="button" data-action="detail">상세 보기</button>
+                    </span></td>
+                  </tr>
+
+                  <tr class="table__row" data-dept="ABC팀" data-status="처리중" data-kind="보수변경">
+                    <td class="table__cell">ABC팀</td>
+                    <td class="table__cell">박민수</td>
+                    <td class="table__cell">321654-6543210</td>
+                    <td class="table__cell">보수변경</td>
+                    <td class="table__cell"><span class="badge badge--info">처리중</span></td>
+                    <td class="table__cell">2026-04-16 09:45</td>
+                    <td class="table__cell table__cell--fit"><span class="rs-actions">
+                      <button class="btn btn--secondary btn--solid btn--sm" type="button" data-action="detail">상세 보기</button>
+                    </span></td>
+                  </tr>
+
+                  <tr class="table__row" data-dept="ABC팀" data-status="처리중" data-kind="취득">
+                    <td class="table__cell">ABC팀</td>
+                    <td class="table__cell">최영수</td>
+                    <td class="table__cell">654321-0123456</td>
+                    <td class="table__cell">취득</td>
+                    <td class="table__cell"><span class="badge badge--info">처리중</span></td>
+                    <td class="table__cell">2026-04-17 15:20</td>
+                    <td class="table__cell table__cell--fit"><span class="rs-actions">
+                      <button class="btn btn--secondary btn--solid btn--sm" type="button" data-action="detail">상세 보기</button>
+                    </span></td>
+                  </tr>
+
+                  <tr class="table__row" data-dept="ABC팀" data-status="반려" data-kind="취득">
+                    <td class="table__cell">ABC팀</td>
+                    <td class="table__cell">박지민</td>
+                    <td class="table__cell">159753-9517538</td>
+                    <td class="table__cell">취득</td>
+                    <td class="table__cell"><span class="rs-status"><span class="badge badge--error">반려</span><span class="tooltip-wrapper" onmouseenter="this.querySelector('.tooltip-panel').classList.add('tooltip-panel--visible')" onmouseleave="this.querySelector('.tooltip-panel').classList.remove('tooltip-panel--visible')"><button class="tooltip-trigger tooltip-trigger--sm" type="button" aria-label="반려 사유 보기"><span class="icon icon--sm" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-search"/></svg></span></button><div class="tooltip-panel elevation-tooltip tooltip-panel--bottom" role="tooltip">취득일이 자격 기준일과 일치하지 않아 반려되었습니다. 공단 확인 후 정정하여 다시 신고해 주세요.</div></span></span></td>
+                    <td class="table__cell">2026-04-18 08:00</td>
+                    <td class="table__cell table__cell--fit"><span class="rs-actions">
+                      <button class="btn btn--secondary btn--solid btn--sm" type="button" data-action="rewrite">다시 작성</button>
+                      <button class="btn btn--secondary btn--solid btn--sm" type="button" data-action="cancelReject">취소</button>
+                    </span></td>
+                  </tr>
+
+                  <tr class="table__row" data-dept="ABC팀" data-status="반려" data-kind="상실">
+                    <td class="table__cell">ABC팀</td>
+                    <td class="table__cell">박지민</td>
+                    <td class="table__cell">159753-9517538</td>
+                    <td class="table__cell">상실</td>
+                    <td class="table__cell"><span class="rs-status"><span class="badge badge--error">반려</span><span class="tooltip-wrapper" onmouseenter="this.querySelector('.tooltip-panel').classList.add('tooltip-panel--visible')" onmouseleave="this.querySelector('.tooltip-panel').classList.remove('tooltip-panel--visible')"><button class="tooltip-trigger tooltip-trigger--sm" type="button" aria-label="반려 사유 보기"><span class="icon icon--sm" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-search"/></svg></span></button><div class="tooltip-panel elevation-tooltip tooltip-panel--bottom" role="tooltip">상실일이 취득일보다 빠르게 입력되어 반려되었습니다. 날짜를 확인 후 다시 신고해 주세요.</div></span></span></td>
+                    <td class="table__cell">2026-04-18 08:00</td>
+                    <td class="table__cell table__cell--fit"><span class="rs-actions">
+                      <button class="btn btn--secondary btn--solid btn--sm" type="button" data-action="rewrite">다시 작성</button>
+                      <button class="btn btn--secondary btn--solid btn--sm" type="button" data-action="cancelReject">취소</button>
+                    </span></td>
+                  </tr>
+
+                  <!-- 검색 결과 없음 (시나리오) -->
+                  <tr class="table__row rs-empty-row" id="rs-empty-search" hidden>
+                    <td class="table__cell" colspan="7">
+                      <div class="empty-state empty-state--compact" role="status" aria-live="polite">
+                        <div class="empty-state__icon" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-search"/></svg></div>
+                        <div class="empty-state__body">
+                          <p class="empty-state__title text-body">검색 결과가 없습니다</p>
+                          <p class="empty-state__description text-body">검색어를 변경하거나 필터를 초기화해 보세요.</p>
+                        </div>
+                        <div class="empty-state__actions">
+                          <button class="btn btn--secondary btn--solid btn--sm" type="button" data-rs-reset>필터 초기화</button>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+
+                  <!-- 데이터 없음 (시나리오) -->
+                  <tr class="table__row rs-empty-row" id="rs-empty-data" hidden>
+                    <td class="table__cell" colspan="7">
+                      <div class="empty-state empty-state--compact" role="status" aria-live="polite">
+                        <div class="empty-state__icon" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-inbox"/></svg></div>
+                        <div class="empty-state__body">
+                          <p class="empty-state__title text-body">신고 대상이 없습니다</p>
+                          <p class="empty-state__description text-body">신고가 필요한 근로자가 생기면 이곳에 표시됩니다.</p>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+
+                </tbody>
+              </table>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+</div>
+
+<!-- ══════════════ 삭제 확인 (임시저장) ══════════════ -->
+<div id="overlay-delete" data-overlay>
+  <div class="alert" role="alertdialog" aria-modal="true" aria-labelledby="del-title" aria-describedby="del-body">
+    <div class="alert__header">
+      <p class="text-card-title alert__title" id="del-title">임시저장한 신고서를 삭제할까요?</p>
+      <button class="icon-on--sm alert__close" type="button" aria-label="닫기" data-overlay-close><svg aria-hidden="true"><use href="#icon-close"/></svg></button>
+    </div>
+    <div class="alert__body" id="del-body">
+      <p class="text-description alert__description">삭제한 신고서는 복구할 수 없어요.</p>
+    </div>
+    <div class="alert__footer">
+      <button class="btn btn--ghost btn--md" type="button" data-overlay-close>취소</button>
+      <button class="btn btn--secondary btn--md" type="button" id="del-confirm">삭제하기</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ 신고 제외 확인 (신고대상) ══════════════ -->
+<div id="overlay-exclude" data-overlay>
+  <div class="alert" role="alertdialog" aria-modal="true" aria-labelledby="exc-title" aria-describedby="exc-body">
+    <div class="alert__header">
+      <p class="text-card-title alert__title" id="exc-title">신고 대상에서 제외할까요?</p>
+      <button class="icon-on--sm alert__close" type="button" aria-label="닫기" data-overlay-close><svg aria-hidden="true"><use href="#icon-close"/></svg></button>
+    </div>
+    <div class="alert__body" id="exc-body">
+      <p class="text-description alert__description">제외하면 이 근로자는 신고 대상 목록에서 사라져요.</p>
+    </div>
+    <div class="alert__footer">
+      <button class="btn btn--ghost btn--md" type="button" data-overlay-close>취소</button>
+      <button class="btn btn--secondary btn--md" type="button" id="exc-confirm">제외하기</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ 반려 신고 취소 확인 ══════════════ -->
+<div id="overlay-cancel-reject" data-overlay>
+  <div class="alert" role="alertdialog" aria-modal="true" aria-labelledby="crj-title" aria-describedby="crj-body">
+    <div class="alert__header">
+      <p class="text-card-title alert__title" id="crj-title">반려된 신고를 취소하시겠어요?</p>
+      <button class="icon-on--sm alert__close" type="button" aria-label="닫기" data-overlay-close><svg aria-hidden="true"><use href="#icon-close"/></svg></button>
+    </div>
+    <div class="alert__body" id="crj-body">
+      <p class="text-description alert__description">취소하면 목록에서 제거되며, 다시 작성할 수 없어요.</p>
+    </div>
+    <div class="alert__footer">
+      <button class="btn btn--ghost btn--md" type="button" data-overlay-close>취소</button>
+      <button class="btn btn--secondary btn--md" type="button" id="crj-confirm">신고 취소하기</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  /* ── 아이콘 sprite fetch 주입 ── */
+  fetch('https://namiruan.github.io/kbz_3.0_ui_stytem/icons/sprite.svg')
+    .then(function(r) { return r.text(); })
+    .then(function(t) { var d = document.createElement('div'); d.style.display = 'none'; d.innerHTML = t; document.body.insertBefore(d, document.body.firstChild); });
+
+  /* ── 컴포넌트 초기화 스캐폴드 ── */
+  function _initComponents(root) {
+    root = root || document;
+    if (typeof initInput === 'function') root.querySelectorAll('.input').forEach(function(el) { if (!el.closest('.input-wrap') && !el.dataset.initInput) { el.dataset.initInput = '1'; initInput(el); } });
+    if (typeof initDropdown === 'function')  root.querySelectorAll('.dropdown').forEach(function(el) { initDropdown(el.parentElement); });
+    if (typeof initSegment === 'function')   root.querySelectorAll('.segment').forEach(function(el) { initSegment(el.parentElement); });
+    if (typeof initTab === 'function')       root.querySelectorAll('.tab-group').forEach(function(el) { initTab(el.parentElement); });
+    if (typeof initFilterBar === 'function') root.querySelectorAll('.filter-bar').forEach(function(el) { initFilterBar(el); });
+    if (typeof initTableSort === 'function') root.querySelectorAll('.table-container').forEach(function(el) { initTableSort(el); });
+  }
+  _initComponents();
+
+  /* ── 프로토 스캐폴드 ── */
+  var protoPanels = Array.prototype.slice.call(document.querySelectorAll('#pane-panels > .scenario-panel'));
+  document.querySelectorAll('#mode-segment .segment__item').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var interactive = this.dataset.mode === 'interactive';
+      document.getElementById('proto-nav').hidden = interactive;
+      document.getElementById('proto-nav-divider').hidden = interactive;
+      closeAllOverlays();
+      if (interactive && window.applyStatusScenario) window.applyStatusScenario('데이터-있음');
+    });
+  });
+  document.querySelectorAll('.proto-nav-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      closeAllOverlays();
+      var name = this.dataset.scenario;
+      document.querySelectorAll('.proto-nav-btn').forEach(function(b) { b.classList.toggle('is-active', b.dataset.scenario === name); });
+      if (window.applyStatusScenario) window.applyStatusScenario(name);
+    });
+  });
+
+  /* ── 오버레이 ── */
+  var _FOCUSABLE = 'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+  var _overlayStack = [];
+  function _topOverlay() { return _overlayStack[_overlayStack.length - 1]; }
+  function _visibleFocusable(ov) { return Array.prototype.filter.call(ov.querySelectorAll(_FOCUSABLE), function(el) { return el.offsetParent !== null; }); }
+  function openOverlay(id) {
+    var ov = document.getElementById(id);
+    if (!ov || ov.classList.contains('is-open')) return;
+    ov._returnFocus = document.activeElement;
+    ov.style.zIndex = 'calc(var(--z-backdrop) + ' + (_overlayStack.length + 1) + ')';
+    ov.classList.add('is-open');
+    _overlayStack.push(ov);
+    var f = _visibleFocusable(ov);
+    (ov.querySelector('[autofocus]') || f[0] || ov).focus();
+  }
+  function closeOverlay(ov) {
+    if (!ov || !ov.classList.contains('is-open')) return;
+    ov.classList.remove('is-open'); ov.style.zIndex = '';
+    var i = _overlayStack.indexOf(ov); if (i > -1) _overlayStack.splice(i, 1);
+    if (ov._returnFocus && ov._returnFocus.focus) ov._returnFocus.focus();
+    ov._returnFocus = null;
+  }
+  function closeAllOverlays() { _overlayStack.slice().reverse().forEach(closeOverlay); }
+  document.addEventListener('click', function(e) { if (e.target.closest('[data-overlay-close]')) closeOverlay(e.target.closest('[data-overlay]')); });
+  document.querySelectorAll('[data-overlay]').forEach(function(ov) {
+    ov.addEventListener('mousedown', function(e) { if (e.target === ov && !ov.hasAttribute('data-overlay-static')) closeOverlay(ov); });
+  });
+  document.addEventListener('keydown', function(e) {
+    var top = _topOverlay(); if (!top) return;
+    if (e.key === 'Escape' && !top.hasAttribute('data-overlay-static')) { e.preventDefault(); closeOverlay(top); return; }
+    if (e.key !== 'Tab') return;
+    var f = _visibleFocusable(top); if (!f.length) return;
+    var first = f[0], last = f[f.length - 1];
+    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+  });
+</script>
+
+<script>
+/* ══════════════ 신고대상 & 진행현황 인터랙션 ══════════════ */
+(function () {
+  var tbody = document.getElementById('rs-tbody');
+  if (!tbody) return;
+
+  /* 신고 종류 → 신고서 파일 라우팅 */
+  var REPORT_FILE = {
+    '취득': 'report-acquire.html', '상실': 'report-loss.html', '사업장 이동': 'report-transfer.html',
+    '보수변경': 'report-change.html', '정정': 'report-correction.html', '휴직': 'report-leave.html', '복직': 'report-return.html'
+  };
+  function dataRows() { return Array.prototype.filter.call(tbody.querySelectorAll('.table__row'), function (r) { return !r.classList.contains('rs-empty-row'); }); }
+
+  /* ── 토스트 ── */
+  function toast(style, msg) {
+    if (typeof makeToast !== 'function') return;
+    var stack = document.querySelector('.toast-stack');
+    if (!stack) { stack = document.createElement('div'); stack.className = 'toast-stack'; stack.setAttribute('aria-live', 'polite'); document.body.appendChild(stack); }
+    stack.insertBefore(makeToast(style, null, msg), stack.firstChild);
+  }
+
+  /* ── 카운트/빈 상태 갱신 ── */
+  function visibleDataRows() { return dataRows().filter(function (r) { return !r.hidden; }); }
+  function refreshCount() {
+    var total = dataRows().length;
+    var cntEl = document.getElementById('rs-count'); if (cntEl) cntEl.textContent = total;
+    var tab = document.getElementById('rs-tab-count'); if (tab) tab.textContent = total;
+    /* 데이터가 하나도 없으면 데이터 없음 상태로 */
+    if (total === 0) { document.getElementById('rs-empty-data').hidden = false; }
+  }
+
+  /* ── 필터링 ── */
+  function selectedLabels(ddId) {
+    var dd = document.getElementById(ddId); if (!dd) return [];
+    return Array.prototype.map.call(dd.querySelectorAll('.dropdown__option[aria-selected="true"]'), function (o) {
+      var l = o.querySelector('.dropdown__option-label'); return l ? l.textContent.trim() : '';
+    }).filter(Boolean);
+  }
+  function applyFilters() {
+    /* 검색/데이터없음 시나리오가 강제된 경우엔 필터를 덮어쓰지 않는다 */
+    if (tbody.dataset.forceEmpty) return;
+    var q = (document.getElementById('rs-search').value || '').trim().toLowerCase();
+    var depts = selectedLabels('rs-dept'), statuses = selectedLabels('rs-status');
+    var shown = 0;
+    dataRows().forEach(function (r) {
+      var name = r.children[1].textContent.toLowerCase(), rrn = r.children[2].textContent.toLowerCase();
+      var ok = true;
+      if (q && name.indexOf(q) < 0 && rrn.indexOf(q) < 0) ok = false;
+      if (depts.length && depts.indexOf(r.dataset.dept) < 0) ok = false;
+      if (statuses.length && statuses.indexOf(r.dataset.status) < 0) ok = false;
+      r.hidden = !ok; if (ok) shown++;
+    });
+    document.getElementById('rs-empty-search').hidden = shown !== 0;
+    document.getElementById('rs-empty-data').hidden = true;
+    var cntEl = document.getElementById('rs-count'); if (cntEl) cntEl.textContent = shown;
+  }
+
+  /* 필터 변경 감지 — 검색 입력 + 드롭다운 옵션 클릭 */
+  var search = document.getElementById('rs-search');
+  if (search) search.addEventListener('input', applyFilters);
+  document.getElementById('rs-fb').addEventListener('click', function (e) {
+    if (e.target.closest('.dropdown__option')) setTimeout(applyFilters, 0);
+  });
+  /* 검색 초기화 */
+  function resetFilters() {
+    if (search) { search.value = ''; var clr = search.parentElement.querySelector('.input-clear'); if (clr) clr.hidden = true; }
+    ['rs-dept', 'rs-status'].forEach(function (id) {
+      var dd = document.getElementById(id); if (!dd) return;
+      dd.querySelectorAll('.dropdown__option[aria-selected="true"]').forEach(function (o) { o.setAttribute('aria-selected', 'false'); o.classList.remove('dropdown__option--selected'); });
+      var val = dd.querySelector('.dropdown__value'), cnt = dd.querySelector('.dropdown__count');
+      if (val) { val.textContent = dd.dataset.placeholder || '전체'; val.classList.add('dropdown__value--placeholder'); }
+      if (cnt) { cnt.hidden = true; cnt.textContent = ''; }
+    });
+    applyFilters();
+  }
+  var resetBtn = document.getElementById('rs-reset');
+  if (resetBtn) resetBtn.addEventListener('click', resetFilters);
+  document.addEventListener('click', function (e) { if (e.target.closest('[data-rs-reset]')) resetFilters(); });
+
+  /* ── 행 관리 액션 ── */
+  var pendingRow = null;
+  tbody.addEventListener('click', function (e) {
+    var btn = e.target.closest('[data-action]'); if (!btn) return;
+    var row = btn.closest('.table__row'); var kind = row.dataset.kind;
+    var file = REPORT_FILE[kind] || 'insurance-join-status.html';
+    switch (btn.dataset.action) {
+      case 'continue':   /* 이어서 작성 — 작성중 신고서 모달 */
+      case 'request':    /* 신고 요청 — 취득: 사업장 선택→취득, 상실: 상실 모달 (프로토타입은 해당 신고서로 이동) */
+      case 'rewrite':    /* 다시 작성 — 이전 내용 유지 신고서 */
+      case 'detail':     /* 상세 보기 — readonly 신고서 */
+        location.href = file; break;
+      case 'delete':      pendingRow = row; openOverlay('overlay-delete'); break;
+      case 'exclude':     pendingRow = row; openOverlay('overlay-exclude'); break;
+      case 'cancelReject': pendingRow = row; openOverlay('overlay-cancel-reject'); break;
+    }
+  });
+  function removePending(msg) {
+    if (pendingRow) { pendingRow.remove(); pendingRow = null; }
+    closeAllOverlays();
+    refreshCount(); applyFilters();
+    toast('success', msg);
+  }
+  var delC = document.getElementById('del-confirm'); if (delC) delC.addEventListener('click', function () { removePending('임시저장한 신고서를 삭제했어요.'); });
+  var excC = document.getElementById('exc-confirm'); if (excC) excC.addEventListener('click', function () { removePending('신고 대상에서 제외했어요.'); });
+  var crjC = document.getElementById('crj-confirm'); if (crjC) crjC.addEventListener('click', function () { removePending('반려된 신고를 취소했어요.'); });
+
+  /* ── 시나리오 프리셋 ── */
+  window.applyStatusScenario = function (name) {
+    var es = document.getElementById('rs-empty-search'), ed = document.getElementById('rs-empty-data');
+    if (name === '검색-결과-없음') {
+      tbody.dataset.forceEmpty = '1';
+      dataRows().forEach(function (r) { r.hidden = true; });
+      es.hidden = false; ed.hidden = true;
+      var c = document.getElementById('rs-count'); if (c) c.textContent = '0';
+    } else if (name === '데이터-없음') {
+      tbody.dataset.forceEmpty = '1';
+      dataRows().forEach(function (r) { r.hidden = true; });
+      es.hidden = true; ed.hidden = false;
+      var c2 = document.getElementById('rs-count'); if (c2) c2.textContent = '0';
+    } else { /* 데이터 있음 */
+      delete tbody.dataset.forceEmpty;
+      es.hidden = true; ed.hidden = true;
+      applyFilters();
+    }
+  };
+})();
+</script>
+
+</body>
+</html>

@@ -1783,5 +1783,14 @@ exits: report-acquire.html, report-loss.html, report-transfer.html, report-chang
 })();
 </script>
 
+<script>
+/* ── 신고대상 & 진행현황 탭 → 별도 파일로 이동 (파일 분리 구조) ── */
+(function () {
+  document.querySelectorAll('.tab[id^="tab-report-"]').forEach(function (tab) {
+    tab.addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); location.href = 'insurance-report-status.html'; }, true);
+  });
+})();
+</script>
+
 </body>
 </html>
