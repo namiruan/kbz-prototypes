@@ -32,7 +32,7 @@
     .acq-info-card__value { font-size: var(--font-size-base); font-weight: var(--font-weight-heading); color: var(--color-text-body); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     /* 입력 행 — 가로 배치, 입력창 하단 정렬 */
     .r-row, .r-reason-row { display: flex; flex-wrap: wrap; align-items: flex-end; column-gap: var(--space-gap-lg); row-gap: var(--space-gap-md); }
-    .r-row > .form-field { flex: 1 1 180px; min-width: 160px; }
+    .r-row > .form-field { flex: 1 1 150px; min-width: 140px; }
     /* 휴직사유 + 육아휴직 대상자녀 한 줄 — 대상자녀 숨김 시 휴직사유가 행 전체를 채운다(flex:1) */
     .r-reason-row > .form-field { flex: 1 1 240px; min-width: 200px; }
     /* 에러가 떠도 같은 행 다른 필드 라벨이 밀리지 않도록 에러 영역 높이를 항상 확보(하단 정렬 유지) */
@@ -85,7 +85,7 @@ exits: insurance-join-status.html, index.html
     <!-- ══════════════ 첫 진입 — 모달 최초 오픈(휴직사유 미선택) ══════════════ -->
     <section class="scenario-panel" data-scenario="첫-진입" data-step>
       <div class="page">
-        <div class="modal" role="dialog" aria-modal="true" aria-labelledby="r-title" style="width:958px;max-width:100%">
+        <div class="modal" role="dialog" aria-modal="true" aria-labelledby="r-title" style="width:900px;max-width:100%">
 
           <div class="modal__header">
             <h2 class="modal__title text-modal-title-sm" id="r-title">복직 신고</h2>
