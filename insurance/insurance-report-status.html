@@ -336,51 +336,51 @@ exits: insurance-join-status.html, report-acquire.html, report-loss.html, report
 
 <!-- ══════════════ 삭제 확인 (임시저장) ══════════════ -->
 <div id="overlay-delete" data-overlay>
-  <div class="alert" role="alertdialog" aria-modal="true" aria-labelledby="del-title" aria-describedby="del-body">
+  <div class="alert alert--danger" role="alertdialog" aria-modal="true" aria-labelledby="del-title" aria-describedby="del-body">
     <div class="alert__header">
-      <p class="text-card-title alert__title" id="del-title">임시저장한 신고서를 삭제할까요?</p>
+      <p class="text-card-title alert__title" id="del-title">임시저장한 신고서를 삭제하시겠어요?</p>
       <button class="icon-on--sm alert__close" type="button" aria-label="닫기" data-overlay-close><svg aria-hidden="true"><use href="#icon-close"/></svg></button>
     </div>
     <div class="alert__body" id="del-body">
       <p class="text-description alert__description">삭제한 신고서는 복구할 수 없어요.</p>
     </div>
     <div class="alert__footer">
-      <button class="btn btn--ghost btn--md" type="button" data-overlay-close>취소</button>
-      <button class="btn btn--secondary btn--md" type="button" id="del-confirm">삭제하기</button>
+      <button class="btn btn--secondary btn--solid btn--md" type="button" data-overlay-close>취소</button>
+      <button class="btn btn--danger btn--md" type="button" id="del-confirm">삭제하기</button>
     </div>
   </div>
 </div>
 
 <!-- ══════════════ 신고 제외 확인 (신고대상) ══════════════ -->
 <div id="overlay-exclude" data-overlay>
-  <div class="alert" role="alertdialog" aria-modal="true" aria-labelledby="exc-title" aria-describedby="exc-body">
+  <div class="alert alert--danger" role="alertdialog" aria-modal="true" aria-labelledby="exc-title" aria-describedby="exc-body">
     <div class="alert__header">
-      <p class="text-card-title alert__title" id="exc-title">신고 대상에서 제외할까요?</p>
+      <p class="text-card-title alert__title" id="exc-title">신고 대상에서 제외하시겠어요?</p>
       <button class="icon-on--sm alert__close" type="button" aria-label="닫기" data-overlay-close><svg aria-hidden="true"><use href="#icon-close"/></svg></button>
     </div>
     <div class="alert__body" id="exc-body">
-      <p class="text-description alert__description">제외하면 이 근로자는 신고 대상 목록에서 사라져요.</p>
+      <p class="text-description alert__description">이 근로자는 신고 진행 목록에서 제외됩니다.</p>
     </div>
     <div class="alert__footer">
-      <button class="btn btn--ghost btn--md" type="button" data-overlay-close>취소</button>
-      <button class="btn btn--secondary btn--md" type="button" id="exc-confirm">제외하기</button>
+      <button class="btn btn--secondary btn--solid btn--md" type="button" data-overlay-close>취소</button>
+      <button class="btn btn--danger btn--md" type="button" id="exc-confirm">제외하기</button>
     </div>
   </div>
 </div>
 
 <!-- ══════════════ 반려 신고 취소 확인 ══════════════ -->
 <div id="overlay-cancel-reject" data-overlay>
-  <div class="alert" role="alertdialog" aria-modal="true" aria-labelledby="crj-title" aria-describedby="crj-body">
+  <div class="alert alert--danger" role="alertdialog" aria-modal="true" aria-labelledby="crj-title" aria-describedby="crj-body">
     <div class="alert__header">
       <p class="text-card-title alert__title" id="crj-title">반려된 신고를 취소하시겠어요?</p>
       <button class="icon-on--sm alert__close" type="button" aria-label="닫기" data-overlay-close><svg aria-hidden="true"><use href="#icon-close"/></svg></button>
     </div>
     <div class="alert__body" id="crj-body">
-      <p class="text-description alert__description">취소하면 목록에서 제거되며, 다시 작성할 수 없어요.</p>
+      <p class="text-description alert__description">신고대상&amp;진행현황 목록에서 제거됩니다.</p>
     </div>
     <div class="alert__footer">
-      <button class="btn btn--ghost btn--md" type="button" data-overlay-close>취소</button>
-      <button class="btn btn--secondary btn--md" type="button" id="crj-confirm">신고 취소하기</button>
+      <button class="btn btn--secondary btn--solid btn--md" type="button" data-overlay-close>취소</button>
+      <button class="btn btn--danger btn--md" type="button" id="crj-confirm">신고 취소하기</button>
     </div>
   </div>
 </div>
@@ -582,7 +582,14 @@ exits: insurance-join-status.html, report-acquire.html, report-loss.html, report
       case 'detail':     /* 상세 보기 — readonly 신고서 */
         location.href = file; break;
       case 'delete':      pendingRow = row; openOverlay('overlay-delete'); break;
-      case 'exclude':     pendingRow = row; openOverlay('overlay-exclude'); break;
+      case 'exclude':
+        pendingRow = row;
+        /* 기획안: 제목에 근로자명 노출 — "{근로자명}님을 신고 대상에서 제외하시겠어요?" */
+        var excName = row.children[1] ? row.children[1].textContent.trim() : '';
+        var excTitle = document.getElementById('exc-title');
+        if (excTitle) excTitle.textContent = (excName ? excName + '님을 ' : '') + '신고 대상에서 제외하시겠어요?';
+        openOverlay('overlay-exclude');
+        break;
       case 'cancelReject': pendingRow = row; openOverlay('overlay-cancel-reject'); break;
     }
   });
