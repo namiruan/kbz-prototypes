@@ -22,6 +22,19 @@
     .rs-status .icon { color: var(--color-text-error); }
     /* 관리 열 — DS action-group(테이블 행 액션 전용). 셀 내 우측 정렬 */
     .table__cell--fit .action-group { white-space: nowrap; }
+    /* 사업장 선택 Modal (취득 신고 요청 → 6-1 CASE-1) — 가입현황과 공용 스타일 */
+    .ws-banner { margin: var(--space-stack-md) 0 0; }
+    .ws-field-error { margin: var(--space-stack-xs) 0 0; color: var(--color-text-error); font-size: var(--font-size-label); }
+    .ws-form-error { margin: 0 auto 0 0; align-self: center; color: var(--color-text-error); font-size: var(--font-size-base); }
+    .ws-row { display: flex; align-items: center; gap: var(--space-gap-md); padding: var(--space-inset-xl); border-bottom: var(--stroke-sm) var(--stroke-solid) var(--color-border-subtle); }
+    .ws-row:last-of-type { border-bottom: none; }
+    .ws-row__head { flex-shrink: 0; width: 176px; display: flex; align-items: center; min-height: var(--height-base); }
+    .ws-row__select { flex: 1; min-width: 0; }
+    .ws-row__select .dropdown, .ws-row__select .dropdown__trigger { width: 100%; }
+    .ws-row__select .dropdown__value { overflow: hidden; text-overflow: ellipsis; }
+    .ws-row > .badge { margin-left: auto; }
+    .ws-row--complete { background: var(--color-surface-success-subtle); }
+    .ws-row--blocked  { background: var(--color-surface-disabled); }
     /* 접수일 '-' 는 옅게 */
     .rs-date-none { color: var(--color-text-subtle); }
     /* 진행상태 안내 툴팁 — 넉넉한 폭 + 좌측 정렬 */
@@ -299,7 +312,7 @@ exits: insurance-join-status.html, report-acquire.html, report-loss.html, report
                   <tr class="table__row rs-empty-row" id="rs-empty-data" hidden>
                     <td class="table__cell" colspan="7">
                       <div class="empty-state empty-state--compact" role="status" aria-live="polite">
-                        <div class="empty-state__icon" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-inbox"/></svg></div>
+                        <div class="empty-state__icon" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-employee"/></svg></div>
                         <div class="empty-state__body">
                           <p class="empty-state__title text-body">신고 대상이 없습니다</p>
                           <p class="empty-state__description text-body">신고가 필요한 근로자가 생기면 이곳에 표시됩니다.</p>
@@ -368,6 +381,32 @@ exits: insurance-join-status.html, report-acquire.html, report-loss.html, report
     <div class="alert__footer">
       <button class="btn btn--ghost btn--md" type="button" data-overlay-close>취소</button>
       <button class="btn btn--secondary btn--md" type="button" id="crj-confirm">신고 취소하기</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ 사업장 선택 Modal (신고 요청 → 취득 CASE-1, 가입현황과 공용) ══════════════ -->
+<div id="overlay-worksite" data-overlay>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="ws-title" style="width:640px">
+    <div class="modal__header">
+      <div class="modal__header-text">
+        <h2 class="modal__title text-modal-title-sm" id="ws-title">사업장 선택</h2>
+        <p class="modal__description text-description" id="ws-desc">취득신고 할 보험을 선택하고, 각 사업장을 지정해주세요.</p>
+      </div>
+      <button class="icon-on--lg" type="button" aria-label="닫기" data-overlay-close><svg aria-hidden="true"><use href="#icon-close"/></svg></button>
+    </div>
+    <div class="modal__body">
+      <div class="modal__content"><div class="ws-row" data-ins="goyong"><div class="ws-row__head"><label class="checkbox"><input type="checkbox" /><span class="checkbox__control" aria-hidden="true"><span class="checkbox__icon-check"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span><span class="checkbox__label" id="ws-lb-goyong">고용보험</span></label></div><div class="ws-row__select" hidden><div class="dropdown dropdown--button dropdown--menu dropdown--disabled"><button class="dropdown__trigger" type="button" aria-haspopup="listbox" aria-expanded="false" disabled aria-disabled="true" aria-labelledby="ws-lb-goyong"><span class="dropdown__value dropdown__value--placeholder">사업장 선택</span><span class="dropdown__chevron" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-chevron-down"/></svg></span></button><div class="dropdown__panel"><ul class="dropdown__list" role="listbox" aria-labelledby="ws-lb-goyong"><li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">주식회사 테크노로직 본사</span></li><li class="dropdown__option" role="option" aria-selected="false" tabindex="-1" data-construction="1"><span class="dropdown__option-label">관산초 별관동 증축공사 관급자재(금속창호) 구입 및 설치</span></li><li class="dropdown__option" role="option" aria-selected="false" tabindex="-1" data-construction="1"><span class="dropdown__option-label">관산초 우천로 포장공사 관급자재(차양) 구입 및 설치</span></li></ul></div></div></div></div><div class="ws-row ws-row--complete" data-ins="sanjae"><div class="ws-row__head"><label class="checkbox checkbox--disabled"><input type="checkbox" disabled aria-disabled="true" tabindex="-1" /><span class="checkbox__control" aria-hidden="true"><span class="checkbox__icon-check"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span><span class="checkbox__label" id="ws-lb-sanjae">산재보험</span></label></div><span class="badge badge--success badge--fill" id="ws-sanjae-reason">취득완료</span></div><div class="ws-row" data-ins="gungang"><div class="ws-row__head"><label class="checkbox"><input type="checkbox" /><span class="checkbox__control" aria-hidden="true"><span class="checkbox__icon-check"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span><span class="checkbox__label" id="ws-lb-gungang">건강보험·국민연금</span></label></div><div class="ws-row__select" hidden><div class="dropdown dropdown--button dropdown--menu dropdown--disabled"><button class="dropdown__trigger" type="button" aria-haspopup="listbox" aria-expanded="false" disabled aria-disabled="true" aria-labelledby="ws-lb-gungang"><span class="dropdown__value dropdown__value--placeholder">사업장 선택</span><span class="dropdown__chevron" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-chevron-down"/></svg></span></button><div class="dropdown__panel"><ul class="dropdown__list" role="listbox" aria-labelledby="ws-lb-gungang"><li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-label">주식회사 테크노로직 본사</span></li><li class="dropdown__option" role="option" aria-selected="false" tabindex="-1" data-construction="1"><span class="dropdown__option-label">관산초 별관동 증축공사 관급자재(금속창호) 구입 및 설치</span></li><li class="dropdown__option" role="option" aria-selected="false" tabindex="-1" data-construction="1"><span class="dropdown__option-label">관산초 우천로 포장공사 관급자재(차양) 구입 및 설치</span></li></ul></div></div></div></div><div class="banner banner--caution ws-banner" role="status" hidden>
+        <span class="icon--md banner__icon" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-triangle-alert"/></svg></span>
+        <div class="text-description banner__body">
+          <p class="banner__message">건설현장으로 건강/연금 가입 시, 민간공사의 경우 상용근로자 보험료가 정산되지 않을 수 있습니다. 발주자 또는 원도급사에 정산 가능 여부를 확인해주세요.</p>
+        </div>
+      </div>
+      </div>
+    </div>
+    <div class="modal__footer">
+      <button class="btn btn--secondary btn--solid btn--md" type="button" data-overlay-close>취소</button>
+      <button class="btn btn--primary btn--solid btn--md" type="button" id="ws-save">저장 후 계속</button>
     </div>
   </div>
 </div>
@@ -534,8 +573,10 @@ exits: insurance-join-status.html, report-acquire.html, report-loss.html, report
     var row = btn.closest('.table__row'); var kind = row.dataset.kind;
     var file = REPORT_FILE[kind] || 'insurance-join-status.html';
     switch (btn.dataset.action) {
+      case 'request':    /* 신고 요청 — 취득: [사업장 선택 Modal] 먼저(6-1 CASE-1), 상실: 상실 신고 Modal 바로(CASE-2) */
+        if (kind === '취득') { openOverlay('overlay-worksite'); } else { location.href = file; }
+        break;
       case 'continue':   /* 이어서 작성 — 작성중 신고서 모달 */
-      case 'request':    /* 신고 요청 — 취득: 사업장 선택→취득, 상실: 상실 모달 (프로토타입은 해당 신고서로 이동) */
       case 'rewrite':    /* 다시 작성 — 이전 내용 유지 신고서 */
       case 'detail':     /* 상세 보기 — readonly 신고서 */
         location.href = file; break;
@@ -553,6 +594,58 @@ exits: insurance-join-status.html, report-acquire.html, report-loss.html, report
   var delC = document.getElementById('del-confirm'); if (delC) delC.addEventListener('click', function () { removePending('임시저장한 신고서를 삭제했어요.'); });
   var excC = document.getElementById('exc-confirm'); if (excC) excC.addEventListener('click', function () { removePending('신고 대상에서 제외했어요.'); });
   var crjC = document.getElementById('crj-confirm'); if (crjC) crjC.addEventListener('click', function () { removePending('반려된 신고를 취소했어요.'); });
+
+  /* ── 사업장 선택 Modal (취득 신고 요청 CASE-1) — 가입현황과 동일 로직 ── */
+  (function initWorksite() {
+    var ws = document.getElementById('overlay-worksite'); if (!ws) return;
+    var banner = ws.querySelector('.ws-banner');
+    ws.querySelectorAll('.ws-row__select').forEach(function (selWrap) {
+      if (selWrap.querySelector('.ws-field-error')) return;
+      var m = document.createElement('p'); m.className = 'ws-field-error'; m.setAttribute('role', 'alert'); m.hidden = true; m.textContent = '사업장을 선택해주세요.'; selWrap.appendChild(m);
+    });
+    var wsFormError = document.createElement('p'); wsFormError.className = 'ws-form-error'; wsFormError.setAttribute('role', 'alert'); wsFormError.hidden = true; wsFormError.textContent = '취득할 보험을 하나 이상 선택해주세요.';
+    var wsFooter = ws.querySelector('.modal__footer'); if (wsFooter) wsFooter.insertBefore(wsFormError, wsFooter.firstChild);
+    function clearWsError(dd) { if (!dd) return; dd.classList.remove('dropdown--error'); var w = dd.closest('.ws-row__select'); var m = w && w.querySelector('.ws-field-error'); if (m) m.hidden = true; }
+    function wsShake(el) { if (!el) return; el.classList.remove('motion-shake'); void el.offsetWidth; el.classList.add('motion-shake'); }
+    function syncBanner() { var row = ws.querySelector('.ws-row[data-ins="gungang"]'); var cb = row ? row.querySelector('input[type="checkbox"]') : null; var sel = row ? row.querySelector('.dropdown__option--selected') : null; var on = !!(cb && cb.checked && sel && sel.dataset.construction === '1'); if (banner) banner.hidden = !on; }
+    ws.querySelectorAll('.ws-row').forEach(function (rowEl) {
+      var cb = rowEl.querySelector('input[type="checkbox"]'), wrap = rowEl.querySelector('.ws-row__select'), dd = rowEl.querySelector('.dropdown');
+      if (!cb || cb.disabled || !dd) return;
+      var trg = dd.querySelector('.dropdown__trigger');
+      cb.addEventListener('change', function () {
+        if (wsFormError) wsFormError.hidden = true;
+        if (wrap) wrap.hidden = !cb.checked;
+        dd.classList.toggle('dropdown--disabled', !cb.checked);
+        if (trg) { trg.disabled = !cb.checked; trg.setAttribute('aria-disabled', String(!cb.checked)); }
+        if (!cb.checked) {
+          dd.classList.remove('dropdown--error', 'dropdown--open');
+          var val = dd.querySelector('.dropdown__value'); if (val) { val.textContent = '사업장 선택'; val.classList.add('dropdown__value--placeholder'); }
+          dd.querySelectorAll('.dropdown__option').forEach(function (o) { o.classList.remove('dropdown__option--selected'); o.setAttribute('aria-selected', 'false'); });
+        }
+        syncBanner();
+      });
+      dd.querySelectorAll('.dropdown__option').forEach(function (o) { o.addEventListener('click', function () { clearWsError(dd); setTimeout(syncBanner, 0); }); });
+    });
+    var saveBtn = document.getElementById('ws-save');
+    if (saveBtn) saveBtn.addEventListener('click', function () {
+      var firstBad = null;
+      ws.querySelectorAll('.ws-row').forEach(function (rowEl) {
+        var cb = rowEl.querySelector('input[type="checkbox"]'), dd = rowEl.querySelector('.dropdown'), selWrap = rowEl.querySelector('.ws-row__select');
+        if (!cb || !dd || !cb.checked) { clearWsError(dd); return; }
+        var empty = dd.querySelector('.dropdown__value').classList.contains('dropdown__value--placeholder');
+        dd.classList.toggle('dropdown--error', empty);
+        var msg = selWrap && selWrap.querySelector('.ws-field-error'); if (msg) msg.hidden = !empty;
+        if (empty) { if (!firstBad) firstBad = dd.querySelector('.dropdown__trigger'); wsShake(selWrap); }
+      });
+      var anyChecked = Array.prototype.some.call(ws.querySelectorAll('.ws-row input[type="checkbox"]'), function (c) { return c.checked && !c.disabled; });
+      wsFormError.hidden = anyChecked;
+      if (!anyChecked) { wsShake(wsFormError); return; }
+      if (firstBad) { firstBad.focus(); return; }
+      /* [근로자 정보>4대보험>사업장 이력] 등록 후 → 취득 신고 Layer Modal 로 이동 */
+      closeAllOverlays();
+      location.href = 'report-acquire.html';
+    });
+  })();
 
   /* ── 시나리오 프리셋 ── */
   window.applyStatusScenario = function (name) {
