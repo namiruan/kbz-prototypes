@@ -2091,6 +2091,9 @@ exits: index.html
   }
   function init() {
     document.body.classList.add('detail-mode');
+    /* 상세보기: 제출된 신고서이므로 값이 채워진 시나리오를 보여준다(빈 '첫 진입' 대신) */
+    var _vNav = Array.prototype.filter.call(document.querySelectorAll('.proto-nav-btn'), function (b) { return b.dataset.scenario === '인상-20이상'; })[0];
+    if (_vNav) _vNav.click();
     document.querySelectorAll('.modal__header [data-acq-cancel]').forEach(function (x) {
       x.addEventListener('click', function (e) { e.stopPropagation(); e.preventDefault(); location.href = returnPage(); }, true);
     });
