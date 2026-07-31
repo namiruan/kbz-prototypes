@@ -1298,9 +1298,15 @@ exits: index.html
 <!-- 상세보기 모드 — ?mode=view 진입 시 조회(readonly)/수정 전환 (신고대상&진행현황 5-5, node 14878-5872) -->
 <style>
   body.view-mode .modal__content > * { pointer-events: none; }
-  body.view-mode .modal__content input:not([type=checkbox]):not([type=radio]):not([type=file]),
+  /* 조회 모드 — 모든 폼 컨트롤을 동일한 readonly(subtle) 톤으로 통일(원 접미사·데이트피커 트리거 포함) */
+  body.view-mode .modal__content .input,
   body.view-mode .modal__content .textarea,
-  body.view-mode .modal__content .dropdown__trigger { background: var(--color-surface-disabled); color: var(--color-text-body); }
+  body.view-mode .modal__content .input-wrap--suffix .input__suffix,
+  body.view-mode .modal__content .dropdown--button .dropdown__trigger,
+  body.view-mode .modal__content .dp .dp__trigger { background: var(--color-surface-subtle); color: var(--color-text-body); }
+  body.view-mode .modal__content .dp .dp__value-part { background: transparent; }
+  body.view-mode .modal__content .dropdown__chevron,
+  body.view-mode .modal__content .dp__chevron { color: var(--color-text-subtle); }
   /* 상세보기: 원래 신고 버튼(취소/임시저장/신고요청)을 숨기고 상세보기 전용 버튼으로 대체 */
   body.detail-mode .modal__footer > .btn { display: none; }
   .detail-actions { display: inline-flex; gap: var(--space-gap-sm); }
