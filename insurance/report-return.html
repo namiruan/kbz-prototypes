@@ -144,22 +144,26 @@ exits: insurance-join-status.html, index.html
                     </div>
                   </div>
 
-                  <!-- 1-2·1-3 — 복직일 · 월급여액 한 줄 -->
+                  <!-- 1-2·1-4 — 복직일(데이트피커) · 연금보험 재제출 납부여부 한 줄 -->
                   <div class="r-row">
                     <div class="form-field" id="r-date-field">
-                      <label class="form-field__label text-form-label" for="r-date">복직일 <span class="form-field__required" aria-hidden="true">(필수)</span></label>
-                      <div class="form-field__body"><input class="input" type="text" id="r-date" placeholder="YYYY-MM-DD" inputmode="numeric" maxlength="10" autocomplete="off"></div>
-                      <div class="form-field__footer"><p class="form-field__error text-helper" id="r-date-err" role="alert">복직일을 입력해 주세요.</p></div>
+                      <label class="form-field__label text-form-label" for="r-in-yr">복직일 <span class="form-field__required" aria-hidden="true">(필수)</span></label>
+                      <div class="form-field__body">
+                        <div class="dp acq-date-dp" id="r-date-dp">
+                          <div class="dp__trigger" aria-haspopup="dialog" aria-label="복직일 선택">
+                            <div class="dp__value-group">
+                              <input class="dp__value-part dp__value-part--year" id="r-in-yr" type="text" inputmode="numeric" placeholder="YYYY" maxlength="4" aria-label="연도" autocomplete="off" value="">
+                              <span class="dp__value-sep" aria-hidden="true">.</span>
+                              <input class="dp__value-part dp__value-part--md" id="r-in-mo" type="text" inputmode="numeric" placeholder="MM" maxlength="2" aria-label="월" autocomplete="off" value="">
+                              <span class="dp__value-sep" aria-hidden="true">.</span>
+                              <input class="dp__value-part dp__value-part--md" id="r-in-dy" type="text" inputmode="numeric" placeholder="DD" maxlength="2" aria-label="일" autocomplete="off" value="">
+                            </div>
+                            <span class="dp__chevron" aria-hidden="true"><span class="icon icon--sm"><svg aria-hidden="true"><use href="#icon-calendar"/></svg></span></span>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="form-field__footer"><p class="form-field__error text-helper" id="r-date-err" role="alert">복직일을 선택해 주세요.</p></div>
                     </div>
-                    <div class="form-field r-amt-field" id="r-pay-field">
-                      <label class="form-field__label text-form-label" for="r-pay">월급여액 <span class="form-field__required" aria-hidden="true">(필수)</span></label>
-                      <div class="form-field__body"><div class="input-wrap input-wrap--suffix"><input class="input" type="text" id="r-pay" inputmode="numeric" autocomplete="off" value="5,300,000"><span class="input__suffix">원</span></div></div>
-                      <div class="form-field__footer"><p class="form-field__error text-helper" id="r-pay-err" role="alert">월급여액을 입력해 주세요.</p></div>
-                    </div>
-                  </div>
-
-                  <!-- 1-4·1-5·1-6 — 연금보험 재제출 납부여부 · 휴직기간 중 받은 보수 · 보수 금액 한 줄 -->
-                  <div class="r-row">
                     <div class="form-field r-radio-field">
                       <span class="form-field__label text-form-label" id="r-pension-label">연금보험 재제출 납부여부 <span class="form-field__required" aria-hidden="true">(필수)</span></span>
                       <div class="form-field__body">
@@ -168,6 +172,15 @@ exits: insurance-join-status.html, index.html
                           <label class="radio"><input type="radio" name="r-pension" value="미희망" checked><span class="radio__control" aria-hidden="true"></span><span class="radio__label">미희망</span></label>
                         </fieldset>
                       </div>
+                    </div>
+                  </div>
+
+                  <!-- 1-3·1-5·1-6 — 월급여액 · 휴직기간 중 받은 보수 · 보수 금액(금액 관련 한 줄) -->
+                  <div class="r-row">
+                    <div class="form-field r-amt-field" id="r-pay-field">
+                      <label class="form-field__label text-form-label" for="r-pay">월급여액 <span class="form-field__required" aria-hidden="true">(필수)</span></label>
+                      <div class="form-field__body"><div class="input-wrap input-wrap--suffix"><input class="input" type="text" id="r-pay" inputmode="numeric" autocomplete="off" value="5,300,000"><span class="input__suffix">원</span></div></div>
+                      <div class="form-field__footer"><p class="form-field__error text-helper" id="r-pay-err" role="alert">월급여액을 입력해 주세요.</p></div>
                     </div>
                     <div class="form-field r-recv-field" id="r-recv-field">
                       <span class="form-field__label text-form-label" id="r-recv-label">휴직기간 중 받은 보수 <span class="form-field__required" aria-hidden="true">(필수)</span></span>
@@ -324,6 +337,7 @@ exits: insurance-join-status.html, index.html
     if (typeof initTextareaContainer === 'function') root.querySelectorAll('.textarea-wrap').forEach(function(el) { initTextareaContainer(el); });
     if (typeof initDropdown === 'function')   root.querySelectorAll('.dropdown').forEach(function(el) { initDropdown(el.parentElement); });
     if (typeof initSegment === 'function')    root.querySelectorAll('.segment').forEach(function(el) { initSegment(el.parentElement); });
+    if (typeof initDatePicker === 'function') initDatePicker(root);
     if (typeof initFileUpload === 'function') initFileUpload(root);
     if (typeof initImagePreview === 'function') initImagePreview(root);
   }
@@ -510,19 +524,33 @@ exits: insurance-join-status.html, index.html
     }
   });
 
-  /* 복직일 — YYYY-MM-DD 자동 하이픈 + 숫자만/유효 날짜 즉시 검증 */
-  var rDate = $('r-date');
-  if (rDate) rDate.addEventListener('input', function () {
-    var raw = this.value;
-    var d = raw.replace(/[^0-9]/g, '').slice(0, 8);
-    var out = d;
-    if (d.length > 6) out = d.slice(0, 4) + '-' + d.slice(4, 6) + '-' + d.slice(6);
-    else if (d.length > 4) out = d.slice(0, 4) + '-' + d.slice(4);
-    this.value = out;
-    if (/[^0-9-]/.test(raw)) { setFieldError('r-date-field', 'r-date-err', '숫자만 입력해 주세요.'); return; }
-    if (/^\d{4}-\d{2}-\d{2}$/.test(out) && !isValidDate(out)) { setFieldError('r-date-field', 'r-date-err', '올바른 날짜를 입력해 주세요.'); return; }
-    if (out.trim() && $('r-date-field').classList.contains('form-field--error')) clearFieldState('r-date-field', 'r-date-err');
-  });
+  /* 복직일(데이트피커) 값 읽기 — 'YYYY-MM-DD' 또는 '' */
+  function dpVal() {
+    var dp = $('r-date-dp'); if (!dp) return '';
+    var yy = $('r-in-yr').value.trim(), mm = $('r-in-mo').value.trim(), dd = $('r-in-dy').value.trim();
+    if (yy.length === 4 && mm && dd) return yy + '-' + ('0' + mm).slice(-2) + '-' + ('0' + dd).slice(-2);
+    return '';
+  }
+  function dateErr(msg) {
+    var dp = $('r-date-dp'), field = $('r-date-field'), err = $('r-date-err');
+    if (msg) { if (dp) dp.classList.add('dp--error'); if (field) field.classList.add('form-field--error'); if (err) { err.textContent = msg; err.removeAttribute('hidden'); } }
+    else { if (dp) dp.classList.remove('dp--error'); if (field) field.classList.remove('form-field--error'); if (err) err.setAttribute('hidden', ''); }
+  }
+  function setDpDate(y, m, d) {
+    var dp = $('r-date-dp'); if (!dp) return;
+    $('r-in-yr').value = y || ''; $('r-in-mo').value = m || ''; $('r-in-dy').value = d || '';
+    dp.classList.toggle('dp--has-value', !!y);
+    dateErr(null);
+  }
+  /* 복직일 — 캘린더 선택·직접 입력 시 유효성 즉시 검증(형식 완성 후 실제 날짜인지). 데이트피커 부품은 DS가 숫자만 필터.
+     값이 미완성이면 아무 것도 하지 않는다(제출 시 뜬 '필수' 에러를 클릭만으로 지우지 않기 위함) */
+  function onDateActivity() {
+    var v = dpVal();
+    if (!v) return;
+    dateErr(isValidDate(v) ? null : '올바른 날짜를 입력해 주세요.');
+  }
+  document.addEventListener('click', function () { setTimeout(onDateActivity, 0); }, true);
+  document.addEventListener('input', function (e) { if (e.target.classList && e.target.classList.contains('dp__value-part')) setTimeout(onDateActivity, 0); });
 
   /* 금액 필드(월급여액·받은 보수) — 천 단위 콤마 + 숫자만 검증 */
   [['r-pay', 'r-pay-field', 'r-pay-err'], ['r-recv-amt', 'r-recv-amt-field', 'r-recv-amt-err']].forEach(function (t) {
@@ -554,11 +582,11 @@ exits: insurance-join-status.html, index.html
     /* 휴직사유 */
     if (!reason) { $('r-reason-field').classList.add('form-field--error'); var re = $('r-reason-err'); if (re) re.removeAttribute('hidden'); shake($('r-reason-field')); firstBad = firstBad || $('r-reason').querySelector('.dropdown__trigger'); ok = false; }
     else { $('r-reason-field').classList.remove('form-field--error'); }
-    /* 복직일 — 미입력 / 날짜 오류 구분 */
-    var dv = $('r-date').value.trim();
-    if (!dv) { setFieldError('r-date-field', 'r-date-err', '복직일을 입력해 주세요.'); shake($('r-date-field')); firstBad = firstBad || $('r-date'); ok = false; }
-    else if (!isValidDate(dv)) { setFieldError('r-date-field', 'r-date-err', '올바른 날짜를 입력해 주세요.'); shake($('r-date-field')); firstBad = firstBad || $('r-date'); ok = false; }
-    else clearFieldState('r-date-field', 'r-date-err');
+    /* 복직일(데이트피커) — 미선택 / 날짜 오류 구분 */
+    var dv = dpVal();
+    if (!dv) { dateErr('복직일을 선택해 주세요.'); shake($('r-date-field')); firstBad = firstBad || $('r-in-yr'); ok = false; }
+    else if (!isValidDate(dv)) { dateErr('올바른 날짜를 입력해 주세요.'); shake($('r-date-field')); firstBad = firstBad || $('r-in-yr'); ok = false; }
+    else dateErr(null);
     /* 월급여액 */
     if (!$('r-pay').value.trim()) { setFieldError('r-pay-field', 'r-pay-err', '월급여액을 입력해 주세요.'); shake($('r-pay-field')); firstBad = firstBad || $('r-pay'); ok = false; }
     /* 휴직기간 중 받은 보수 '있음'이면 금액 필수 */
@@ -594,7 +622,7 @@ exits: insurance-join-status.html, index.html
   /* 취소 → 작성 내용 있으면 확인 알럿 */
   function panelHasInput() {
     if (reasonVal()) return true;
-    if ($('r-date').value.trim() || $('r-child').value.trim()) return true;
+    if (dpVal() || $('r-in-yr').value.trim() || $('r-in-mo').value.trim() || $('r-in-dy').value.trim() || $('r-child').value.trim()) return true;
     if (recvVal() === '있음' || ($('r-recv-amt').value && $('r-recv-amt').value.trim())) return true;
     var memo = $('r-memo'); if (memo && memo.value.trim()) return true;
     if (upHasFile()) return true;
@@ -626,7 +654,7 @@ exits: insurance-join-status.html, index.html
   }
   window.applyReturnScenario = function (name) {
     /* 리셋 */
-    $('r-date').value = ''; clearFieldState('r-date-field', 'r-date-err');
+    setDpDate('', '', '');
     $('r-pay').value = '5,300,000'; clearFieldState('r-pay-field', 'r-pay-err');
     ddApply('r-recv', '없음'); refreshRecv();
     var childEl = $('r-child'); if (childEl) childEl.value = '';
@@ -645,7 +673,7 @@ exits: insurance-join-status.html, index.html
     else if (name === '기타') { ddApply('r-reason', '기타'); }
     refreshReason();
     /* 데모 값 채우기(첫 진입 제외) */
-    if (name !== '첫-진입') { $('r-date').value = '2027-08-01'; }
+    if (name !== '첫-진입') { setDpDate('2027', '08', '01'); }
     if (name === '육아휴직') {
       $('r-child').value = '200315-3';
       ddApply('r-recv', '있음'); refreshRecv(); $('r-recv-amt').value = '1,200,000';
