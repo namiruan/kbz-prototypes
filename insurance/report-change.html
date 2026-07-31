@@ -299,6 +299,7 @@ exits: index.html
       <button class="proto-nav-btn" data-scenario="인상-20미만" type="button">보수인상 · 20% 미만</button>
       <button class="proto-nav-btn" data-scenario="인하-20이상" type="button">보수인하 · 20% 이상</button>
       <button class="proto-nav-btn" data-scenario="착오정정" type="button">착오정정</button>
+      <button class="proto-nav-btn" data-scenario="상세보기" type="button">상세보기(조회)</button>
     </nav>
   </aside>
 
@@ -1517,10 +1518,13 @@ exits: index.html
       document.getElementById('proto-nav-divider').hidden = interactive;
       closeAllOverlays();
       if (interactive) {
+        if (window.exitDetailView) window.exitDetailView();
         if (protoPanels[0]) { showOnlyPanel(protoPanels[0]); _initComponents(protoPanels[0]); }
       } else {
+        if (window.exitDetailView) window.exitDetailView();
         var active = document.querySelector('.proto-nav-btn.is-active');
         var name = active ? active.dataset.scenario : (protoPanels[0] && protoPanels[0].dataset.scenario);
+        if (name === '상세보기') { if (window.enterDetailView) window.enterDetailView(true); return; }
         var target = protoPanels.filter(function(p) { return p.dataset.scenario === name; })[0] || protoPanels[0];
         if (target) showOnlyPanel(target);
       }
@@ -1532,8 +1536,10 @@ exits: index.html
     btn.addEventListener('click', function() {
       closeAllOverlays();
       var name = this.dataset.scenario;
-      protoPanels.forEach(function(p) { p.hidden = p.dataset.scenario !== name; });
       document.querySelectorAll('.proto-nav-btn').forEach(function(b) { b.classList.toggle('is-active', b.dataset.scenario === name); });
+      if (name === '상세보기') { if (window.enterDetailView) window.enterDetailView(true); return; }
+      if (window.exitDetailView) window.exitDetailView();
+      protoPanels.forEach(function(p) { p.hidden = p.dataset.scenario !== name; });
     });
   });
 
@@ -2055,8 +2061,8 @@ exits: index.html
 </style>
 <script>
 (function () {
+  var DETAIL_SCENARIO = '인상-20이상';
   var params = new URLSearchParams(location.search);
-  if (params.get('mode') !== 'view') return;
   var editable = params.get('editable') === '1';   /* 진행상태 '접수완료'일 때만 수정하기 노출(처리중은 미노출) */
   function toast(msg) {
     if (typeof makeToast !== 'function') return;
@@ -2089,15 +2095,38 @@ exits: index.html
     setActions('<button class="btn btn--secondary btn--solid btn--md" type="button" data-vd="cancel">취소</button>' +
                '<button class="btn btn--primary btn--md" type="button" data-vd="submit">수정 및 제출</button>');
   }
-  function init() {
+  function clearActions() { document.querySelectorAll('.detail-actions').forEach(function (w) { w.remove(); }); }
+  /* 상세보기: 제출된 신고서이므로 값이 채워진 시나리오를 보여준다(빈 '첫 진입' 대신) */
+  function fillScenario() {
+    if (typeof window.applyCorrScenario === 'function') { window.applyCorrScenario(DETAIL_SCENARIO); return; }
+    if (typeof window.applyLeaveScenario === 'function') { window.applyLeaveScenario(DETAIL_SCENARIO); return; }
+    document.querySelectorAll('#pane-panels > .scenario-panel').forEach(function (p) { p.hidden = p.dataset.scenario !== DETAIL_SCENARIO; });
+  }
+  function enterDetail(ed) {
+    editable = ed !== false;
     document.body.classList.add('detail-mode');
-    /* 상세보기: 제출된 신고서이므로 값이 채워진 시나리오를 보여준다(빈 '첫 진입' 대신) */
-    var _vNav = Array.prototype.filter.call(document.querySelectorAll('.proto-nav-btn'), function (b) { return b.dataset.scenario === '인상-20이상'; })[0];
-    if (_vNav) _vNav.click();
-    document.querySelectorAll('.modal__header [data-acq-cancel]').forEach(function (x) {
-      x.addEventListener('click', function (e) { e.stopPropagation(); e.preventDefault(); location.href = returnPage(); }, true);
-    });
+    fillScenario();
     enterView();
+  }
+  function exitDetail() {
+    document.body.classList.remove('detail-mode');
+    document.body.classList.remove('view-mode');
+    clearActions();
+  }
+  window.enterDetailView = enterDetail;
+  window.exitDetailView = exitDetail;
+  /* 헤더 X: 상세보기 중에는 목록으로 복귀(그 외 모드에선 기존 취소 플로우 유지) */
+  document.querySelectorAll('.modal__header [data-acq-cancel]').forEach(function (x) {
+    x.addEventListener('click', function (e) {
+      if (!document.body.classList.contains('detail-mode')) return;
+      e.stopPropagation(); e.preventDefault(); location.href = returnPage();
+    }, true);
+  });
+  function init() {
+    if (params.get('mode') !== 'view') return;
+    var nav = Array.prototype.filter.call(document.querySelectorAll('.proto-nav-btn'), function (b) { return b.dataset.scenario === '상세보기'; })[0];
+    if (nav) document.querySelectorAll('.proto-nav-btn').forEach(function (b) { b.classList.toggle('is-active', b === nav); });
+    enterDetail(editable);
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 })();
