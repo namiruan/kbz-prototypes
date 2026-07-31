@@ -571,7 +571,8 @@ exits: insurance-join-status.html, report-acquire.html, report-loss.html, report
   tbody.addEventListener('click', function (e) {
     var btn = e.target.closest('[data-action]'); if (!btn) return;
     var row = btn.closest('.table__row'); var kind = row.dataset.kind;
-    var file = REPORT_FILE[kind] || 'insurance-join-status.html';
+    /* 신고서 모달에서 닫기/취소/제출 시 이 페이지로 돌아오도록 return 파라미터 전달 */
+    var file = (REPORT_FILE[kind] || 'insurance-join-status.html') + '?return=insurance-report-status.html';
     switch (btn.dataset.action) {
       case 'request':    /* 신고 요청 — 취득: [사업장 선택 Modal] 먼저(6-1 CASE-1), 상실: 상실 신고 Modal 바로(CASE-2) */
         if (kind === '취득') { openOverlay('overlay-worksite'); } else { location.href = file; }
@@ -643,7 +644,7 @@ exits: insurance-join-status.html, report-acquire.html, report-loss.html, report
       if (firstBad) { firstBad.focus(); return; }
       /* [근로자 정보>4대보험>사업장 이력] 등록 후 → 취득 신고 Layer Modal 로 이동 */
       closeAllOverlays();
-      location.href = 'report-acquire.html';
+      location.href = 'report-acquire.html?return=insurance-report-status.html';
     });
   })();
 
@@ -666,6 +667,16 @@ exits: insurance-join-status.html, report-acquire.html, report-loss.html, report
       applyFilters();
     }
   };
+
+  /* ── 신고서에서 이 페이지로 돌아오며 제출 완료 시 성공 토스트 (?submitted=<유형>) ── */
+  (function () {
+    var m = /[?&]submitted=([^&]+)/.exec(location.search);
+    if (!m) return;
+    var LABEL = { acquire: '취득', loss: '상실', transfer: '사업장 이동', change: '보수변경', correction: '정정', leave: '휴직', return: '복직' };
+    var label = LABEL[m[1]] || '';
+    if (history.replaceState) history.replaceState(null, '', location.pathname);
+    setTimeout(function () { toast('success', (label ? label + ' ' : '') + '신고가 접수되었어요.'); }, 400);
+  })();
 })();
 </script>
 

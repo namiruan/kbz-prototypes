@@ -11,6 +11,7 @@
   <link rel="stylesheet" href="https://namiruan.github.io/kbz_3.0_ui_stytem/tokens.css">
   <link rel="stylesheet" href="https://namiruan.github.io/kbz_3.0_ui_stytem/components.css">
   <script src="https://namiruan.github.io/kbz_3.0_ui_stytem/components.js"></script>
+  <script>window.returnPage = function () { return new URLSearchParams(location.search).get('return') === 'insurance-report-status.html' ? 'insurance-report-status.html' : 'insurance-join-status.html'; };</script>
   <style>
     /* 이 페이지 고유 레이아웃만 — 컴포넌트·프로토타입 크롬은 components.css가 처리 */
     /* 허브 복귀 링크 — 사이드바 최상단. .link는 인라인이라 블록 배치·여백을 페이지에서 준다 */
@@ -1951,7 +1952,7 @@ exits: index.html
     setTimeout(function () {
       clearButtonLoading(btn);
       closeOverlay(document.getElementById('overlay-submit'));
-      location.href = 'insurance-join-status.html?submitted=change';
+      location.href = returnPage() + '?submitted=change';
     }, 1500);
   });
 
@@ -1981,13 +1982,13 @@ exits: index.html
   document.querySelectorAll('[data-acq-cancel]').forEach(function (btn) {
     btn.addEventListener('click', function () {
       if (panelHasInput(this.closest('.scenario-panel'))) openOverlay('overlay-cancel');
-      else location.href = 'insurance-join-status.html';
+      else location.href = returnPage();
     });
   });
   var cancelOv = document.getElementById('overlay-cancel');
   if (cancelOv) {
     var cancelBtn = cancelOv.querySelector('.btn--secondary');
-    if (cancelBtn) cancelBtn.addEventListener('click', function () { location.href = 'insurance-join-status.html'; });
+    if (cancelBtn) cancelBtn.addEventListener('click', function () { location.href = returnPage(); });
   }
 
   /* 초기 동기화 — 변경사유 기본 선택(보수인상) 기준으로 변경년월 활성화·보험 자동선택까지 반영 */
