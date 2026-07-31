@@ -1231,11 +1231,21 @@ exits: index.html
     });
   }
 
+  /* 첫 진입 시 미리 채워진 기본값(예: 상실일 데이트피커)을 '작성 중'으로 오인하지 않도록,
+     로드 시점의 초깃값을 스냅샷해 둔다(변경 여부 비교용). */
+  document.querySelectorAll('#pane-panels input[type="text"]').forEach(function (el) { el.dataset.initialVal = el.value; });
+
   /* 취소 → 작성 내용 있으면 확인 알럿, 없으면 바로 목록 */
   function panelHasInput(panel) {
     if (!panel) return false;
     var vals = panel.querySelectorAll('input[type="text"]:not([readonly]), textarea');
-    for (var i = 0; i < vals.length; i++) { if (String(vals[i].value).trim()) return true; }
+    for (var i = 0; i < vals.length; i++) {
+      var el = vals[i], v = String(el.value).trim();
+      if (!v) continue;
+      /* 기본값이 있던 필드(데이트피커 부품 등)는 초깃값과 달라졌을 때만 '작성 중'으로 간주 */
+      if (el.dataset.initialVal != null && v === String(el.dataset.initialVal).trim()) continue;
+      return true;
+    }
     if (panel.querySelector('.file-upload-item')) return true;
     if (panel.querySelector('.acq-reason-dd .dropdown__value:not(.dropdown__value--placeholder)')) return true;
     return false;
