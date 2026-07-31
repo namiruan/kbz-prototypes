@@ -184,7 +184,7 @@ exits: insurance-join-status.html, index.html
                     </div>
                     <div class="form-field r-amt-field" id="r-recv-amt-field">
                       <label class="form-field__label text-form-label" for="r-recv-amt">보수 금액 <span class="form-field__required" aria-hidden="true">(필수)</span></label>
-                      <div class="form-field__body"><div class="input-wrap input-wrap--suffix"><input class="input" type="text" id="r-recv-amt" placeholder="숫자 입력" inputmode="numeric" autocomplete="off" disabled><span class="input__suffix">원</span></div></div>
+                      <div class="form-field__body"><div class="input-wrap input-wrap--suffix"><input class="input input--disabled" type="text" id="r-recv-amt" placeholder="숫자 입력" inputmode="numeric" autocomplete="off" disabled><span class="input__suffix">원</span></div></div>
                       <div class="form-field__footer"><p class="form-field__error text-helper" id="r-recv-amt-err" role="alert">받은 보수를 입력해 주세요.</p></div>
                     </div>
                   </div>
@@ -494,6 +494,7 @@ exits: insurance-join-status.html, index.html
     var amt = $('r-recv-amt'); if (!amt) return;
     var on = recvVal() === '있음';
     amt.disabled = !on;
+    amt.classList.toggle('input--disabled', !on);   /* DS 비활성 스타일은 클래스로 적용 */
     if (!on) { amt.value = ''; clearFieldState('r-recv-amt-field', 'r-recv-amt-err'); }
   }
 
