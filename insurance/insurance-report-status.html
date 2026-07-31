@@ -20,9 +20,8 @@
     /* 진행 상태 셀 — 반려는 배지 + 돋보기(사유 hover) */
     .rs-status { display: inline-flex; align-items: center; gap: var(--space-gap-2xs); }
     .rs-status .icon { color: var(--color-text-error); }
-    /* 관리 열 — 버튼 가로 배치, 줄바꿈 방지 */
-    .rs-actions { display: inline-flex; align-items: center; gap: var(--space-gap-xs); white-space: nowrap; }
-    .rs-actions .btn { flex-shrink: 0; }
+    /* 관리 열 — DS action-group(테이블 행 액션 전용). 셀 내 우측 정렬 */
+    .table__cell--fit .action-group { white-space: nowrap; }
     /* 접수일 '-' 는 옅게 */
     .rs-date-none { color: var(--color-text-subtle); }
     /* 진행상태 안내 툴팁 — 넉넉한 폭 + 좌측 정렬 */
@@ -173,10 +172,10 @@ exits: insurance-join-status.html, report-acquire.html, report-loss.html, report
                     <td class="table__cell">보수변경</td>
                     <td class="table__cell"><span class="badge badge--neutral">임시저장</span></td>
                     <td class="table__cell rs-date-none">-</td>
-                    <td class="table__cell table__cell--fit"><span class="rs-actions">
-                      <button class="btn btn--secondary btn--solid btn--sm" type="button" data-action="continue">이어서 작성</button>
-                      <button class="btn btn--secondary btn--solid btn--sm" type="button" data-action="delete">삭제</button>
-                    </span></td>
+                    <td class="table__cell table__cell--fit"><div class="action-group">
+                      <button class="action-btn action-btn--sm" type="button" data-action="continue">이어서 작성</button>
+                      <button class="action-btn action-btn--sm" type="button" data-action="delete">삭제</button>
+                    </div></td>
                   </tr>
 
                   <tr class="table__row" data-dept="전략기획팀" data-status="신고대상" data-kind="취득">
@@ -186,10 +185,10 @@ exits: insurance-join-status.html, report-acquire.html, report-loss.html, report
                     <td class="table__cell">취득</td>
                     <td class="table__cell"><span class="badge badge--caution">신고대상</span></td>
                     <td class="table__cell rs-date-none">-</td>
-                    <td class="table__cell table__cell--fit"><span class="rs-actions">
-                      <button class="btn btn--secondary btn--solid btn--sm" type="button" data-action="request">신고 요청</button>
-                      <button class="btn btn--secondary btn--solid btn--sm" type="button" data-action="exclude">신고 제외</button>
-                    </span></td>
+                    <td class="table__cell table__cell--fit"><div class="action-group">
+                      <button class="action-btn action-btn--sm" type="button" data-action="request">신고 요청</button>
+                      <button class="action-btn action-btn--sm" type="button" data-action="exclude">신고 제외</button>
+                    </div></td>
                   </tr>
 
                   <tr class="table__row" data-dept="전략기획팀" data-status="신고대상" data-kind="상실">
@@ -199,10 +198,10 @@ exits: insurance-join-status.html, report-acquire.html, report-loss.html, report
                     <td class="table__cell">상실</td>
                     <td class="table__cell"><span class="badge badge--caution">신고대상</span></td>
                     <td class="table__cell rs-date-none">-</td>
-                    <td class="table__cell table__cell--fit"><span class="rs-actions">
-                      <button class="btn btn--secondary btn--solid btn--sm" type="button" data-action="request">신고 요청</button>
-                      <button class="btn btn--secondary btn--solid btn--sm" type="button" data-action="exclude">신고 제외</button>
-                    </span></td>
+                    <td class="table__cell table__cell--fit"><div class="action-group">
+                      <button class="action-btn action-btn--sm" type="button" data-action="request">신고 요청</button>
+                      <button class="action-btn action-btn--sm" type="button" data-action="exclude">신고 제외</button>
+                    </div></td>
                   </tr>
 
                   <tr class="table__row" data-dept="전략기획팀" data-status="신고대상" data-kind="상실">
@@ -212,10 +211,10 @@ exits: insurance-join-status.html, report-acquire.html, report-loss.html, report
                     <td class="table__cell">상실</td>
                     <td class="table__cell"><span class="badge badge--caution">신고대상</span></td>
                     <td class="table__cell rs-date-none">-</td>
-                    <td class="table__cell table__cell--fit"><span class="rs-actions">
-                      <button class="btn btn--secondary btn--solid btn--sm" type="button" data-action="request">신고 요청</button>
-                      <button class="btn btn--secondary btn--solid btn--sm" type="button" data-action="exclude">신고 제외</button>
-                    </span></td>
+                    <td class="table__cell table__cell--fit"><div class="action-group">
+                      <button class="action-btn action-btn--sm" type="button" data-action="request">신고 요청</button>
+                      <button class="action-btn action-btn--sm" type="button" data-action="exclude">신고 제외</button>
+                    </div></td>
                   </tr>
 
                   <tr class="table__row" data-dept="ABC팀" data-status="접수완료" data-kind="사업장 이동">
@@ -225,9 +224,9 @@ exits: insurance-join-status.html, report-acquire.html, report-loss.html, report
                     <td class="table__cell">사업장 이동</td>
                     <td class="table__cell"><span class="badge badge--success">접수완료</span></td>
                     <td class="table__cell">2026-04-15 12:15</td>
-                    <td class="table__cell table__cell--fit"><span class="rs-actions">
-                      <button class="btn btn--secondary btn--solid btn--sm" type="button" data-action="detail">상세 보기</button>
-                    </span></td>
+                    <td class="table__cell table__cell--fit"><div class="action-group">
+                      <button class="action-btn action-btn--sm" type="button" data-action="detail">상세 보기</button>
+                    </div></td>
                   </tr>
 
                   <tr class="table__row" data-dept="ABC팀" data-status="처리중" data-kind="보수변경">
@@ -237,9 +236,9 @@ exits: insurance-join-status.html, report-acquire.html, report-loss.html, report
                     <td class="table__cell">보수변경</td>
                     <td class="table__cell"><span class="badge badge--info">처리중</span></td>
                     <td class="table__cell">2026-04-16 09:45</td>
-                    <td class="table__cell table__cell--fit"><span class="rs-actions">
-                      <button class="btn btn--secondary btn--solid btn--sm" type="button" data-action="detail">상세 보기</button>
-                    </span></td>
+                    <td class="table__cell table__cell--fit"><div class="action-group">
+                      <button class="action-btn action-btn--sm" type="button" data-action="detail">상세 보기</button>
+                    </div></td>
                   </tr>
 
                   <tr class="table__row" data-dept="ABC팀" data-status="처리중" data-kind="취득">
@@ -249,9 +248,9 @@ exits: insurance-join-status.html, report-acquire.html, report-loss.html, report
                     <td class="table__cell">취득</td>
                     <td class="table__cell"><span class="badge badge--info">처리중</span></td>
                     <td class="table__cell">2026-04-17 15:20</td>
-                    <td class="table__cell table__cell--fit"><span class="rs-actions">
-                      <button class="btn btn--secondary btn--solid btn--sm" type="button" data-action="detail">상세 보기</button>
-                    </span></td>
+                    <td class="table__cell table__cell--fit"><div class="action-group">
+                      <button class="action-btn action-btn--sm" type="button" data-action="detail">상세 보기</button>
+                    </div></td>
                   </tr>
 
                   <tr class="table__row" data-dept="ABC팀" data-status="반려" data-kind="취득">
@@ -261,10 +260,10 @@ exits: insurance-join-status.html, report-acquire.html, report-loss.html, report
                     <td class="table__cell">취득</td>
                     <td class="table__cell"><span class="rs-status"><span class="badge badge--error">반려</span><span class="tooltip-wrapper" onmouseenter="this.querySelector('.tooltip-panel').classList.add('tooltip-panel--visible')" onmouseleave="this.querySelector('.tooltip-panel').classList.remove('tooltip-panel--visible')"><button class="tooltip-trigger tooltip-trigger--sm" type="button" aria-label="반려 사유 보기"><span class="icon icon--sm" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-search"/></svg></span></button><div class="tooltip-panel elevation-tooltip tooltip-panel--bottom" role="tooltip">취득일이 자격 기준일과 일치하지 않아 반려되었습니다. 공단 확인 후 정정하여 다시 신고해 주세요.</div></span></span></td>
                     <td class="table__cell">2026-04-18 08:00</td>
-                    <td class="table__cell table__cell--fit"><span class="rs-actions">
-                      <button class="btn btn--secondary btn--solid btn--sm" type="button" data-action="rewrite">다시 작성</button>
-                      <button class="btn btn--secondary btn--solid btn--sm" type="button" data-action="cancelReject">취소</button>
-                    </span></td>
+                    <td class="table__cell table__cell--fit"><div class="action-group">
+                      <button class="action-btn action-btn--sm" type="button" data-action="rewrite">다시 작성</button>
+                      <button class="action-btn action-btn--sm" type="button" data-action="cancelReject">취소</button>
+                    </div></td>
                   </tr>
 
                   <tr class="table__row" data-dept="ABC팀" data-status="반려" data-kind="상실">
@@ -274,10 +273,10 @@ exits: insurance-join-status.html, report-acquire.html, report-loss.html, report
                     <td class="table__cell">상실</td>
                     <td class="table__cell"><span class="rs-status"><span class="badge badge--error">반려</span><span class="tooltip-wrapper" onmouseenter="this.querySelector('.tooltip-panel').classList.add('tooltip-panel--visible')" onmouseleave="this.querySelector('.tooltip-panel').classList.remove('tooltip-panel--visible')"><button class="tooltip-trigger tooltip-trigger--sm" type="button" aria-label="반려 사유 보기"><span class="icon icon--sm" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-search"/></svg></span></button><div class="tooltip-panel elevation-tooltip tooltip-panel--bottom" role="tooltip">상실일이 취득일보다 빠르게 입력되어 반려되었습니다. 날짜를 확인 후 다시 신고해 주세요.</div></span></span></td>
                     <td class="table__cell">2026-04-18 08:00</td>
-                    <td class="table__cell table__cell--fit"><span class="rs-actions">
-                      <button class="btn btn--secondary btn--solid btn--sm" type="button" data-action="rewrite">다시 작성</button>
-                      <button class="btn btn--secondary btn--solid btn--sm" type="button" data-action="cancelReject">취소</button>
-                    </span></td>
+                    <td class="table__cell table__cell--fit"><div class="action-group">
+                      <button class="action-btn action-btn--sm" type="button" data-action="rewrite">다시 작성</button>
+                      <button class="action-btn action-btn--sm" type="button" data-action="cancelReject">취소</button>
+                    </div></td>
                   </tr>
 
                   <!-- 검색 결과 없음 (시나리오) -->
