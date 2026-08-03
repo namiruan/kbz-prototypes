@@ -26,7 +26,7 @@
     .acq-info-card__value { font-size: var(--font-size-base); font-weight: var(--font-weight-heading); color: var(--color-text-body); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
     /* 4대보험 카드 2×2 */
-    .wi-cards { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-gap-lg); }
+    .wi-cards { display: flex; flex-direction: column; gap: var(--space-gap-md); }
     /* 카드 기본 — 근로자 정보 카드(acq-info-card)와 동일한 border 토큰 */
     .wi-card { background: var(--color-surface-base); border: var(--stroke-sm) solid var(--color-border-default); border-radius: var(--radius-md); padding: var(--space-inset-xl); }
     /* 상태색 언어 — 취득신고서 .acq-ins-item과 통일: 취득=초록 라인, 상실=caution 라인, 미가입=회색 채움 */
