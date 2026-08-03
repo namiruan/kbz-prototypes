@@ -17,9 +17,10 @@
     .proto-hub-link { display: block; padding: var(--space-inset-squish-sm); font-size: var(--font-size-sm); }
     .wp-page-title { font-size: var(--font-size-h1); font-weight: var(--font-weight-heading); color: var(--color-text-display); margin: 0 0 var(--space-stack-lg); }
 
-    /* 툴바 — 좌: 결과 수, 우: 검색·초기화·추가·삭제 한 줄 */
-    .wp-toolbar-actions { display: flex; align-items: center; gap: var(--space-gap-sm); }
-    .wp-reset-btn { color: var(--color-text-subtle); }
+    /* 액션 바 — 좌: 검색(filter-bar, 가변), 우: 근무지 추가·삭제 버튼 */
+    .wp-actions-row { display: flex; align-items: center; gap: var(--space-gap-md); margin-bottom: var(--space-stack-lg); }
+    .wp-actions-row .filter-bar { flex: 1; min-width: 0; }
+    .wp-actions { display: flex; align-items: center; gap: var(--space-gap-sm); flex-shrink: 0; }
 
     /* 테이블 — 근무지명은 가변, 관리번호는 고정폭 */
     .wp-table { table-layout: fixed; }
@@ -76,15 +77,10 @@ exits: index.html
 
           <h1 class="wp-page-title">근무지 관리</h1>
 
-          <div class="table-container">
-            <div class="table__toolbar">
-              <div class="table__title-group">
-                <span class="table__count" aria-live="polite">내 탐색 결과 <b class="table__count-value" id="wp-count">4</b></span>
-              </div>
-              <div class="wp-toolbar-actions">
-                <button class="btn btn--ghost btn--sm wp-reset-btn" type="button" id="wp-reset">
-                  <span class="icon icon--sm" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-refresh"/></svg></span>검색초기화
-                </button>
+          <!-- 액션 바 — 검색(DS filter-bar)은 좌측, 근무지 추가·삭제 버튼은 테이블 컨테이너 바깥 우측 -->
+          <div class="wp-actions-row">
+            <div class="filter-bar" id="wp-fb">
+              <div class="filter-bar__bar" role="toolbar" aria-label="근무지 검색">
                 <div class="filter-bar__search">
                   <div class="input-wrap">
                     <input class="input input--ghost" type="search" placeholder="근무처명 또는 관리번호를 입력해주세요." aria-label="근무처명 또는 관리번호 검색" id="wp-search">
@@ -92,12 +88,28 @@ exits: index.html
                   </div>
                   <button class="icon-on--md" type="button" aria-label="검색" id="wp-search-btn"><svg aria-hidden="true"><use href="#icon-search"/></svg></button>
                 </div>
-                <button class="btn btn--primary btn--md" type="button" id="wp-add" data-overlay-open="overlay-add">
-                  <span class="icon icon--sm" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-plus"/></svg></span>근무지 추가
-                </button>
-                <button class="btn btn--secondary btn--md" type="button" id="wp-delete">
-                  <span class="icon icon--sm" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-delete"/></svg></span>삭제
-                </button>
+                <div class="filter-bar__reset-wrap">
+                  <span class="tooltip-wrapper" onmouseenter="this.querySelector('.tooltip-panel').classList.add('tooltip-panel--visible')" onmouseleave="this.querySelector('.tooltip-panel').classList.remove('tooltip-panel--visible')">
+                    <button class="icon-on--md" type="button" aria-label="검색초기화" id="wp-reset"><svg aria-hidden="true"><use href="#icon-refresh"/></svg></button>
+                    <div class="tooltip-panel elevation-tooltip tooltip-panel--bottom" role="tooltip">검색초기화</div>
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div class="wp-actions">
+              <button class="btn btn--primary btn--md" type="button" id="wp-add" data-overlay-open="overlay-add">
+                <span class="icon icon--sm" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-plus"/></svg></span>근무지 추가
+              </button>
+              <button class="btn btn--secondary btn--md" type="button" id="wp-delete">
+                <span class="icon icon--sm" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-delete"/></svg></span>삭제
+              </button>
+            </div>
+          </div>
+
+          <div class="table-container">
+            <div class="table__toolbar">
+              <div class="table__title-group">
+                <span class="table__count" aria-live="polite">내 탐색 결과 <b class="table__count-value" id="wp-count">4</b></span>
               </div>
             </div>
 
