@@ -77,6 +77,10 @@
     /* 서브탭마다 내용 폭이 달라 모달 폭도 탭별로 조정(부드럽게 전환) */
     .modal--lg { transition: width 0.2s ease; }
 
+    /* 좌측 세로 탭 내비 — 디자인(Figma)엔 내비/콘텐츠 사이 세로 구분선이 없다.
+       DS CSS(components.css)가 기본으로 넣는 border-right가 디자인과 불일치하여 제거(항목 간 가로 구분선은 유지) */
+    .modal--lg .modal__body > .tab-group--vertical { border-right: none; }
+
     /* 공단 대사 안내 배너 */
     #wi-banner { margin-bottom: var(--space-stack-lg); }
 
@@ -200,8 +204,8 @@ exits: index.html, report-acquire.html, report-loss.html, report-transfer.html, 
                       <table class="table table--info" aria-label="건강/연금 사업장 이력">
                         <thead class="table__head"><tr>
                           <th class="table__head-cell" scope="col" style="width:64px">번호</th>
-                          <th class="table__head-cell" scope="col" style="width:220px">사업장</th>
-                          <th class="table__head-cell" scope="col" style="width:170px">관리번호</th>
+                          <th class="table__head-cell" scope="col" style="width:260px">사업장</th>
+                          <th class="table__head-cell" scope="col" style="width:130px">관리번호</th>
                           <th class="table__head-cell" scope="col" style="width:130px">취득일</th>
                           <th class="table__head-cell" scope="col" style="width:130px">상실일</th>
                         </tr></thead>
@@ -217,8 +221,8 @@ exits: index.html, report-acquire.html, report-loss.html, report-transfer.html, 
                       <table class="table table--info" aria-label="고용 사업장 이력">
                         <thead class="table__head"><tr>
                           <th class="table__head-cell" scope="col" style="width:64px">번호</th>
-                          <th class="table__head-cell" scope="col" style="width:220px">사업장</th>
-                          <th class="table__head-cell" scope="col" style="width:170px">관리번호</th>
+                          <th class="table__head-cell" scope="col" style="width:260px">사업장</th>
+                          <th class="table__head-cell" scope="col" style="width:130px">관리번호</th>
                           <th class="table__head-cell" scope="col" style="width:130px">취득일</th>
                           <th class="table__head-cell" scope="col" style="width:130px">상실일</th>
                         </tr></thead>
@@ -233,8 +237,8 @@ exits: index.html, report-acquire.html, report-loss.html, report-transfer.html, 
                       <table class="table table--info" aria-label="산재 사업장 이력">
                         <thead class="table__head"><tr>
                           <th class="table__head-cell" scope="col" style="width:64px">번호</th>
-                          <th class="table__head-cell" scope="col" style="width:220px">사업장</th>
-                          <th class="table__head-cell" scope="col" style="width:170px">관리번호</th>
+                          <th class="table__head-cell" scope="col" style="width:260px">사업장</th>
+                          <th class="table__head-cell" scope="col" style="width:130px">관리번호</th>
                           <th class="table__head-cell" scope="col" style="width:130px">취득일</th>
                           <th class="table__head-cell" scope="col" style="width:130px">상실일</th>
                         </tr></thead>
