@@ -227,6 +227,7 @@ exits: index.html
       <button class="proto-nav-btn is-active" data-scenario="첫-진입" type="button">첫 진입</button>
       <button class="proto-nav-btn" data-scenario="일부-상실" type="button">일부 상실</button>
       <button class="proto-nav-btn" data-scenario="전체-상실" type="button">전체 상실 (퇴사)</button>
+      <button class="proto-nav-btn" data-scenario="상세보기" type="button">상세보기(조회)</button>
     </nav>
   </aside>
 
@@ -894,10 +895,13 @@ exits: index.html
       document.getElementById('proto-nav-divider').hidden = interactive;
       closeAllOverlays();
       if (interactive) {
+        if (window.exitDetailView) window.exitDetailView();
         if (protoPanels[0]) { showOnlyPanel(protoPanels[0]); _initComponents(protoPanels[0]); }
       } else {
+        if (window.exitDetailView) window.exitDetailView();
         var active = document.querySelector('.proto-nav-btn.is-active');
         var name = active ? active.dataset.scenario : (protoPanels[0] && protoPanels[0].dataset.scenario);
+        if (name === '상세보기') { if (window.enterDetailView) window.enterDetailView(true); return; }
         var target = protoPanels.filter(function(p) { return p.dataset.scenario === name; })[0] || protoPanels[0];
         if (target) showOnlyPanel(target);
       }
@@ -909,8 +913,10 @@ exits: index.html
     btn.addEventListener('click', function() {
       closeAllOverlays();
       var name = this.dataset.scenario;
-      protoPanels.forEach(function(p) { p.hidden = p.dataset.scenario !== name; });
       document.querySelectorAll('.proto-nav-btn').forEach(function(b) { b.classList.toggle('is-active', b.dataset.scenario === name); });
+      if (name === '상세보기') { if (window.enterDetailView) window.enterDetailView(true); return; }
+      if (window.exitDetailView) window.exitDetailView();
+      protoPanels.forEach(function(p) { p.hidden = p.dataset.scenario !== name; });
     });
   });
 
@@ -1319,8 +1325,8 @@ exits: index.html
 </style>
 <script>
 (function () {
+  var DETAIL_SCENARIO = '전체-상실';
   var params = new URLSearchParams(location.search);
-  if (params.get('mode') !== 'view') return;
   var editable = params.get('editable') === '1';   /* 진행상태 '접수완료'일 때만 수정하기 노출(처리중은 미노출) */
   function toast(msg) {
     if (typeof makeToast !== 'function') return;
@@ -1353,12 +1359,49 @@ exits: index.html
     setActions('<button class="btn btn--secondary btn--solid btn--md" type="button" data-vd="cancel">취소</button>' +
                '<button class="btn btn--primary btn--md" type="button" data-vd="submit">수정 및 제출</button>');
   }
-  function init() {
-    document.body.classList.add('detail-mode');
-    document.querySelectorAll('.modal__header [data-acq-cancel]').forEach(function (x) {
-      x.addEventListener('click', function (e) { e.stopPropagation(); e.preventDefault(); location.href = returnPage(); }, true);
+  function clearActions() { document.querySelectorAll('.detail-actions').forEach(function (w) { w.remove(); }); }
+  /* 상세보기: 제출된 신고서이므로 값이 채워진 시나리오를 보여준다(빈 '첫 진입' 대신) */
+  function fillScenario() {
+    document.querySelectorAll('#pane-panels > .scenario-panel').forEach(function (p) { p.hidden = p.dataset.scenario !== DETAIL_SCENARIO; });
+    /* 상실 사유·구체적 사유(필수) 미선택 → 자진 퇴사·이직으로 채운다 */
+    var panel = document.querySelector('.scenario-panel[data-scenario="' + DETAIL_SCENARIO + '"]');
+    if (!panel) return;
+    var fills = ['자진 퇴사', '이직'];
+    panel.querySelectorAll('.acq-reason-dd .dropdown__value').forEach(function (v, i) {
+      if (!v.classList.contains('dropdown__value--placeholder') || !fills[i]) return;
+      v.classList.remove('dropdown__value--placeholder');
+      v.textContent = fills[i];
+      v.closest('.dropdown').querySelectorAll('.dropdown__option').forEach(function (o) {
+        var lbl = o.querySelector('.dropdown__option-label');
+        if (lbl && lbl.textContent.trim() === fills[i]) o.setAttribute('aria-selected', 'true');
+      });
     });
+  }
+  function enterDetail(ed) {
+    editable = ed !== false;
+    document.body.classList.add('detail-mode');
+    fillScenario();
     enterView();
+  }
+  function exitDetail() {
+    document.body.classList.remove('detail-mode');
+    document.body.classList.remove('view-mode');
+    clearActions();
+  }
+  window.enterDetailView = enterDetail;
+  window.exitDetailView = exitDetail;
+  /* 헤더 X: 상세보기 중에는 목록으로 복귀(그 외 모드에선 기존 취소 플로우 유지) */
+  document.querySelectorAll('.modal__header [data-acq-cancel]').forEach(function (x) {
+    x.addEventListener('click', function (e) {
+      if (!document.body.classList.contains('detail-mode')) return;
+      e.stopPropagation(); e.preventDefault(); location.href = returnPage();
+    }, true);
+  });
+  function init() {
+    if (params.get('mode') !== 'view') return;
+    var nav = Array.prototype.filter.call(document.querySelectorAll('.proto-nav-btn'), function (b) { return b.dataset.scenario === '상세보기'; })[0];
+    if (nav) document.querySelectorAll('.proto-nav-btn').forEach(function (b) { b.classList.toggle('is-active', b === nav); });
+    enterDetail(editable);
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 })();
