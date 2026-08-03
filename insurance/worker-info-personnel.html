@@ -18,17 +18,29 @@
     /* 서브탭 */
     .pi-subtabs { margin-bottom: var(--space-stack-lg); }
 
-    /* 인사노트 섹션 */
+    /* 인사노트 섹션 — 입퇴사·근무정보는 아코디언(접기/펼치기) */
     .pi-section + .pi-section { margin-top: var(--space-stack-2xl); }
     .pi-section__head { display: flex; align-items: center; justify-content: space-between; gap: var(--space-gap-md); margin-bottom: var(--space-stack-sm); min-height: 36px; }
+    .pi-section__toggle { display: flex; align-items: center; gap: var(--space-gap-2xs); background: transparent; border: 0; padding: 0; cursor: pointer; }
+    .pi-section__toggle:focus-visible { outline: var(--stroke-md) solid var(--color-border-focus); outline-offset: var(--space-offset-focus); border-radius: var(--radius-xs); }
     .pi-section__title { display: flex; align-items: center; gap: var(--space-gap-xs); color: var(--color-text-brand); font-weight: var(--font-weight-heading); }
+    .pi-section__icon { color: var(--color-text-brand); transition: transform var(--duration-fast) var(--easing-base); }
+    .pi-section.is-collapsed .pi-section__icon { transform: rotate(-90deg); }
+    .pi-section.is-collapsed .pi-section__head { margin-bottom: 0; }
+    .pi-section.is-collapsed .pi-section__body { display: none; }
     .pi-section__count { color: var(--color-text-subtle); font-weight: var(--font-weight-body); }
-    .pi-section__actions { display: flex; gap: var(--space-gap-sm); flex-shrink: 0; }
+    .pi-section__actions { display: flex; align-items: center; gap: var(--space-gap-sm); flex-shrink: 0; }
 
     .pi-check-cell { width: 44px; text-align: center; }
     .pi-quit-date { max-width: 168px; }
     .pi-none { color: var(--color-text-subtle); }
     .pi-note { width: 100%; min-height: 140px; resize: vertical; }
+
+    /* 이력 테이블 — 내용(고정값) 폭만큼만 표시 */
+    #pi-sp-note .table-container { width: fit-content; max-width: 100%; }
+    #pi-sp-note .table { width: auto; }
+    /* 서브탭마다 모달 폭을 내용에 맞게(4대보험 탭과 동일, 부드럽게 전환) */
+    .modal--lg { transition: width 0.2s ease; }
 
     /* 좌측 세로 탭 내비 — 디자인엔 세로 구분선 없음(DS 기본 border-right 제거) */
     .modal--lg .modal__body > .tab-group--vertical { border-right: none; }
@@ -134,7 +146,10 @@ exits: index.html, worker-info-insurance.html, report-loss.html
                     <!-- 입퇴사 -->
                     <div class="pi-section" data-table="join">
                       <div class="pi-section__head">
-                        <div class="pi-section__title">입퇴사 <span class="pi-section__count badge badge--neutral" data-count>1</span></div>
+                        <button class="pi-section__toggle" type="button" aria-expanded="true" aria-controls="pi-join-body">
+                          <span class="icon icon--sm pi-section__icon" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-chevron-down"/></svg></span>
+                          <span class="pi-section__title">입퇴사 <span class="pi-section__count badge badge--neutral" data-count>1</span></span>
+                        </button>
                         <div class="pi-section__actions">
                           <button class="btn btn--primary btn--md" type="button" data-add>
                             <span class="icon icon--sm" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-plus"/></svg></span>추가
@@ -147,6 +162,7 @@ exits: index.html, worker-info-insurance.html, report-loss.html
                           </span>
                         </div>
                       </div>
+                      <div class="pi-section__body" id="pi-join-body">
                       <div class="table-container">
                         <table class="table table--info" aria-label="입퇴사">
                           <thead class="table__head"><tr>
@@ -165,12 +181,16 @@ exits: index.html, worker-info-insurance.html, report-loss.html
                           </tbody>
                         </table>
                       </div>
+                      </div>
                     </div>
 
                     <!-- 근무정보 -->
                     <div class="pi-section" data-table="work">
                       <div class="pi-section__head">
-                        <div class="pi-section__title">근무정보 <span class="pi-section__count badge badge--neutral" data-count>2</span></div>
+                        <button class="pi-section__toggle" type="button" aria-expanded="true" aria-controls="pi-work-body">
+                          <span class="icon icon--sm pi-section__icon" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-chevron-down"/></svg></span>
+                          <span class="pi-section__title">근무정보 <span class="pi-section__count badge badge--neutral" data-count>2</span></span>
+                        </button>
                         <div class="pi-section__actions">
                           <button class="btn btn--primary btn--md" type="button" data-add>
                             <span class="icon icon--sm" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-plus"/></svg></span>추가
@@ -183,6 +203,7 @@ exits: index.html, worker-info-insurance.html, report-loss.html
                           </span>
                         </div>
                       </div>
+                      <div class="pi-section__body" id="pi-work-body">
                       <div class="table-container">
                         <table class="table table--info" aria-label="근무정보">
                           <thead class="table__head"><tr>
@@ -192,7 +213,7 @@ exits: index.html, worker-info-insurance.html, report-loss.html
                             <th class="table__head-cell" scope="col" style="width:96px">부서</th>
                             <th class="table__head-cell" scope="col" style="width:96px">직책</th>
                             <th class="table__head-cell" scope="col" style="width:96px">직위</th>
-                            <th class="table__head-cell" scope="col">담당업무</th>
+                            <th class="table__head-cell" scope="col" style="width:180px">담당업무</th>
                           </tr></thead>
                           <tbody class="table__body" data-rows>
                             <tr class="table__row">
@@ -215,6 +236,7 @@ exits: index.html, worker-info-insurance.html, report-loss.html
                             </tr>
                           </tbody>
                         </table>
+                      </div>
                       </div>
                     </div>
 
@@ -352,6 +374,26 @@ exits: index.html, worker-info-insurance.html, report-loss.html
     refresh();
   }
   document.querySelectorAll('.pi-section[data-table]').forEach(initSectionTable);
+
+  /* ── 아코디언(입퇴사·근무정보 접기/펼치기) ── */
+  document.querySelectorAll('.pi-section__toggle').forEach(function (t) {
+    t.addEventListener('click', function () {
+      var sec = t.closest('.pi-section');
+      var collapsed = sec.classList.toggle('is-collapsed');
+      t.setAttribute('aria-expanded', String(!collapsed));
+    });
+  });
+
+  /* ── 서브탭마다 모달 폭을 내용에 맞게 조정 (4대보험 탭과 동일) ── */
+  (function () {
+    var modal = document.querySelector('.modal--lg');
+    var W = { 'pi-sp-info': 640, 'pi-sp-note': 940 };
+    function fit(id) { if (modal && W[id]) modal.style.width = W[id] + 'px'; }
+    document.querySelectorAll('.pi-subtabs .tab').forEach(function (t) {
+      t.addEventListener('click', function () { fit(this.getAttribute('aria-controls')); });
+    });
+    fit('pi-sp-note'); /* 기본 서브탭 */
+  })();
 
   /* ── 퇴사일 저장 → 상실신고 Confirm Modal (area 1) ──
      취득된 4대보험이 있는 근로자의 퇴사일 저장 시 안내 */
