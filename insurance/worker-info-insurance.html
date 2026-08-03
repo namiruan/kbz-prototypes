@@ -31,12 +31,11 @@
     /* 보험명 라벨 — 뱃지(위)·보험명(아래). 배경 없음. 카드(정보값)와 상단 정렬되도록 동일 세로 패딩 */
     .wi-card__name { flex: 0 0 auto; display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-gap-2xs); padding: var(--space-inset-xl) 0; }
     /* 정보값 카드 — 이 영역에만 상태 배경색 */
-    .wi-card__box { flex: 1 1 0; min-width: 0; display: flex; padding: var(--space-inset-xl); border-radius: var(--radius-md); background: var(--color-surface-subtle); }
+    .wi-card__box { flex: 1 1 0; min-width: 0; display: flex; gap: var(--space-gap-2xl); padding: var(--space-inset-xl); border-radius: var(--radius-md); background: var(--color-surface-subtle); }
     .wi-card[data-status="취득"] .wi-card__box { background: var(--color-surface-success-subtle); }
     .wi-card[data-status="상실"] .wi-card__box { background: var(--color-surface-caution-subtle); }
     .wi-card--none .wi-card__box { background: var(--color-surface-subtle); }
     .wi-card__cell { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-gap-2xs); }
-    .wi-card__cell + .wi-card__cell { border-left: var(--stroke-sm) solid var(--color-border-default); padding-left: var(--space-gap-xl); margin-left: var(--space-gap-xl); }
     .wi-card__key { color: var(--color-text-subtle); font-size: var(--font-size-sm); }
     .wi-card__val, .wi-card__title { font-weight: var(--font-weight-heading); color: var(--color-text-body); overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
 
