@@ -18,18 +18,15 @@
     /* 서브탭 */
     .pi-subtabs { margin-bottom: var(--space-stack-lg); }
 
-    /* 인사노트 섹션 — 입퇴사·근무정보는 아코디언(접기/펼치기) */
+    /* 인사노트 섹션 — 입퇴사·근무정보는 DS 디스클로저(disclosure)로 접기/펼치기 */
     .pi-section + .pi-section { margin-top: var(--space-stack-2xl); }
-    .pi-section__head { display: flex; align-items: center; justify-content: space-between; gap: var(--space-gap-md); margin-bottom: var(--space-stack-sm); min-height: 36px; }
-    .pi-section__toggle { display: flex; align-items: center; gap: var(--space-gap-2xs); background: transparent; border: 0; padding: 0; cursor: pointer; }
-    .pi-section__toggle:focus-visible { outline: var(--stroke-md) solid var(--color-border-focus); outline-offset: var(--space-offset-focus); border-radius: var(--radius-xs); }
+    /* 디스클로저를 풀 폭 블록 섹션으로 확장(DS 기본은 inline/inline-flex) */
+    .pi-section.disclosure, .pi-section.disclosure--icon-only { display: block; }
+    .pi-section__head { display: flex; align-items: center; justify-content: space-between; gap: var(--space-gap-md); min-height: 36px; }
     .pi-section__title { display: flex; align-items: center; gap: var(--space-gap-xs); color: var(--color-text-brand); font-weight: var(--font-weight-heading); }
-    .pi-section__icon { color: var(--color-text-brand); transition: transform var(--duration-fast) var(--easing-base); }
-    .pi-section.is-collapsed .pi-section__icon { transform: rotate(-90deg); }
-    .pi-section.is-collapsed .pi-section__head { margin-bottom: 0; }
-    .pi-section.is-collapsed .pi-section__body { display: none; }
-    .pi-section__count { color: var(--color-text-subtle); font-weight: var(--font-weight-body); }
     .pi-section__actions { display: flex; align-items: center; gap: var(--space-gap-sm); flex-shrink: 0; }
+    /* 디스클로저 body — 표 색상 그대로(DS의 subtle 상속 방지) */
+    .pi-section.disclosure--expanded .disclosure__body { color: inherit; margin-top: var(--space-stack-sm); }
 
     .pi-check-cell { width: 44px; text-align: center; }
     .pi-quit-date { max-width: 168px; }
@@ -144,12 +141,14 @@ exits: index.html, worker-info-insurance.html, report-loss.html
                   <div id="pi-sp-note" role="tabpanel" aria-labelledby="pi-sub-note">
 
                     <!-- 입퇴사 -->
-                    <div class="pi-section" data-table="join">
+                    <div class="pi-section disclosure disclosure--icon-only disclosure--expanded" data-table="join" data-label-expand="입퇴사 펼치기" data-label-collapse="입퇴사 접기">
                       <div class="pi-section__head">
-                        <button class="pi-section__toggle" type="button" aria-expanded="true" aria-controls="pi-join-body">
-                          <span class="icon icon--sm pi-section__icon" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-chevron-down"/></svg></span>
-                          <span class="pi-section__title">입퇴사 <span class="pi-section__count badge badge--neutral" data-count>1</span></span>
-                        </button>
+                        <span class="disclosure__header">
+                          <span class="pi-section__title">입퇴사 <span class="badge badge--neutral" data-count>1</span></span>
+                          <button class="disclosure__trigger" type="button" aria-expanded="true" aria-controls="pi-join-body" aria-label="입퇴사 접기">
+                            <span class="disclosure__label">접기</span><span class="icon-on--sm disclosure__icon" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-chevron-down"/></svg></span>
+                          </button>
+                        </span>
                         <div class="pi-section__actions">
                           <button class="btn btn--primary btn--md" type="button" data-add>
                             <span class="icon icon--sm" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-plus"/></svg></span>추가
@@ -162,7 +161,7 @@ exits: index.html, worker-info-insurance.html, report-loss.html
                           </span>
                         </div>
                       </div>
-                      <div class="pi-section__body" id="pi-join-body">
+                      <div class="disclosure__body" id="pi-join-body">
                       <div class="table-container">
                         <table class="table table--info" aria-label="입퇴사">
                           <thead class="table__head"><tr>
@@ -185,12 +184,14 @@ exits: index.html, worker-info-insurance.html, report-loss.html
                     </div>
 
                     <!-- 근무정보 -->
-                    <div class="pi-section" data-table="work">
+                    <div class="pi-section disclosure disclosure--icon-only disclosure--expanded" data-table="work" data-label-expand="근무정보 펼치기" data-label-collapse="근무정보 접기">
                       <div class="pi-section__head">
-                        <button class="pi-section__toggle" type="button" aria-expanded="true" aria-controls="pi-work-body">
-                          <span class="icon icon--sm pi-section__icon" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-chevron-down"/></svg></span>
-                          <span class="pi-section__title">근무정보 <span class="pi-section__count badge badge--neutral" data-count>2</span></span>
-                        </button>
+                        <span class="disclosure__header">
+                          <span class="pi-section__title">근무정보 <span class="badge badge--neutral" data-count>2</span></span>
+                          <button class="disclosure__trigger" type="button" aria-expanded="true" aria-controls="pi-work-body" aria-label="근무정보 접기">
+                            <span class="disclosure__label">접기</span><span class="icon-on--sm disclosure__icon" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-chevron-down"/></svg></span>
+                          </button>
+                        </span>
                         <div class="pi-section__actions">
                           <button class="btn btn--primary btn--md" type="button" data-add>
                             <span class="icon icon--sm" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-plus"/></svg></span>추가
@@ -203,7 +204,7 @@ exits: index.html, worker-info-insurance.html, report-loss.html
                           </span>
                         </div>
                       </div>
-                      <div class="pi-section__body" id="pi-work-body">
+                      <div class="disclosure__body" id="pi-work-body">
                       <div class="table-container">
                         <table class="table table--info" aria-label="근무정보">
                           <thead class="table__head"><tr>
@@ -290,6 +291,7 @@ exits: index.html, worker-info-insurance.html, report-loss.html
   function _initComponents(root) {
     root = root || document;
     if (typeof initTab === 'function') initTab(root);
+    if (typeof initDisclosure === 'function') initDisclosure(root);
     if (typeof initTableSort === 'function') root.querySelectorAll('.table-container').forEach(function (el) { initTableSort(el); });
     if (typeof initSegment === 'function') root.querySelectorAll('.segment').forEach(function (el) { initSegment(el.parentElement); });
     if (typeof initInput === 'function') root.querySelectorAll('.input').forEach(function (el) { if (!el.closest('.input-wrap') && !el.dataset.initInput) { el.dataset.initInput = '1'; initInput(el); } });
@@ -375,14 +377,7 @@ exits: index.html, worker-info-insurance.html, report-loss.html
   }
   document.querySelectorAll('.pi-section[data-table]').forEach(initSectionTable);
 
-  /* ── 아코디언(입퇴사·근무정보 접기/펼치기) ── */
-  document.querySelectorAll('.pi-section__toggle').forEach(function (t) {
-    t.addEventListener('click', function () {
-      var sec = t.closest('.pi-section');
-      var collapsed = sec.classList.toggle('is-collapsed');
-      t.setAttribute('aria-expanded', String(!collapsed));
-    });
-  });
+  /* 아코디언(입퇴사·근무정보)은 DS 디스클로저(initDisclosure)가 처리 */
 
   /* ── 서브탭마다 모달 폭을 내용에 맞게 조정 (4대보험 탭과 동일) ── */
   (function () {
