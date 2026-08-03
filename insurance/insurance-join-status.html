@@ -75,6 +75,45 @@
        '선택 불가'는 checkbox--disabled가 담당한다 (역할 분리) */
     .ws-row--complete { background: var(--color-surface-success-subtle); }  /* 취득완료 — 처리됨 */
     .ws-row--blocked  { background: var(--color-surface-disabled); }        /* 선택불가 — 제약으로 막힘 */
+
+    /* ══ 4대보험 상세 Layer Modal (Figma 14878-5882) — 근로자정보 4대보험 탭과 동일 스타일 ══ */
+    .id-subtabs { margin-bottom: var(--space-stack-lg); }
+    /* 근로자 정보(이름/주민번호) */
+    .id-person { padding-bottom: var(--space-stack-md); border-bottom: var(--stroke-sm) solid var(--color-border-subtle); margin-bottom: var(--space-stack-lg); }
+    .id-person__name { font-weight: var(--font-weight-heading); color: var(--color-text-body); }
+    .id-person__id { color: var(--color-text-body); }
+    /* 사업장 카드 */
+    .id-site { display: flex; flex-direction: column; gap: var(--space-gap-2xs); border: var(--stroke-sm) solid var(--color-border-default); border-radius: var(--radius-md); padding: var(--space-inset-lg) var(--space-inset-xl); margin-bottom: var(--space-stack-lg); }
+    .id-site__label { font-size: var(--font-size-sm); color: var(--color-text-subtle); }
+    .id-site__value { font-weight: var(--font-weight-heading); color: var(--color-text-body); }
+    /* 4대보험 카드 — 근로자정보 탭과 동일(오픈 카드, 상태별 배경) */
+    .wi-cards { display: flex; flex-direction: column; gap: var(--space-gap-xs); }
+    .wi-card { display: flex; align-items: stretch; gap: var(--space-gap-md); }
+    .wi-card__name { flex: 0 0 auto; width: 84px; display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-gap-2xs); padding: var(--space-inset-xl) 0; }
+    .wi-card__box { flex: 0 0 auto; box-sizing: border-box; width: calc(132px * 3 + var(--space-gap-lg) * 2 + var(--space-inset-xl) * 2); display: flex; gap: var(--space-gap-lg); padding: var(--space-inset-xl); border-radius: var(--radius-md); background: var(--color-surface-subtle); }
+    .wi-card[data-status="취득"] .wi-card__box { background: var(--color-surface-success-subtle); }
+    .wi-card[data-status="상실"] .wi-card__box { background: var(--color-surface-caution-subtle); }
+    .wi-card__cell { flex: 0 0 auto; width: 132px; display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-gap-2xs); }
+    .wi-card__key { color: var(--color-text-subtle); font-size: var(--font-size-sm); }
+    .wi-card__val, .wi-card__title { font-weight: var(--font-weight-heading); color: var(--color-text-body); }
+    .wi-subhead { display: flex; align-items: center; gap: var(--space-gap-xs); margin: var(--space-stack-xl) 0 var(--space-stack-sm); color: var(--color-text-brand); font-weight: var(--font-weight-heading); }
+    .wi-subhead__count { color: var(--color-text-subtle); font-weight: var(--font-weight-body); }
+    .wi-none { color: var(--color-text-subtle); }
+    .wi-ins-badges { display: inline-flex; gap: var(--space-gap-2xs); flex-wrap: wrap; }
+    .wi-report-row { cursor: pointer; }
+    .wi-report-row:hover { background: var(--color-surface-brand-subtle); }
+    .wi-guide { margin: 0 0 var(--space-stack-md); padding-left: var(--space-gap-lg); color: var(--color-text-subtle); font-size: var(--font-size-sm); display: flex; flex-direction: column; gap: var(--space-gap-2xs); }
+    .wi-path { color: var(--color-text-brand); }
+    /* 이력·피부양자·신고 테이블 — 내용 폭만큼(전입/전출) / 전체 폭(신고이력) */
+    #idp-move .table-container { width: fit-content; max-width: 100%; }
+    #idp-move .table { width: auto; }
+    #idp-report .table-container, #idp-report .table { width: 100%; }
+    /* 표 하단 보더 겹침 방지(숨김 행이 :last-child일 때) */
+    #overlay-insurance-detail .table__body .table__row:not([hidden]):not(:has(~ .table__row:not([hidden]))) .table__cell { border-bottom: none; }
+    /* 신고 내용 조회 — 읽기 전용 정보 테이블(가운데 정렬) */
+    .rv-table.table-container { border-left: 0; border-right: 0; border-radius: 0; width: fit-content; max-width: 100%; margin-left: auto; margin-right: auto; }
+    .rv-table .table__cell.rv-key { width: 1%; white-space: nowrap; color: var(--color-text-subtle); font-weight: var(--font-weight-medium); padding-right: var(--space-gap-2xl); }
+    .rv-table .table__cell.rv-brand { color: var(--color-text-brand); font-weight: var(--font-weight-heading); }
   </style>
 </head>
 <body>
@@ -1280,24 +1319,181 @@ exits: report-acquire.html, report-loss.html, report-transfer.html, report-chang
 <!-- ══════════════ 4대보험 상세 Modal (4-6 행 클릭) ══════════════ -->
 
 <div id="overlay-insurance-detail" data-overlay>
-  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="dt-title" style="width:560px">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="dt-title" style="width:640px;max-width:100%;max-height:88vh">
     <div class="modal__header">
       <h2 class="modal__title text-modal-title-sm" id="dt-title">4대보험 상세</h2>
       <button class="icon-on--lg" type="button" aria-label="닫기" data-overlay-close><svg aria-hidden="true"><use href="#icon-close"/></svg></button>
     </div>
     <div class="modal__body">
       <div class="modal__content">
-        <p class="text-description" id="dt-desc">이 화면은 「근로자정보 — 4대보험 tab」의 사이드바를 제거한 형태입니다. 가입정보·전입/전출 이력·신고이력 3개 탭에 12개 area 명세가 있어 별도 프로토타입으로 분리했습니다.</p>
-        <ul class="text-description" id="dt-list">
-          <li>가입정보 — 근로자 정보 · 취득 정보 · 피부양자 · 미가입 보험 · 공단 대사 배너</li>
-          <li>전입/전출 이력 — 사업장별 취득 정보</li>
-          <li>신고이력 — 처리완료 신고 목록</li>
-        </ul>
+
+        <!-- 서브탭 -->
+        <div class="tab-group id-subtabs" role="tablist" aria-label="4대보험 상세">
+          <span class="tab-group__slider" aria-hidden="true"></span>
+          <button class="tab tab--selected" role="tab" aria-selected="true" id="idt-join" aria-controls="idp-join" tabindex="0"><span class="tab__label">가입정보</span></button>
+          <button class="tab" role="tab" aria-selected="false" id="idt-move" aria-controls="idp-move" tabindex="-1"><span class="tab__label">전입/전출 이력</span></button>
+          <button class="tab" role="tab" aria-selected="false" id="idt-report" aria-controls="idp-report" tabindex="-1"><span class="tab__label">신고이력</span></button>
+        </div>
+
+        <!-- ═══ 가입정보 ═══ -->
+        <div id="idp-join" role="tabpanel" aria-labelledby="idt-join">
+          <div class="id-person">
+            <div class="id-person__name">유가영</div>
+            <div class="id-person__id">123456-1234567</div>
+          </div>
+          <div class="id-site">
+            <span class="id-site__label">사업장</span>
+            <span class="id-site__value">남웅건설(주)</span>
+          </div>
+          <div class="wi-cards">
+            <div class="wi-card" data-status="취득">
+              <div class="wi-card__name"><span class="badge badge--success">취득</span><span class="wi-card__title">국민연금</span></div>
+              <div class="wi-card__box">
+                <div class="wi-card__cell"><span class="wi-card__key">취득일</span><span class="wi-card__val">2022.03.15</span></div>
+                <div class="wi-card__cell"><span class="wi-card__key">상실일</span><span class="wi-card__val">-</span></div>
+                <div class="wi-card__cell"><span class="wi-card__key">보수월액</span><span class="wi-card__val">3,500,000 원</span></div>
+              </div>
+            </div>
+            <div class="wi-card" data-status="취득">
+              <div class="wi-card__name"><span class="badge badge--success">취득</span><span class="wi-card__title">건강보험</span></div>
+              <div class="wi-card__box">
+                <div class="wi-card__cell"><span class="wi-card__key">취득일</span><span class="wi-card__val">2022.03.15</span></div>
+                <div class="wi-card__cell"><span class="wi-card__key">상실일</span><span class="wi-card__val">-</span></div>
+                <div class="wi-card__cell"><span class="wi-card__key">보수월액</span><span class="wi-card__val">3,600,000 원</span></div>
+              </div>
+            </div>
+            <div class="wi-card" data-status="상실">
+              <div class="wi-card__name"><span class="badge badge--caution">상실</span><span class="wi-card__title">고용보험</span></div>
+              <div class="wi-card__box">
+                <div class="wi-card__cell"><span class="wi-card__key">취득일</span><span class="wi-card__val">2022.03.15</span></div>
+                <div class="wi-card__cell"><span class="wi-card__key">상실일</span><span class="wi-card__val">2022.03.15</span></div>
+                <div class="wi-card__cell"><span class="wi-card__key">보수월액</span><span class="wi-card__val">3,500,000 원</span></div>
+              </div>
+            </div>
+            <div class="wi-card" data-status="상실">
+              <div class="wi-card__name"><span class="badge badge--caution">상실</span><span class="wi-card__title">산재보험</span></div>
+              <div class="wi-card__box">
+                <div class="wi-card__cell"><span class="wi-card__key">취득일</span><span class="wi-card__val">2022.03.15</span></div>
+                <div class="wi-card__cell"><span class="wi-card__key">상실일</span><span class="wi-card__val">2022.03.15</span></div>
+                <div class="wi-card__cell"><span class="wi-card__key">보수월액</span><span class="wi-card__val">3,500,000 원</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="wi-subhead">피부양자</div>
+          <div class="table-container">
+            <table class="table table--info" aria-label="피부양자">
+              <thead class="table__head"><tr>
+                <th class="table__head-cell" scope="col" style="width:100px">관계</th>
+                <th class="table__head-cell" scope="col" style="width:140px">성명</th>
+                <th class="table__head-cell" scope="col">주민등록번호</th>
+                <th class="table__head-cell" scope="col" style="width:150px">취득일</th>
+              </tr></thead>
+              <tbody class="table__body">
+                <tr class="table__row"><td class="table__cell">모</td><td class="table__cell">이미래</td><td class="table__cell">123456-1234567</td><td class="table__cell">2025-01-01</td></tr>
+                <tr class="table__row"><td class="table__cell">자녀</td><td class="table__cell">김민준</td><td class="table__cell">123456-1234567</td><td class="table__cell">2025-01-01</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- ═══ 전입/전출 이력 ═══ -->
+        <div id="idp-move" role="tabpanel" aria-labelledby="idt-move" hidden>
+          <div class="wi-subhead">건강/연금 <span class="wi-subhead__count">2</span></div>
+          <div class="table-container">
+            <table class="table table--info" aria-label="건강/연금 전입/전출 이력">
+              <thead class="table__head"><tr>
+                <th class="table__head-cell" scope="col" style="width:52px">번호</th>
+                <th class="table__head-cell" scope="col" style="width:200px">사업장</th>
+                <th class="table__head-cell" scope="col" style="width:130px">관리번호</th>
+                <th class="table__head-cell" scope="col" style="width:104px">취득일</th>
+                <th class="table__head-cell" scope="col" style="width:104px">상실일</th>
+              </tr></thead>
+              <tbody class="table__body">
+                <tr class="table__row"><td class="table__cell">2</td><td class="table__cell">영등포 오피스 개발사업 중 철근콘크리트공사</td><td class="table__cell">123-45678-97</td><td class="table__cell">2026-01-03</td><td class="table__cell wi-none">-</td></tr>
+                <tr class="table__row"><td class="table__cell">1</td><td class="table__cell">남웅건설(주)</td><td class="table__cell">124-12345-01</td><td class="table__cell">2026-01-01</td><td class="table__cell">2026-01-02</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="wi-subhead">고용 <span class="wi-subhead__count">1</span></div>
+          <div class="table-container">
+            <table class="table table--info" aria-label="고용 전입/전출 이력">
+              <thead class="table__head"><tr>
+                <th class="table__head-cell" scope="col" style="width:52px">번호</th>
+                <th class="table__head-cell" scope="col" style="width:200px">사업장</th>
+                <th class="table__head-cell" scope="col" style="width:130px">관리번호</th>
+                <th class="table__head-cell" scope="col" style="width:104px">취득일</th>
+                <th class="table__head-cell" scope="col" style="width:104px">상실일</th>
+              </tr></thead>
+              <tbody class="table__body">
+                <tr class="table__row"><td class="table__cell">1</td><td class="table__cell">남웅건설(주)</td><td class="table__cell">012-001551-12</td><td class="table__cell">2026-01-05</td><td class="table__cell wi-none">-</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="wi-subhead">산재 <span class="wi-subhead__count">2</span></div>
+          <div class="table-container">
+            <table class="table table--info" aria-label="산재 전입/전출 이력">
+              <thead class="table__head"><tr>
+                <th class="table__head-cell" scope="col" style="width:52px">번호</th>
+                <th class="table__head-cell" scope="col" style="width:200px">사업장</th>
+                <th class="table__head-cell" scope="col" style="width:130px">관리번호</th>
+                <th class="table__head-cell" scope="col" style="width:104px">취득일</th>
+                <th class="table__head-cell" scope="col" style="width:104px">상실일</th>
+              </tr></thead>
+              <tbody class="table__body">
+                <tr class="table__row"><td class="table__cell">2</td><td class="table__cell">영등포 오피스 개발사업 중 철근콘크리트공사</td><td class="table__cell">012-001551-12</td><td class="table__cell wi-none">-</td><td class="table__cell wi-none">-</td></tr>
+                <tr class="table__row"><td class="table__cell">1</td><td class="table__cell">남웅건설(주)</td><td class="table__cell">012-001551-12</td><td class="table__cell">2026-01-02</td><td class="table__cell wi-none">-</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- ═══ 신고이력 ═══ -->
+        <div id="idp-report" role="tabpanel" aria-labelledby="idt-report" hidden>
+          <div class="wi-guide">
+            <span>• 본 이력에는 공단 신고가 완료된 건만 표시됩니다.</span>
+            <span>• 진행중인 신고건은 <span class="wi-path">[상용근로자&gt;4대보험 관리&gt;4대보험 신고 tab]</span>에서 확인 가능합니다.</span>
+          </div>
+          <div class="table-container">
+            <table class="table table--hover" id="id-report-table" aria-label="신고 이력">
+              <thead class="table__head"><tr>
+                <th class="table__head-cell table__head-cell--sort" scope="col" aria-sort="none"><button class="table__sort-btn" aria-label="신고유형 정렬">신고유형<span class="tooltip-wrapper" onmouseenter="this.querySelector('.tooltip-panel').classList.add('tooltip-panel--visible')" onmouseleave="this.querySelector('.tooltip-panel').classList.remove('tooltip-panel--visible')"><span class="icon icon--sm" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-sort-asc"/></svg></span><div class="tooltip-panel elevation-tooltip tooltip-panel--bottom" role="tooltip">오름차순</div></span></button></th>
+                <th class="table__head-cell table__head-cell--sort" scope="col" aria-sort="none"><button class="table__sort-btn" aria-label="신고 보험 정렬">신고 보험<span class="tooltip-wrapper" onmouseenter="this.querySelector('.tooltip-panel').classList.add('tooltip-panel--visible')" onmouseleave="this.querySelector('.tooltip-panel').classList.remove('tooltip-panel--visible')"><span class="icon icon--sm" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-sort-asc"/></svg></span><div class="tooltip-panel elevation-tooltip tooltip-panel--bottom" role="tooltip">오름차순</div></span></button></th>
+                <th class="table__head-cell table__head-cell--sort" scope="col" aria-sort="none" style="width:150px"><button class="table__sort-btn" aria-label="처리일 정렬">처리일<span class="tooltip-wrapper" onmouseenter="this.querySelector('.tooltip-panel').classList.add('tooltip-panel--visible')" onmouseleave="this.querySelector('.tooltip-panel').classList.remove('tooltip-panel--visible')"><span class="icon icon--sm" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-sort-asc"/></svg></span><div class="tooltip-panel elevation-tooltip tooltip-panel--bottom" role="tooltip">오름차순</div></span></button></th>
+              </tr></thead>
+              <tbody class="table__body">
+                <tr class="table__row wi-report-row" data-report="loss"><td class="table__cell">상실</td><td class="table__cell"><span class="wi-ins-badges"><span class="badge badge--brand badge--line">고용</span><span class="badge badge--brand badge--line">산재</span><span class="badge badge--brand badge--line">건강</span><span class="badge badge--brand badge--line">연금</span></span></td><td class="table__cell">2024-06-10</td></tr>
+                <tr class="table__row wi-report-row" data-report="change"><td class="table__cell">보수변경</td><td class="table__cell"><span class="wi-ins-badges"><span class="badge badge--brand badge--line">건강</span></span></td><td class="table__cell">2024-06-10</td></tr>
+                <tr class="table__row wi-report-row" data-report="transfer"><td class="table__cell">사업장 이동</td><td class="table__cell"><span class="wi-ins-badges"><span class="badge badge--brand badge--line">건강</span><span class="badge badge--brand badge--line">연금</span></span></td><td class="table__cell">2024-06-10</td></tr>
+                <tr class="table__row wi-report-row" data-report="acquire"><td class="table__cell">취득</td><td class="table__cell"><span class="wi-ins-badges"><span class="badge badge--brand badge--line">고용</span><span class="badge badge--brand badge--line">산재</span><span class="badge badge--brand badge--line">건강</span><span class="badge badge--brand badge--line">연금</span></span></td><td class="table__cell">2024-06-10</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 신고 이력 행 클릭 → 신고 내용 조회(읽기 전용) Layer Modal -->
+<div id="overlay-report-view" data-overlay>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="rv-title" style="width:fit-content;min-width:320px;max-width:100%">
+    <div class="modal__header">
+      <h2 class="modal__title text-modal-title-sm" id="rv-title">신고 내용 조회</h2>
+      <button class="icon-on--lg" type="button" aria-label="닫기" data-overlay-close><svg aria-hidden="true"><use href="#icon-close"/></svg></button>
+    </div>
+    <div class="modal__body">
+      <div class="modal__content">
+        <div class="table-container rv-table">
+          <table class="table table--info" aria-label="신고 내용">
+            <tbody class="table__body" id="rv-body"></tbody>
+          </table>
+        </div>
       </div>
     </div>
     <div class="modal__footer">
-      <button class="btn btn--secondary btn--solid btn--md" type="button" data-overlay-close>닫기</button>
-      <button class="btn btn--primary btn--solid btn--md" type="button" id="dt-open">4대보험 상세 열기</button>
+      <button class="btn btn--primary btn--md" type="button" data-overlay-close autofocus>확인</button>
     </div>
   </div>
 </div>
@@ -1789,6 +1985,47 @@ exits: report-acquire.html, report-loss.html, report-transfer.html, report-chang
   document.querySelectorAll('.tab[id^="tab-report-"]').forEach(function (tab) {
     tab.addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); location.href = 'insurance-report-status.html'; }, true);
   });
+})();
+</script>
+
+<script>
+/* ══ 4대보험 상세 · 신고이력 — 행 클릭 시 신고 내용 조회 + 정렬 시 행 재배열 ══ */
+(function () {
+  var ESC = function (s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); };
+  var RV = {
+    acquire: [['취득일', '2024-05-31'], ['신고 보험', '건강보험, 국민연금, 고용보험, 산재보험'], ['주 소정근로시간', '40 시간'], ['월급여액', '3,000,000 원'], ['사업장', '(주)한성산업'], ['직종', '사무직']],
+    loss: [['상실일', '2024-05-31'], ['신고 보험', '건강보험, 국민연금'], ['전년도 보수총액/산정월수', '2,800,000 원 / 10 개월'], ['당해년도 보수총액/산정월수', '3,200,000 원 / 12 개월'], ['상실사유', '퇴직 / 개인사정']],
+    transfer: [['신고유형', '사업장 이동'], ['전입일', '2026-01-01'], ['신고 보험', '건강보험, 국민연금'], ['변경 전', '(주)한성산업-제조'], ['변경 후', '(주)한성산업-물류센터']],
+    change: [['신고유형', '보수 변경'], ['변경 사유', '착오 정정'], ['신고보험', '고용보험, 산재보험, 건강보험, 연금보험'], ['변경 전 보수월액', '4,200,000 원'], ['변경 후 보수월액', '4,500,000 원'], ['변경년월', '2026.03']]
+  };
+  var body = document.getElementById('rv-body');
+  document.querySelectorAll('#id-report-table .wi-report-row').forEach(function (row) {
+    row.addEventListener('click', function () {
+      var rows = RV[this.dataset.report]; if (!rows || !body) return;
+      body.innerHTML = rows.map(function (r) {
+        var isIns = /^신고\s?보험$/.test(r[0]);
+        return '<tr class="table__row"><td class="table__cell rv-key">' + ESC(r[0]) + '</td><td class="table__cell' + (isIns ? ' rv-brand' : '') + '">' + ESC(r[1]) + '</td></tr>';
+      }).join('');
+      document.getElementById('overlay-report-view').classList.add('is-open');
+    });
+  });
+
+  /* 정렬(오름/내림) 시 실제 행 재배열 — DS initTableSort는 상태만 관리하므로 보완 */
+  var table = document.getElementById('id-report-table');
+  if (table && table.tBodies[0]) {
+    var tbody = table.tBodies[0];
+    var cellText = function (r, i) { var c = r.cells[i]; return c ? c.textContent.replace(/\s+/g, ' ').trim() : ''; };
+    table.querySelectorAll('.table__head-cell--sort').forEach(function (th) {
+      var btn = th.querySelector('.table__sort-btn'); if (!btn) return;
+      btn.addEventListener('click', function () {
+        var dir = th.classList.contains('table__head-cell--sort-desc') ? 'desc' : 'asc';
+        Array.prototype.slice.call(tbody.rows).sort(function (a, b) {
+          var c = cellText(a, th.cellIndex).localeCompare(cellText(b, th.cellIndex), 'ko', { numeric: true });
+          return dir === 'desc' ? -c : c;
+        }).forEach(function (r) { tbody.appendChild(r); });
+      });
+    });
+  }
 })();
 </script>
 
