@@ -1824,6 +1824,14 @@ exits: index.html
       jobTrig.classList.remove('acq-job-trigger--placeholder'); jobTrig.classList.add('acq-job-trigger--complete');
       jobHidden.value = '철근공';
     }
+    /* 고용보험 제외 사유(필수) 미선택 → 대표자/사업주로 채운다 */
+    var goyongVal = document.querySelector('.scenario-panel[data-scenario="작성-중"] .acq-ins-item[data-ins="고용보험"][data-status="제외"] .dropdown__value');
+    if (goyongVal && goyongVal.classList.contains('dropdown__value--placeholder')) {
+      goyongVal.classList.remove('dropdown__value--placeholder');
+      goyongVal.textContent = '대표자/사업주';
+      var goyongOpt = goyongVal.closest('.dropdown').querySelector('.dropdown__option');
+      if (goyongOpt) goyongOpt.setAttribute('aria-selected', 'true');
+    }
   }
   function enterDetail(ed) {
     editable = ed !== false;
