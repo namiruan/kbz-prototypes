@@ -1,0 +1,401 @@
+<!-- design-system: v0.5.1 -->
+<!-- prototype: 근로자 정보 — 인사정보 tab · 인사노트 (Figma node 14878-5886)
+     대제목 모달(modal--lg): 좌측 세로 탭 내비 + 우측 인사정보/인사노트 서브탭
+     인사노트: 입퇴사·근무정보 테이블 + 기타 특이사항. 퇴사일 저장 시 상실신고 Confirm Modal -->
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>근로자 정보 — 인사노트</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+  <link rel="stylesheet" href="https://namiruan.github.io/kbz_3.0_ui_stytem/tokens.css">
+  <link rel="stylesheet" href="https://namiruan.github.io/kbz_3.0_ui_stytem/components.css">
+  <script src="https://namiruan.github.io/kbz_3.0_ui_stytem/components.js"></script>
+  <style>
+    .proto-hub-link { display: block; padding: var(--space-inset-squish-sm); font-size: var(--font-size-sm); }
+
+    /* 서브탭 */
+    .pi-subtabs { margin-bottom: var(--space-stack-lg); }
+
+    /* 인사노트 섹션 */
+    .pi-section + .pi-section { margin-top: var(--space-stack-2xl); }
+    .pi-section__head { display: flex; align-items: center; justify-content: space-between; gap: var(--space-gap-md); margin-bottom: var(--space-stack-sm); min-height: 36px; }
+    .pi-section__title { display: flex; align-items: center; gap: var(--space-gap-xs); color: var(--color-text-brand); font-weight: var(--font-weight-heading); }
+    .pi-section__count { color: var(--color-text-subtle); font-weight: var(--font-weight-body); }
+    .pi-section__actions { display: flex; gap: var(--space-gap-sm); flex-shrink: 0; }
+
+    .pi-check-cell { width: 44px; text-align: center; }
+    .pi-quit-date { max-width: 168px; }
+    .pi-none { color: var(--color-text-subtle); }
+    .pi-note { width: 100%; min-height: 140px; resize: vertical; }
+
+    /* 좌측 세로 탭 내비 — 디자인엔 세로 구분선 없음(DS 기본 border-right 제거) */
+    .modal--lg .modal__body > .tab-group--vertical { border-right: none; }
+
+    /* 좌측 내비 미구현 섹션 placeholder */
+    .pi-placeholder { display: flex; align-items: center; justify-content: center; min-height: 360px; }
+
+    /* Confirm(상실신고) — 안내 타이틀 강조 */
+    .alert__title.is-caution { color: var(--color-text-caution); }
+
+    /* 표 하단 보더 겹침 방지 (행 동적 삭제 대비) */
+    .table__body .table__row:not([hidden]):not(:has(~ .table__row:not([hidden]))) .table__cell { border-bottom: none; }
+  </style>
+</head>
+<body>
+<!-- @flow
+title: 근로자 정보 — 인사노트
+exits: index.html, worker-info-insurance.html, report-loss.html
+-->
+
+<div class="proto-layout">
+
+  <aside class="proto-sidebar" id="proto-sidebar">
+    <a class="link proto-hub-link" href="index.html">← 화면 목록</a>
+
+    <div class="segment segment--md" role="radiogroup" aria-label="보기 모드" id="mode-segment">
+      <span class="segment__slider" aria-hidden="true"></span>
+      <button class="segment__item segment__item--selected" role="radio" aria-checked="true" type="button" data-mode="scenario">시나리오</button>
+      <button class="segment__item" role="radio" aria-checked="false" type="button" data-mode="interactive">인터랙티브</button>
+    </div>
+
+    <div class="proto-nav-divider" id="proto-nav-divider"></div>
+
+    <nav class="proto-nav" id="proto-nav" aria-label="시나리오 선택">
+      <button class="proto-nav-btn is-active" data-scenario="기본" type="button">기본</button>
+      <button class="proto-nav-btn" data-scenario="퇴사일-등록" type="button">퇴사일 등록</button>
+    </nav>
+  </aside>
+
+  <main class="proto-content">
+    <div id="pane-panels">
+
+      <section class="scenario-panel" data-scenario="기본" data-step>
+        <div class="page">
+
+          <div class="modal modal--lg" role="dialog" aria-modal="true" aria-labelledby="pi-title" style="width:940px;max-width:100%;max-height:88vh">
+
+            <div class="modal__header">
+              <h2 class="modal__title text-modal-title" id="pi-title">근로자 정보</h2>
+              <button class="icon-on--lg" type="button" aria-label="닫기" data-acq-cancel><svg aria-hidden="true"><use href="#icon-close"/></svg></button>
+            </div>
+
+            <div class="modal__body">
+
+              <!-- 좌측 세로 탭 내비 -->
+              <div class="tab-group tab-group--vertical" role="tablist" aria-orientation="vertical" aria-label="근로자 정보 섹션">
+                <span class="tab-group__slider" aria-hidden="true"></span>
+                <button class="tab tab--selected" role="tab" aria-selected="true" id="pi-nav-info" aria-controls="pi-panel-main" tabindex="0"><span class="tab__label">인사정보</span></button>
+                <button class="tab" role="tab" aria-selected="false" id="pi-nav-edu" aria-controls="pi-panel-etc" tabindex="-1"><span class="tab__label">학력·자격·경력</span></button>
+                <button class="tab" role="tab" aria-selected="false" id="pi-nav-pay" aria-controls="pi-panel-etc" tabindex="-1"><span class="tab__label">급여 정보</span></button>
+                <button class="tab" role="tab" aria-selected="false" id="pi-nav-work" aria-controls="pi-panel-etc" tabindex="-1"><span class="tab__label">근무 정보</span></button>
+                <button class="tab" role="tab" aria-selected="false" id="pi-nav-4dae" aria-controls="pi-panel-etc" tabindex="-1"><span class="tab__label">4대보험</span></button>
+                <button class="tab" role="tab" aria-selected="false" id="pi-nav-doc" aria-controls="pi-panel-etc" tabindex="-1"><span class="tab__label">등록·발급 서류</span></button>
+              </div>
+
+              <!-- 미구현 섹션 placeholder -->
+              <div id="pi-panel-etc" role="tabpanel" aria-labelledby="pi-nav-info" hidden>
+                <div class="pi-placeholder">
+                  <div class="empty-state empty-state--compact" role="status">
+                    <div class="empty-state__icon" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-employee"/></svg></div>
+                    <div class="empty-state__body">
+                      <p class="empty-state__title text-body">이 섹션은 인사노트 프로토타입 범위에 포함되지 않습니다.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 인사정보 섹션 -->
+              <div id="pi-panel-main" role="tabpanel" aria-labelledby="pi-nav-info">
+                <div class="modal__content">
+
+                  <div class="tab-group pi-subtabs" role="tablist" aria-label="인사정보">
+                    <span class="tab-group__slider" aria-hidden="true"></span>
+                    <button class="tab" role="tab" aria-selected="false" id="pi-sub-info" aria-controls="pi-sp-info" tabindex="-1"><span class="tab__label">인사정보</span></button>
+                    <button class="tab tab--selected" role="tab" aria-selected="true" id="pi-sub-note" aria-controls="pi-sp-note" tabindex="0"><span class="tab__label">인사노트</span></button>
+                  </div>
+
+                  <!-- ═══ 인사정보 (범위 밖) ═══ -->
+                  <div id="pi-sp-info" role="tabpanel" aria-labelledby="pi-sub-info" hidden>
+                    <div class="pi-placeholder">
+                      <div class="empty-state empty-state--compact" role="status">
+                        <div class="empty-state__icon" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-employee"/></svg></div>
+                        <div class="empty-state__body">
+                          <p class="empty-state__title text-body">인사정보 화면은 인사노트 프로토타입 범위에 포함되지 않습니다.</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- ═══ 인사노트 ═══ -->
+                  <div id="pi-sp-note" role="tabpanel" aria-labelledby="pi-sub-note">
+
+                    <!-- 입퇴사 -->
+                    <div class="pi-section" data-table="join">
+                      <div class="pi-section__head">
+                        <div class="pi-section__title">입퇴사 <span class="pi-section__count badge badge--neutral" data-count>1</span></div>
+                        <div class="pi-section__actions">
+                          <button class="btn btn--primary btn--md" type="button" data-add>
+                            <span class="icon icon--sm" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-plus"/></svg></span>추가
+                          </button>
+                          <span class="tooltip-wrapper" onmouseenter="if(this.querySelector('button').classList.contains('btn--inactive'))this.querySelector('.tooltip-panel').classList.add('tooltip-panel--visible')" onmouseleave="this.querySelector('.tooltip-panel').classList.remove('tooltip-panel--visible')">
+                            <button class="btn btn--secondary btn--md btn--inactive" type="button" data-del aria-describedby="pi-join-del-tip">
+                              <span class="icon icon--sm" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-delete"/></svg></span>삭제
+                            </button>
+                            <div class="tooltip-panel elevation-tooltip tooltip-panel--top" id="pi-join-del-tip" role="tooltip">삭제할 항목을 체크해 주세요.</div>
+                          </span>
+                        </div>
+                      </div>
+                      <div class="table-container">
+                        <table class="table table--info" aria-label="입퇴사">
+                          <thead class="table__head"><tr>
+                            <th class="table__head-cell pi-check-cell" scope="col"><label class="checkbox"><input type="checkbox" data-check-all aria-label="전체 선택"><span class="checkbox__control" aria-hidden="true"><span class="checkbox__icon-check"><svg aria-hidden="true"><use href="#icon-check"/></svg></span><span class="checkbox__icon-indeterminate"></span></span></label></th>
+                            <th class="table__head-cell" scope="col" style="width:64px">번호</th>
+                            <th class="table__head-cell" scope="col" style="width:200px">입사일</th>
+                            <th class="table__head-cell" scope="col">퇴사일</th>
+                          </tr></thead>
+                          <tbody class="table__body" data-rows>
+                            <tr class="table__row">
+                              <td class="table__cell pi-check-cell"><label class="checkbox"><input type="checkbox" data-row-check aria-label="1행 선택"><span class="checkbox__control" aria-hidden="true"><span class="checkbox__icon-check"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span></label></td>
+                              <td class="table__cell" data-no>1</td>
+                              <td class="table__cell">2012-03-01</td>
+                              <td class="table__cell"><input class="input pi-quit-date" type="date" aria-label="퇴사일"></td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+
+                    <!-- 근무정보 -->
+                    <div class="pi-section" data-table="work">
+                      <div class="pi-section__head">
+                        <div class="pi-section__title">근무정보 <span class="pi-section__count badge badge--neutral" data-count>2</span></div>
+                        <div class="pi-section__actions">
+                          <button class="btn btn--primary btn--md" type="button" data-add>
+                            <span class="icon icon--sm" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-plus"/></svg></span>추가
+                          </button>
+                          <span class="tooltip-wrapper" onmouseenter="if(this.querySelector('button').classList.contains('btn--inactive'))this.querySelector('.tooltip-panel').classList.add('tooltip-panel--visible')" onmouseleave="this.querySelector('.tooltip-panel').classList.remove('tooltip-panel--visible')">
+                            <button class="btn btn--secondary btn--md btn--inactive" type="button" data-del aria-describedby="pi-work-del-tip">
+                              <span class="icon icon--sm" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-delete"/></svg></span>삭제
+                            </button>
+                            <div class="tooltip-panel elevation-tooltip tooltip-panel--top" id="pi-work-del-tip" role="tooltip">삭제할 항목을 체크해 주세요.</div>
+                          </span>
+                        </div>
+                      </div>
+                      <div class="table-container">
+                        <table class="table table--info" aria-label="근무정보">
+                          <thead class="table__head"><tr>
+                            <th class="table__head-cell pi-check-cell" scope="col"><label class="checkbox"><input type="checkbox" data-check-all aria-label="전체 선택"><span class="checkbox__control" aria-hidden="true"><span class="checkbox__icon-check"><svg aria-hidden="true"><use href="#icon-check"/></svg></span><span class="checkbox__icon-indeterminate"></span></span></label></th>
+                            <th class="table__head-cell" scope="col" style="width:56px">번호</th>
+                            <th class="table__head-cell" scope="col" style="width:132px">적용일</th>
+                            <th class="table__head-cell" scope="col" style="width:96px">부서</th>
+                            <th class="table__head-cell" scope="col" style="width:96px">직책</th>
+                            <th class="table__head-cell" scope="col" style="width:96px">직위</th>
+                            <th class="table__head-cell" scope="col">담당업무</th>
+                          </tr></thead>
+                          <tbody class="table__body" data-rows>
+                            <tr class="table__row">
+                              <td class="table__cell pi-check-cell"><label class="checkbox"><input type="checkbox" data-row-check aria-label="1행 선택"><span class="checkbox__control" aria-hidden="true"><span class="checkbox__icon-check"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span></label></td>
+                              <td class="table__cell" data-no>1</td>
+                              <td class="table__cell">2026-04-06</td>
+                              <td class="table__cell">개발실</td>
+                              <td class="table__cell">개발실</td>
+                              <td class="table__cell">과장</td>
+                              <td class="table__cell pi-none">-</td>
+                            </tr>
+                            <tr class="table__row">
+                              <td class="table__cell pi-check-cell"><label class="checkbox"><input type="checkbox" data-row-check aria-label="2행 선택"><span class="checkbox__control" aria-hidden="true"><span class="checkbox__icon-check"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span></label></td>
+                              <td class="table__cell" data-no>2</td>
+                              <td class="table__cell">2026-01-01</td>
+                              <td class="table__cell">운영실</td>
+                              <td class="table__cell pi-none">-</td>
+                              <td class="table__cell">사원</td>
+                              <td class="table__cell pi-none">-</td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+
+                    <!-- 기타 특이사항 -->
+                    <div class="pi-section">
+                      <div class="pi-section__head">
+                        <div class="pi-section__title">기타 특이사항</div>
+                      </div>
+                      <textarea class="textarea pi-note" rows="5" placeholder="특이사항을 입력해주세요."></textarea>
+                    </div>
+
+                  </div>
+
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+</div>
+
+<!-- 퇴사일 저장 → 상실신고 안내 Confirm Modal (area 1) -->
+<div id="overlay-quit-confirm" data-overlay>
+  <div class="alert" role="alertdialog" aria-modal="true" aria-labelledby="quit-title" aria-describedby="quit-body">
+    <div class="alert__header">
+      <p class="text-card-title alert__title is-caution" id="quit-title">퇴사일이 등록되었습니다.</p>
+    </div>
+    <div class="alert__body" id="quit-body">
+      <p class="text-description alert__description">4대보험 상실신고가 가능합니다.<br>지금 진행하지 않더라도, 4대보험 신고 메뉴에서 다시 진행할 수 있습니다.</p>
+    </div>
+    <div class="alert__footer">
+      <button class="btn btn--secondary btn--solid btn--md" type="button" data-overlay-close>다음에 하기</button>
+      <button class="btn btn--primary btn--md" type="button" id="quit-go-loss">상실신고 하기</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  /* ── 아이콘 sprite 주입 ── */
+  fetch('https://namiruan.github.io/kbz_3.0_ui_stytem/icons/sprite.svg')
+    .then(function (r) { return r.text(); })
+    .then(function (t) { var d = document.createElement('div'); d.style.display = 'none'; d.innerHTML = t; document.body.insertBefore(d, document.body.firstChild); });
+
+  /* ── 컴포넌트 초기화 ── */
+  function _initComponents(root) {
+    root = root || document;
+    if (typeof initTab === 'function') initTab(root);
+    if (typeof initTableSort === 'function') root.querySelectorAll('.table-container').forEach(function (el) { initTableSort(el); });
+    if (typeof initSegment === 'function') root.querySelectorAll('.segment').forEach(function (el) { initSegment(el.parentElement); });
+    if (typeof initInput === 'function') root.querySelectorAll('.input').forEach(function (el) { if (!el.closest('.input-wrap') && !el.dataset.initInput) { el.dataset.initInput = '1'; initInput(el); } });
+  }
+  _initComponents();
+
+  /* ── 경량 오버레이 컨트롤러 ── */
+  var _ovStack = [];
+  function openOverlay(id) {
+    var ov = document.getElementById(id); if (!ov || ov.classList.contains('is-open')) return;
+    ov._rf = document.activeElement;
+    ov.style.zIndex = 'calc(var(--z-backdrop) + ' + (_ovStack.length + 1) + ')';
+    ov.classList.add('is-open'); _ovStack.push(ov);
+    (ov.querySelector('[autofocus]') || ov.querySelector('.btn--primary') || ov).focus();
+  }
+  function closeOverlay(ov) {
+    if (!ov || !ov.classList.contains('is-open')) return;
+    ov.classList.remove('is-open'); ov.style.zIndex = '';
+    var i = _ovStack.indexOf(ov); if (i > -1) _ovStack.splice(i, 1);
+    if (ov._rf && ov._rf.focus) ov._rf.focus(); ov._rf = null;
+  }
+  document.addEventListener('click', function (e) { if (e.target.closest('[data-overlay-close]')) closeOverlay(e.target.closest('[data-overlay]')); });
+  document.querySelectorAll('[data-overlay]').forEach(function (ov) {
+    ov.addEventListener('mousedown', function (e) { if (e.target === ov) closeOverlay(ov); });
+  });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && _ovStack.length) closeOverlay(_ovStack[_ovStack.length - 1]); });
+
+  /* ── 편집형 테이블(입퇴사·근무정보): 전체선택·삭제(체크 시 활성)·추가·건수 ── */
+  function initSectionTable(section) {
+    var tbody = section.querySelector('[data-rows]');
+    var countEl = section.querySelector('[data-count]');
+    var delBtn = section.querySelector('[data-del]');
+    var addBtn = section.querySelector('[data-add]');
+    var checkAll = section.querySelector('[data-check-all]');
+    var kind = section.dataset.table;
+
+    function rows() { return Array.prototype.slice.call(tbody.querySelectorAll('tr.table__row')); }
+    function refresh() {
+      var rs = rows();
+      if (countEl) countEl.textContent = rs.length;
+      rs.forEach(function (r, i) { var n = r.querySelector('[data-no]'); if (n) n.textContent = i + 1; });
+      var checked = rs.filter(function (r) { var c = r.querySelector('[data-row-check]'); return c && c.checked; });
+      if (delBtn) delBtn.classList.toggle('btn--inactive', checked.length === 0);
+      if (checkAll) {
+        checkAll.checked = rs.length > 0 && checked.length === rs.length;
+        checkAll.indeterminate = checked.length > 0 && checked.length < rs.length;
+      }
+    }
+
+    tbody.addEventListener('change', function (e) { if (e.target.matches('[data-row-check]')) refresh(); });
+    if (checkAll) checkAll.addEventListener('change', function () {
+      rows().forEach(function (r) { var c = r.querySelector('[data-row-check]'); if (c) c.checked = checkAll.checked; });
+      refresh();
+    });
+    if (delBtn) delBtn.addEventListener('click', function () {
+      if (delBtn.classList.contains('btn--inactive')) return;
+      rows().forEach(function (r) { var c = r.querySelector('[data-row-check]'); if (c && c.checked) r.remove(); });
+      refresh();
+    });
+    if (addBtn) addBtn.addEventListener('click', function () {
+      var tr = document.createElement('tr');
+      tr.className = 'table__row';
+      var checkCell = '<td class="table__cell pi-check-cell"><label class="checkbox"><input type="checkbox" data-row-check aria-label="행 선택"><span class="checkbox__control" aria-hidden="true"><span class="checkbox__icon-check"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span></label></td>';
+      if (kind === 'join') {
+        tr.innerHTML = checkCell +
+          '<td class="table__cell" data-no></td>' +
+          '<td class="table__cell"><input class="input pi-quit-date" type="date" aria-label="입사일"></td>' +
+          '<td class="table__cell"><input class="input pi-quit-date" type="date" aria-label="퇴사일"></td>';
+      } else {
+        tr.innerHTML = checkCell +
+          '<td class="table__cell" data-no></td>' +
+          '<td class="table__cell"><input class="input pi-quit-date" type="date" aria-label="적용일"></td>' +
+          '<td class="table__cell"><input class="input" type="text" aria-label="부서"></td>' +
+          '<td class="table__cell"><input class="input" type="text" aria-label="직책"></td>' +
+          '<td class="table__cell"><input class="input" type="text" aria-label="직위"></td>' +
+          '<td class="table__cell"><input class="input" type="text" aria-label="담당업무"></td>';
+      }
+      tbody.appendChild(tr);
+      refresh();
+    });
+
+    refresh();
+  }
+  document.querySelectorAll('.pi-section[data-table]').forEach(initSectionTable);
+
+  /* ── 퇴사일 저장 → 상실신고 Confirm Modal (area 1) ──
+     취득된 4대보험이 있는 근로자의 퇴사일 저장 시 안내 */
+  var _quitShown = false;
+  document.querySelector('.pi-section[data-table="join"] [data-rows]').addEventListener('change', function (e) {
+    if (e.target.matches('.pi-quit-date') && e.target.value && e.target.getAttribute('aria-label') === '퇴사일') {
+      if (_quitShown) return;
+      _quitShown = true;
+      openOverlay('overlay-quit-confirm');
+    }
+  });
+  /* 상실신고 하기 → 상실신고 화면 */
+  var goLoss = document.getElementById('quit-go-loss');
+  if (goLoss) goLoss.addEventListener('click', function () { location.href = 'report-loss.html?return=worker-info-personnel.html'; });
+
+  /* ── 프로토 스캐폴드 ── */
+  document.querySelectorAll('#mode-segment .segment__item').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var interactive = this.dataset.mode === 'interactive';
+      document.getElementById('proto-nav').hidden = interactive;
+      document.getElementById('proto-nav-divider').hidden = interactive;
+    });
+  });
+  document.querySelectorAll('.proto-nav-btn').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var name = this.dataset.scenario;
+      document.querySelectorAll('.proto-nav-btn').forEach(function (b) { b.classList.toggle('is-active', b.dataset.scenario === name); });
+      var quit = document.querySelector('.pi-section[data-table="join"] .pi-quit-date');
+      if (name === '퇴사일-등록') {
+        if (quit) quit.value = '2026-05-31';
+        openOverlay('overlay-quit-confirm');
+      } else {
+        _ovStack.slice().reverse().forEach(closeOverlay);
+        if (quit) quit.value = '';
+        _quitShown = false;
+      }
+    });
+  });
+
+  /* 닫기(X) → 허브로 */
+  document.querySelectorAll('.modal__header [data-acq-cancel]').forEach(function (x) {
+    x.addEventListener('click', function () { location.href = 'index.html'; });
+  });
+</script>
+
+</body>
+</html>
