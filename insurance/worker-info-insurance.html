@@ -49,6 +49,15 @@
     .wi-subhead:first-child { margin-top: 0; }
     .wi-subhead__count { color: var(--color-text-subtle); font-weight: var(--font-weight-body); }
 
+    /* 근로자정보 이력·피부양자 테이블 — 대부분 고정값(주민번호·날짜·관리번호)이라
+       전체 폭으로 늘이지 않고 내용(고정값) 폭만큼만 표시 */
+    #wi-sp-worksite .table-container,
+    #wi-sp-report .table-container,
+    #wi-dependents .table-container { width: fit-content; max-width: 100%; }
+    #wi-sp-worksite .table,
+    #wi-sp-report .table,
+    #wi-dependents .table { width: auto; }
+
     /* 피부양자/사업장 이력/신고 테이블 — 값 없는 셀 표시 */
     .wi-none { color: var(--color-text-subtle); }
     /* 빈 상태(피부양자 없음) */
@@ -185,7 +194,7 @@ exits: index.html, report-acquire.html, report-loss.html, report-transfer.html, 
                       <table class="table table--info" aria-label="건강/연금 사업장 이력">
                         <thead class="table__head"><tr>
                           <th class="table__head-cell" scope="col" style="width:64px">번호</th>
-                          <th class="table__head-cell" scope="col">사업장</th>
+                          <th class="table__head-cell" scope="col" style="width:220px">사업장</th>
                           <th class="table__head-cell" scope="col" style="width:170px">관리번호</th>
                           <th class="table__head-cell" scope="col" style="width:130px">취득일</th>
                           <th class="table__head-cell" scope="col" style="width:130px">상실일</th>
@@ -202,7 +211,7 @@ exits: index.html, report-acquire.html, report-loss.html, report-transfer.html, 
                       <table class="table table--info" aria-label="고용 사업장 이력">
                         <thead class="table__head"><tr>
                           <th class="table__head-cell" scope="col" style="width:64px">번호</th>
-                          <th class="table__head-cell" scope="col">사업장</th>
+                          <th class="table__head-cell" scope="col" style="width:220px">사업장</th>
                           <th class="table__head-cell" scope="col" style="width:170px">관리번호</th>
                           <th class="table__head-cell" scope="col" style="width:130px">취득일</th>
                           <th class="table__head-cell" scope="col" style="width:130px">상실일</th>
@@ -218,7 +227,7 @@ exits: index.html, report-acquire.html, report-loss.html, report-transfer.html, 
                       <table class="table table--info" aria-label="산재 사업장 이력">
                         <thead class="table__head"><tr>
                           <th class="table__head-cell" scope="col" style="width:64px">번호</th>
-                          <th class="table__head-cell" scope="col">사업장</th>
+                          <th class="table__head-cell" scope="col" style="width:220px">사업장</th>
                           <th class="table__head-cell" scope="col" style="width:170px">관리번호</th>
                           <th class="table__head-cell" scope="col" style="width:130px">취득일</th>
                           <th class="table__head-cell" scope="col" style="width:130px">상실일</th>
@@ -400,7 +409,7 @@ exits: index.html, report-acquire.html, report-loss.html, report-transfer.html, 
     var head = '<thead class="table__head"><tr>' +
       '<th class="table__head-cell" scope="col" style="width:100px">관계</th>' +
       '<th class="table__head-cell" scope="col" style="width:140px">성명</th>' +
-      '<th class="table__head-cell" scope="col">주민등록번호</th>' +
+      '<th class="table__head-cell" scope="col" style="width:160px">주민등록번호</th>' +
       '<th class="table__head-cell" scope="col" style="width:150px">취득일</th>' +
       '</tr></thead>';
     var body;
