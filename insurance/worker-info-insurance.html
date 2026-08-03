@@ -36,8 +36,8 @@
     /* 한 행: 보험명(뱃지 위·이름 아래) · 취득일 · 상실일 · 보수월액, 셀 사이 구분선 */
     .wi-card__rows { display: flex; }
     .wi-card__cell { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-gap-2xs); }
-    /* 보험명 셀은 고정 폭 — 미가입(제외사유)이든 취득(취득일)이든 2번째 셀이 같은 위치에서 시작 */
-    .wi-card__cell--name { flex: 0 0 180px; }
+    /* 보험명 셀 — 내용에 맞춘 최소 너비(보험명이 모두 같은 길이라 취득일/제외사유는 자연히 정렬) */
+    .wi-card__cell--name { flex: 0 0 auto; }
     .wi-card__cell + .wi-card__cell { border-left: var(--stroke-sm) solid var(--color-border-default); padding-left: var(--space-gap-xl); margin-left: var(--space-gap-xl); }
     .wi-card__key { color: var(--color-text-subtle); font-size: var(--font-size-sm); }
     .wi-card__val, .wi-card__title { font-weight: var(--font-weight-heading); color: var(--color-text-body); overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
