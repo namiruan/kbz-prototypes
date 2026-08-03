@@ -326,7 +326,7 @@ exits: index.html, worker-info-insurance.html, report-loss.html
       var sel = o === value;
       return '<li class="dropdown__option' + (sel ? ' dropdown__option--selected' : '') + '" role="option" aria-selected="' + (sel ? 'true' : 'false') + '" tabindex="-1"><span class="dropdown__option-label">' + o + '</span></li>';
     }).join('');
-    return '<div class="dropdown dropdown--button dropdown--menu" data-field="' + key + '">' +
+    return '<div class="dropdown dropdown--button dropdown--menu dropdown--sm" data-field="' + key + '">' +
       '<button class="dropdown__trigger" type="button" aria-haspopup="listbox" aria-expanded="false" aria-label="' + cfg.label + ' 선택">' +
       '<span class="dropdown__value' + (has ? '' : ' dropdown__value--placeholder') + '">' + (has ? value : cfg.label) + '</span>' +
       '<span class="dropdown__chevron" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-chevron-down"/></svg></span>' +
