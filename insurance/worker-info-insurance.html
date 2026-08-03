@@ -77,6 +77,11 @@
     /* 안내 문구 내 경로(대괄호) — 브랜드 컬러 강조 */
     .wi-path { color: var(--color-text-brand); }
 
+    /* 신고 내용 조회 모달 — 라벨/값 2열 리스트(읽기 전용) */
+    .rv-list { display: grid; grid-template-columns: max-content 1fr; column-gap: var(--space-gap-2xl); row-gap: var(--space-gap-sm); margin: 0; }
+    .rv-list dt { color: var(--color-text-subtle); }
+    .rv-list dd { margin: 0; color: var(--color-text-body); }
+
     /* 서브탭마다 내용 폭이 달라 모달 폭도 탭별로 조정(부드럽게 전환) */
     .modal--lg { transition: width 0.2s ease; }
 
@@ -294,6 +299,22 @@ exits: index.html, report-acquire.html, report-loss.html, report-transfer.html, 
 
 </div>
 
+<!-- 신고 이력 행 클릭 → 신고 내용 조회(읽기 전용) Layer Modal (Figma 14878-5884) -->
+<div id="wi-view-overlay" data-overlay>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="wi-view-title" style="width:600px;max-width:100%">
+    <div class="modal__header">
+      <h2 class="modal__title text-modal-title-sm" id="wi-view-title">신고 내용 조회</h2>
+      <button class="icon-on--lg" type="button" aria-label="닫기" data-overlay-close><svg aria-hidden="true"><use href="#icon-close"/></svg></button>
+    </div>
+    <div class="modal__body">
+      <dl class="rv-list" id="wi-view-body"></dl>
+    </div>
+    <div class="modal__footer">
+      <button class="btn btn--primary btn--md" type="button" data-overlay-close autofocus>확인</button>
+    </div>
+  </div>
+</div>
+
 <script>
   /* ── 아이콘 sprite 주입 ── */
   fetch('https://namiruan.github.io/kbz_3.0_ui_stytem/icons/sprite.svg')
@@ -374,11 +395,69 @@ exits: index.html, report-acquire.html, report-loss.html, report-transfer.html, 
     x.addEventListener('click', function () { location.href = 'index.html'; });
   });
 
-  /* 신고 이력 행 클릭 → 해당 신고서 조회 모드로 */
+  /* ── 오버레이(Layer Modal) 컨트롤러 ── */
+  var _wiOvStack = [];
+  function wiOpenOverlay(id) {
+    var ov = document.getElementById(id); if (!ov || ov.classList.contains('is-open')) return;
+    ov._rf = document.activeElement;
+    ov.style.zIndex = 'calc(var(--z-backdrop) + ' + (_wiOvStack.length + 1) + ')';
+    ov.classList.add('is-open'); _wiOvStack.push(ov);
+    (ov.querySelector('[autofocus]') || ov).focus();
+  }
+  function wiCloseOverlay(ov) {
+    if (!ov || !ov.classList.contains('is-open')) return;
+    ov.classList.remove('is-open'); ov.style.zIndex = '';
+    var i = _wiOvStack.indexOf(ov); if (i > -1) _wiOvStack.splice(i, 1);
+    if (ov._rf && ov._rf.focus) ov._rf.focus(); ov._rf = null;
+  }
+  document.addEventListener('click', function (e) { if (e.target.closest('[data-overlay-close]')) wiCloseOverlay(e.target.closest('[data-overlay]')); });
+  document.querySelectorAll('[data-overlay]').forEach(function (ov) {
+    ov.addEventListener('mousedown', function (e) { if (e.target === ov) wiCloseOverlay(ov); });
+  });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && _wiOvStack.length) wiCloseOverlay(_wiOvStack[_wiOvStack.length - 1]); });
+
+  /* ── 신고 내용 조회(읽기 전용) — 신고 유형별 항목 (Figma 14878-5884) ── */
+  function _rvEsc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+  var WI_VIEW = {
+    acquire: [
+      ['취득일', '2024-05-31'],
+      ['신고 보험', '건강보험, 국민연금, 고용보험, 산재보험'],
+      ['주 소정근로시간', '40 시간'],
+      ['월급여액', '3,000,000 원'],
+      ['사업장', '(주)한성산업'],
+      ['직종', '사무직']
+    ],
+    loss: [
+      ['상실일', '2024-05-31'],
+      ['신고 보험', '건강보험, 국민연금'],
+      ['전년도 보수총액/산정월수', '2,800,000 원 / 10 개월'],
+      ['당해년도 보수총액/산정월수', '3,200,000 원 / 12 개월'],
+      ['상실사유', '퇴직 / 개인사정']
+    ],
+    transfer: [
+      ['신고유형', '사업장 이동'],
+      ['전입일', '2026-01-01'],
+      ['신고 보험', '건강보험, 국민연금'],
+      ['변경 전', '(주)한성산업-제조'],
+      ['변경 후', '(주)한성산업-물류센터']
+    ],
+    change: [
+      ['신고유형', '보수 변경'],
+      ['변경 사유', '착오 정정'],
+      ['신고보험', '고용보험, 산재보험, 건강보험, 연금보험'],
+      ['변경 전 보수월액', '4,200,000 원'],
+      ['변경 후 보수월액', '4,500,000 원'],
+      ['변경년월', '2026.03']
+    ]
+  };
+  /* 신고 이력 행 클릭 → 신고 내용 조회 Layer Modal 열기 */
   document.querySelectorAll('.wi-report-row').forEach(function (row) {
     row.addEventListener('click', function () {
-      var f = { loss: 'report-loss.html', change: 'report-change.html', transfer: 'report-transfer.html', acquire: 'report-acquire.html' }[this.dataset.report];
-      if (f) location.href = f + '?mode=view&return=worker-info-insurance.html';
+      var rows = WI_VIEW[this.dataset.report]; if (!rows) return;
+      document.getElementById('wi-view-body').innerHTML = rows.map(function (r) {
+        return '<dt>' + _rvEsc(r[0]) + '</dt><dd>' + _rvEsc(r[1]) + '</dd>';
+      }).join('');
+      wiOpenOverlay('wi-view-overlay');
     });
   });
 </script>
