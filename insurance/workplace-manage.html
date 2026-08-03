@@ -1,0 +1,522 @@
+<!-- design-system: v0.5.1 -->
+<!-- prototype: 근무지 관리 (상용근로자 설정) — Figma node 14878-5888
+     4대보험 신고 시 취득할 사업장(or현장)을 등록·관리하는 화면.
+     근무지 추가 Layer Modal(overlay-add)은 이 페이지에 함께 담는다. -->
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>근무지 관리</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+  <link rel="stylesheet" href="https://namiruan.github.io/kbz_3.0_ui_stytem/tokens.css">
+  <link rel="stylesheet" href="https://namiruan.github.io/kbz_3.0_ui_stytem/components.css">
+  <script src="https://namiruan.github.io/kbz_3.0_ui_stytem/components.js"></script>
+  <style>
+    /* 이 페이지 고유 레이아웃만 — 컴포넌트·프로토타입 크롬은 components.css가 처리 */
+    .proto-hub-link { display: block; padding: var(--space-inset-squish-sm); font-size: var(--font-size-sm); }
+    .wp-page-title { font-size: var(--font-size-h1); font-weight: var(--font-weight-heading); color: var(--color-text-display); margin: 0 0 var(--space-stack-lg); }
+
+    /* 툴바 — 좌: 결과 수, 우: 검색·초기화·추가·삭제 한 줄 */
+    .wp-toolbar-actions { display: flex; align-items: center; gap: var(--space-gap-sm); }
+    .wp-reset-btn { color: var(--color-text-subtle); }
+
+    /* 테이블 — 근무지명은 가변, 관리번호는 고정폭 */
+    .wp-table { table-layout: fixed; }
+    .wp-table .table__cell, .wp-table .table__head-cell { vertical-align: middle; }
+    .wp-worksite { display: inline-flex; align-items: center; gap: var(--space-gap-xs); }
+    .wp-worksite__name { overflow: hidden; text-overflow: ellipsis; }
+
+    /* 관리번호 셀 — 보험명(라벨) + 번호 2행 그리드 */
+    .wp-mgmt-no { display: grid; grid-template-columns: auto 1fr; column-gap: var(--space-gap-sm); row-gap: 2px; white-space: nowrap; }
+    .wp-mgmt-no__key { color: var(--color-text-subtle); }
+    .wp-mgmt-no__val { color: var(--color-text-body); }
+
+    /* 체크박스 셀 중앙 정렬 */
+    .wp-check-cell { text-align: center; }
+    .wp-check-cell .checkbox { display: inline-flex; }
+
+    /* 근무지 추가 Modal — 관리번호 2×2 그리드 */
+    .wp-add-form { display: flex; flex-direction: column; gap: var(--space-stack-lg); }
+    .wp-add-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-gap-lg) var(--space-gap-lg); }
+    #add-kind { width: 240px; }
+  </style>
+</head>
+<body>
+<!-- @flow
+title: 근무지 관리
+exits: index.html
+-->
+
+<div class="proto-layout">
+
+  <aside class="proto-sidebar" id="proto-sidebar">
+    <a class="link proto-hub-link" href="index.html">← 화면 목록</a>
+
+    <div class="segment segment--md" role="radiogroup" aria-label="보기 모드" id="mode-segment">
+      <span class="segment__slider" aria-hidden="true"></span>
+      <button class="segment__item segment__item--selected" role="radio" aria-checked="true" type="button" data-mode="scenario">시나리오</button>
+      <button class="segment__item" role="radio" aria-checked="false" type="button" data-mode="interactive">인터랙티브</button>
+    </div>
+
+    <div class="proto-nav-divider" id="proto-nav-divider"></div>
+
+    <nav class="proto-nav" id="proto-nav" aria-label="시나리오 선택">
+      <button class="proto-nav-btn is-active" data-scenario="데이터-있음" type="button">데이터 있음</button>
+      <button class="proto-nav-btn" data-scenario="검색-결과-없음" type="button">검색 결과 없음</button>
+      <button class="proto-nav-btn" data-scenario="데이터-없음" type="button">데이터 없음 (본사만)</button>
+    </nav>
+  </aside>
+
+  <main class="proto-content">
+    <div id="pane-panels">
+
+      <section class="scenario-panel" data-scenario="데이터-있음" data-step>
+        <div class="page">
+
+          <h1 class="wp-page-title">근무지 관리</h1>
+
+          <div class="table-container">
+            <div class="table__toolbar">
+              <div class="table__title-group">
+                <span class="table__count" aria-live="polite">내 탐색 결과 <b class="table__count-value" id="wp-count">4</b></span>
+              </div>
+              <div class="wp-toolbar-actions">
+                <button class="btn btn--ghost btn--sm wp-reset-btn" type="button" id="wp-reset">
+                  <span class="icon icon--sm" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-refresh"/></svg></span>검색초기화
+                </button>
+                <div class="filter-bar__search">
+                  <div class="input-wrap">
+                    <input class="input input--ghost" type="search" placeholder="근무처명 또는 관리번호를 입력해주세요." aria-label="근무처명 또는 관리번호 검색" id="wp-search">
+                    <button class="input-clear icon-on--badge" type="button" aria-label="지우기" hidden><svg aria-hidden="true"><use href="#icon-close"/></svg></button>
+                  </div>
+                  <button class="icon-on--md" type="button" aria-label="검색" id="wp-search-btn"><svg aria-hidden="true"><use href="#icon-search"/></svg></button>
+                </div>
+                <button class="btn btn--primary btn--md" type="button" id="wp-add" data-overlay-open="overlay-add">
+                  <span class="icon icon--sm" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-plus"/></svg></span>근무지 추가
+                </button>
+                <button class="btn btn--secondary btn--md" type="button" id="wp-delete">
+                  <span class="icon icon--sm" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-delete"/></svg></span>삭제
+                </button>
+              </div>
+            </div>
+
+            <table class="table wp-table" id="wp-table" aria-label="근무지 목록">
+              <colgroup>
+                <col style="width:48px">
+                <col style="width:104px">
+                <col>
+                <col style="width:290px">
+                <col style="width:210px">
+                <col style="width:210px">
+              </colgroup>
+              <thead class="table__head">
+                <tr>
+                  <th class="table__head-cell wp-check-cell" scope="col">
+                    <label class="checkbox"><input type="checkbox" id="wp-check-all" aria-label="전체 선택"><span class="checkbox__control" aria-hidden="true"><span class="checkbox__icon-check"><svg aria-hidden="true"><use href="#icon-check"/></svg></span><span class="checkbox__icon-indeterminate"></span></span></label>
+                  </th>
+                  <th class="table__head-cell table__head-cell--sort" scope="col" aria-sort="none"><button class="table__sort-btn" aria-label="구분 정렬">구분<span class="tooltip-wrapper" onmouseenter="this.querySelector('.tooltip-panel').classList.add('tooltip-panel--visible')" onmouseleave="this.querySelector('.tooltip-panel').classList.remove('tooltip-panel--visible')"><span class="icon icon--sm" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-sort-asc"/></svg></span><div class="tooltip-panel elevation-tooltip tooltip-panel--bottom" role="tooltip">오름차순</div></span></button></th>
+                  <th class="table__head-cell table__head-cell--sort" scope="col" aria-sort="none"><button class="table__sort-btn" aria-label="근무지명 정렬">근무지명<span class="tooltip-wrapper" onmouseenter="this.querySelector('.tooltip-panel').classList.add('tooltip-panel--visible')" onmouseleave="this.querySelector('.tooltip-panel').classList.remove('tooltip-panel--visible')"><span class="icon icon--sm" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-sort-asc"/></svg></span><div class="tooltip-panel elevation-tooltip tooltip-panel--bottom" role="tooltip">오름차순</div></span></button></th>
+                  <th class="table__head-cell table__head-cell--sort" scope="col" aria-sort="none"><button class="table__sort-btn" aria-label="소재지 정렬">소재지<span class="tooltip-wrapper" onmouseenter="this.querySelector('.tooltip-panel').classList.add('tooltip-panel--visible')" onmouseleave="this.querySelector('.tooltip-panel').classList.remove('tooltip-panel--visible')"><span class="icon icon--sm" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-sort-asc"/></svg></span><div class="tooltip-panel elevation-tooltip tooltip-panel--bottom" role="tooltip">오름차순</div></span></button></th>
+                  <th class="table__head-cell table__head-cell--sort" scope="col" aria-sort="none"><button class="table__sort-btn" aria-label="고용/산재 관리번호 정렬">고용/산재 관리번호<span class="tooltip-wrapper" onmouseenter="this.querySelector('.tooltip-panel').classList.add('tooltip-panel--visible')" onmouseleave="this.querySelector('.tooltip-panel').classList.remove('tooltip-panel--visible')"><span class="icon icon--sm" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-sort-asc"/></svg></span><div class="tooltip-panel elevation-tooltip tooltip-panel--bottom" role="tooltip">오름차순</div></span></button></th>
+                  <th class="table__head-cell table__head-cell--sort" scope="col" aria-sort="none"><button class="table__sort-btn" aria-label="건강/연금 관리번호 정렬">건강/연금 관리번호<span class="tooltip-wrapper" onmouseenter="this.querySelector('.tooltip-panel').classList.add('tooltip-panel--visible')" onmouseleave="this.querySelector('.tooltip-panel').classList.remove('tooltip-panel--visible')"><span class="icon icon--sm" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-sort-asc"/></svg></span><div class="tooltip-panel elevation-tooltip tooltip-panel--bottom" role="tooltip">오름차순</div></span></button></th>
+                </tr>
+              </thead>
+              <tbody class="table__body" id="wp-tbody">
+
+                <!-- 본사 — 체크박스 비활성(선택 불가) -->
+                <tr class="table__row" data-kind="사업장" data-hq="1">
+                  <td class="table__cell wp-check-cell"><label class="checkbox checkbox--disabled"><input type="checkbox" disabled aria-disabled="true" tabindex="-1" aria-label="본사는 선택할 수 없음"><span class="checkbox__control" aria-hidden="true"><span class="checkbox__icon-check"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span></label></td>
+                  <td class="table__cell">사업장</td>
+                  <td class="table__cell"><span class="wp-worksite"><span class="wp-worksite__name">(주)한성산업</span><span class="badge badge--brand badge--line">본사</span></span></td>
+                  <td class="table__cell">전남 목포시 후광대로 143번안길 8-7</td>
+                  <td class="table__cell"><div class="wp-mgmt-no"><span class="wp-mgmt-no__key">고용</span><span class="wp-mgmt-no__val">907-00-56703-1</span><span class="wp-mgmt-no__key">산재</span><span class="wp-mgmt-no__val">907-00-56703-1</span></div></td>
+                  <td class="table__cell"><div class="wp-mgmt-no"><span class="wp-mgmt-no__key">건강</span><span class="wp-mgmt-no__val">907-00-56703-1</span><span class="wp-mgmt-no__key">연금</span><span class="wp-mgmt-no__val">907-00-56703-1</span></div></td>
+                </tr>
+
+                <tr class="table__row" data-kind="사업장">
+                  <td class="table__cell wp-check-cell"><label class="checkbox"><input type="checkbox" aria-label="(주)한성산업-제조 선택"><span class="checkbox__control" aria-hidden="true"><span class="checkbox__icon-check"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span></label></td>
+                  <td class="table__cell">사업장</td>
+                  <td class="table__cell"><span class="wp-worksite"><span class="wp-worksite__name">(주)한성산업-제조</span></span></td>
+                  <td class="table__cell">광주 서구 마륵동 178-4번지 B L 3-2번지</td>
+                  <td class="table__cell"><div class="wp-mgmt-no"><span class="wp-mgmt-no__key">고용</span><span class="wp-mgmt-no__val">907-00-90453-1</span><span class="wp-mgmt-no__key">산재</span><span class="wp-mgmt-no__val">907-00-90453-1</span></div></td>
+                  <td class="table__cell"><div class="wp-mgmt-no"><span class="wp-mgmt-no__key">건강</span><span class="wp-mgmt-no__val">411-81-09665-0</span><span class="wp-mgmt-no__key">연금</span><span class="wp-mgmt-no__val">411-81-09665-0</span></div></td>
+                </tr>
+
+                <tr class="table__row" data-kind="현장">
+                  <td class="table__cell wp-check-cell"><label class="checkbox"><input type="checkbox" aria-label="관산초 별관동 현장 선택"><span class="checkbox__control" aria-hidden="true"><span class="checkbox__icon-check"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span></label></td>
+                  <td class="table__cell">현장</td>
+                  <td class="table__cell"><span class="wp-worksite"><span class="wp-worksite__name">관산초 별관동 및 씨름장 증축공사 관급자재(금속제장) 구입 및 설치</span></span></td>
+                  <td class="table__cell">광주 서구 마륵동 178-4번지 B L 3-2번지</td>
+                  <td class="table__cell"><div class="wp-mgmt-no"><span class="wp-mgmt-no__key">고용</span><span class="wp-mgmt-no__val">907-00-90453-1</span><span class="wp-mgmt-no__key">산재</span><span class="wp-mgmt-no__val">907-00-90453-1</span></div></td>
+                  <td class="table__cell"><div class="wp-mgmt-no"><span class="wp-mgmt-no__key">건강</span><span class="wp-mgmt-no__val">-</span><span class="wp-mgmt-no__key">연금</span><span class="wp-mgmt-no__val">-</span></div></td>
+                </tr>
+
+                <tr class="table__row" data-kind="현장">
+                  <td class="table__cell wp-check-cell"><label class="checkbox"><input type="checkbox" aria-label="관산초 우천로 현장 선택"><span class="checkbox__control" aria-hidden="true"><span class="checkbox__icon-check"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span></label></td>
+                  <td class="table__cell">현장</td>
+                  <td class="table__cell"><span class="wp-worksite"><span class="wp-worksite__name">관산초 우천로 포장공사 관급자재(차양) 구입 및 설치</span></span></td>
+                  <td class="table__cell">광주 서구 마륵동 178-4번지 B L 3-2번지</td>
+                  <td class="table__cell"><div class="wp-mgmt-no"><span class="wp-mgmt-no__key">고용</span><span class="wp-mgmt-no__val">907-00-90453-1</span><span class="wp-mgmt-no__key">산재</span><span class="wp-mgmt-no__val">907-00-90453-1</span></div></td>
+                  <td class="table__cell"><div class="wp-mgmt-no"><span class="wp-mgmt-no__key">건강</span><span class="wp-mgmt-no__val">-</span><span class="wp-mgmt-no__key">연금</span><span class="wp-mgmt-no__val">-</span></div></td>
+                </tr>
+
+                <!-- 검색 결과 없음 (시나리오) -->
+                <tr class="table__row wp-empty-row" id="wp-empty-search" hidden>
+                  <td class="table__cell" colspan="6">
+                    <div class="empty-state empty-state--compact" role="status" aria-live="polite">
+                      <div class="empty-state__icon" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-search"/></svg></div>
+                      <div class="empty-state__body">
+                        <p class="empty-state__title text-body">검색 결과가 없습니다</p>
+                        <p class="empty-state__description text-body">검색어를 변경하거나 검색을 초기화해 보세요.</p>
+                      </div>
+                      <div class="empty-state__actions">
+                        <button class="btn btn--secondary btn--solid btn--sm" type="button" data-wp-reset>검색 초기화</button>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+
+              </tbody>
+            </table>
+          </div>
+
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+</div>
+
+<!-- ══════════════ 근무지 미선택 Alert (삭제 유효성) ══════════════ -->
+<div id="overlay-check" data-overlay>
+  <div class="alert" role="alertdialog" aria-modal="true" aria-labelledby="chk-title">
+    <div class="alert__header">
+      <p class="text-card-title alert__title" id="chk-title">근무지를 체크해 주세요.</p>
+      <button class="icon-on--sm alert__close" type="button" aria-label="닫기" data-overlay-close><svg aria-hidden="true"><use href="#icon-close"/></svg></button>
+    </div>
+    <div class="alert__body">
+      <p class="text-description alert__description">삭제할 근무지를 하나 이상 선택해 주세요.</p>
+    </div>
+    <div class="alert__footer">
+      <button class="btn btn--primary btn--md" type="button" data-overlay-close>확인</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ 근무지 삭제 확인 (Confirm) ══════════════ -->
+<div id="overlay-delete" data-overlay>
+  <div class="alert alert--danger" role="alertdialog" aria-modal="true" aria-labelledby="del-title" aria-describedby="del-body">
+    <div class="alert__header">
+      <p class="text-card-title alert__title" id="del-title">근무지를 삭제하시겠습니까?</p>
+      <button class="icon-on--sm alert__close" type="button" aria-label="닫기" data-overlay-close><svg aria-hidden="true"><use href="#icon-close"/></svg></button>
+    </div>
+    <div class="alert__body" id="del-body">
+      <p class="text-description alert__description">선택한 근무지가 목록에서 삭제됩니다.</p>
+    </div>
+    <div class="alert__footer">
+      <button class="btn btn--secondary btn--solid btn--md" type="button" data-overlay-close>취소</button>
+      <button class="btn btn--danger btn--md" type="button" id="del-confirm">삭제하기</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ 근무지 추가 Layer Modal ══════════════ -->
+<div id="overlay-add" data-overlay data-overlay-static>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="add-title" style="width:560px">
+    <div class="modal__header">
+      <div class="modal__header-text">
+        <h2 class="modal__title text-modal-title-sm" id="add-title">근무지 추가</h2>
+        <p class="modal__description text-description">4대보험 신고 시 취득할 사업장(또는 현장)을 등록해 주세요.</p>
+      </div>
+      <button class="icon-on--lg" type="button" aria-label="닫기" data-overlay-close><svg aria-hidden="true"><use href="#icon-close"/></svg></button>
+    </div>
+    <div class="modal__body">
+      <div class="modal__content">
+        <div class="wp-add-form">
+
+          <div class="form-field">
+            <span class="form-field__label text-form-label" id="add-kind-label">구분 <span class="form-field__required" aria-hidden="true">(필수)</span></span>
+            <div class="segment segment--md" role="radiogroup" aria-labelledby="add-kind-label" id="add-kind">
+              <span class="segment__slider" aria-hidden="true"></span>
+              <button class="segment__item segment__item--selected" role="radio" aria-checked="true" type="button" data-kind="사업장">사업장</button>
+              <button class="segment__item" role="radio" aria-checked="false" type="button" data-kind="현장">현장</button>
+            </div>
+          </div>
+
+          <div class="form-field">
+            <label class="form-field__label text-form-label" for="add-name">근무지명 <span class="form-field__required" aria-hidden="true">(필수)</span></label>
+            <div class="form-field__body"><input class="input" id="add-name" type="text" placeholder="근무지명을 입력해 주세요." autocomplete="off"></div>
+            <div class="form-field__footer"><p class="form-field__error text-helper" id="add-name-err" role="alert">근무지명을 입력해 주세요.</p></div>
+          </div>
+
+          <div class="form-field">
+            <label class="form-field__label text-form-label" for="add-loc">소재지</label>
+            <div class="form-field__body"><input class="input" id="add-loc" type="text" placeholder="소재지를 입력해 주세요." autocomplete="off"></div>
+          </div>
+
+          <div class="wp-add-grid">
+            <div class="form-field">
+              <label class="form-field__label text-form-label" for="add-goyong">고용 관리번호</label>
+              <div class="form-field__body"><input class="input" id="add-goyong" type="text" placeholder="000-00-00000-0" autocomplete="off"></div>
+            </div>
+            <div class="form-field">
+              <label class="form-field__label text-form-label" for="add-sanjae">산재 관리번호</label>
+              <div class="form-field__body"><input class="input" id="add-sanjae" type="text" placeholder="000-00-00000-0" autocomplete="off"></div>
+            </div>
+            <div class="form-field">
+              <label class="form-field__label text-form-label" for="add-gungang">건강 관리번호</label>
+              <div class="form-field__body"><input class="input" id="add-gungang" type="text" placeholder="000-00-00000-0" autocomplete="off"></div>
+            </div>
+            <div class="form-field">
+              <label class="form-field__label text-form-label" for="add-yeongeum">연금 관리번호</label>
+              <div class="form-field__body"><input class="input" id="add-yeongeum" type="text" placeholder="000-00-00000-0" autocomplete="off"></div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+    <div class="modal__footer">
+      <button class="btn btn--secondary btn--solid btn--md" type="button" data-overlay-close>취소</button>
+      <button class="btn btn--primary btn--md" type="button" id="add-submit">추가하기</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  /* ── 아이콘 sprite 주입 ── */
+  fetch('https://namiruan.github.io/kbz_3.0_ui_stytem/icons/sprite.svg')
+    .then(function (r) { return r.text(); })
+    .then(function (t) { var d = document.createElement('div'); d.style.display = 'none'; d.innerHTML = t; document.body.insertBefore(d, document.body.firstChild); });
+
+  /* ── 컴포넌트 초기화 ── */
+  function _initComponents(root) {
+    root = root || document;
+    if (typeof initInput === 'function') root.querySelectorAll('.input').forEach(function (el) { if (!el.closest('.input-wrap') && !el.dataset.initInput) { el.dataset.initInput = '1'; initInput(el); } });
+    if (typeof initSegment === 'function') root.querySelectorAll('.segment').forEach(function (el) { initSegment(el.parentElement); });
+    if (typeof initTableSort === 'function') root.querySelectorAll('.table-container').forEach(function (el) { initTableSort(el); });
+  }
+  _initComponents();
+
+  /* ── 프로토 스캐폴드 ── */
+  document.querySelectorAll('#mode-segment .segment__item').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var interactive = this.dataset.mode === 'interactive';
+      document.getElementById('proto-nav').hidden = interactive;
+      document.getElementById('proto-nav-divider').hidden = interactive;
+      closeAllOverlays();
+      if (interactive && window.applyWpScenario) window.applyWpScenario('데이터-있음');
+    });
+  });
+  document.querySelectorAll('.proto-nav-btn').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      closeAllOverlays();
+      var name = this.dataset.scenario;
+      document.querySelectorAll('.proto-nav-btn').forEach(function (b) { b.classList.toggle('is-active', b.dataset.scenario === name); });
+      if (window.applyWpScenario) window.applyWpScenario(name);
+    });
+  });
+
+  /* ── 오버레이 스택 ── */
+  var _FOCUSABLE = 'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+  var _overlayStack = [];
+  function _topOverlay() { return _overlayStack[_overlayStack.length - 1]; }
+  function _visibleFocusable(ov) { return Array.prototype.filter.call(ov.querySelectorAll(_FOCUSABLE), function (el) { return el.offsetParent !== null; }); }
+  function openOverlay(id) {
+    var ov = document.getElementById(id);
+    if (!ov || ov.classList.contains('is-open')) return;
+    ov._returnFocus = document.activeElement;
+    ov.style.zIndex = 'calc(var(--z-backdrop) + ' + (_overlayStack.length + 1) + ')';
+    ov.classList.add('is-open');
+    _overlayStack.push(ov);
+    var f = _visibleFocusable(ov);
+    (ov.querySelector('[autofocus]') || f[0] || ov).focus();
+  }
+  function closeOverlay(ov) {
+    if (!ov || !ov.classList.contains('is-open')) return;
+    ov.classList.remove('is-open'); ov.style.zIndex = '';
+    var i = _overlayStack.indexOf(ov); if (i > -1) _overlayStack.splice(i, 1);
+    if (ov._returnFocus && ov._returnFocus.focus) ov._returnFocus.focus();
+    ov._returnFocus = null;
+  }
+  function closeAllOverlays() { _overlayStack.slice().reverse().forEach(closeOverlay); }
+  document.querySelectorAll('[data-overlay-open]').forEach(function (el) {
+    el.addEventListener('click', function (e) { e.preventDefault(); openOverlay(this.dataset.overlayOpen); });
+  });
+  document.addEventListener('click', function (e) { if (e.target.closest('[data-overlay-close]')) closeOverlay(e.target.closest('[data-overlay]')); });
+  document.querySelectorAll('[data-overlay]').forEach(function (ov) {
+    ov.addEventListener('mousedown', function (e) { if (e.target === ov && !ov.hasAttribute('data-overlay-static')) closeOverlay(ov); });
+  });
+  document.addEventListener('keydown', function (e) {
+    var top = _topOverlay(); if (!top) return;
+    if (e.key === 'Escape' && !top.hasAttribute('data-overlay-static')) { e.preventDefault(); closeOverlay(top); return; }
+    if (e.key !== 'Tab') return;
+    var f = _visibleFocusable(top); if (!f.length) return;
+    var first = f[0], last = f[f.length - 1];
+    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+  });
+</script>
+
+<script>
+/* ══════════════ 근무지 관리 인터랙션 ══════════════ */
+(function () {
+  var tbody = document.getElementById('wp-tbody');
+  if (!tbody) return;
+  var checkAll = document.getElementById('wp-check-all');
+  var search = document.getElementById('wp-search');
+
+  function dataRows() { return Array.prototype.filter.call(tbody.querySelectorAll('.table__row'), function (r) { return !r.classList.contains('wp-empty-row'); }); }
+  function rowCheckbox(r) { return r.querySelector('input[type="checkbox"]'); }
+  function selectableRows() { return dataRows().filter(function (r) { var c = rowCheckbox(r); return c && !c.disabled && !r.hidden; }); }
+
+  /* ── 토스트 ── */
+  function toast(style, msg) {
+    if (typeof makeToast !== 'function') return;
+    var stack = document.querySelector('.toast-stack');
+    if (!stack) { stack = document.createElement('div'); stack.className = 'toast-stack'; stack.setAttribute('aria-live', 'polite'); document.body.appendChild(stack); }
+    stack.insertBefore(makeToast(style, null, msg), stack.firstChild);
+  }
+
+  /* ── 카운트 ── */
+  function refreshCount() {
+    var visible = dataRows().filter(function (r) { return !r.hidden; }).length;
+    var el = document.getElementById('wp-count'); if (el) el.textContent = visible;
+  }
+
+  /* ── 전체 선택 체크박스 동기화 ── */
+  function syncCheckAll() {
+    var rows = selectableRows();
+    var checked = rows.filter(function (r) { return rowCheckbox(r).checked; });
+    checkAll.checked = rows.length > 0 && checked.length === rows.length;
+    checkAll.indeterminate = checked.length > 0 && checked.length < rows.length;
+  }
+  if (checkAll) checkAll.addEventListener('change', function () {
+    selectableRows().forEach(function (r) { rowCheckbox(r).checked = checkAll.checked; });
+    checkAll.indeterminate = false;
+  });
+  tbody.addEventListener('change', function (e) {
+    if (e.target.matches('input[type="checkbox"]')) syncCheckAll();
+  });
+
+  /* ── 검색 필터 ── */
+  function applyFilters() {
+    if (tbody.dataset.forceState) return;
+    var q = (search.value || '').trim().toLowerCase();
+    var shown = 0;
+    dataRows().forEach(function (r) {
+      var name = r.children[2].textContent.toLowerCase();
+      var no = (r.children[4].textContent + ' ' + r.children[5].textContent).toLowerCase();
+      var ok = !q || name.indexOf(q) >= 0 || no.indexOf(q) >= 0;
+      r.hidden = !ok; if (ok) shown++;
+    });
+    document.getElementById('wp-empty-search').hidden = shown !== 0;
+    var el = document.getElementById('wp-count'); if (el) el.textContent = shown;
+    syncCheckAll();
+  }
+  if (search) {
+    search.addEventListener('input', function () {
+      var clear = search.parentElement.querySelector('.input-clear');
+      if (clear) clear.hidden = !search.value;
+      applyFilters();
+    });
+  }
+  document.querySelector('.filter-bar__search .input-clear') && document.querySelector('.filter-bar__search .input-clear').addEventListener('click', function () {
+    search.value = ''; this.hidden = true; applyFilters();
+  });
+  var searchBtn = document.getElementById('wp-search-btn');
+  if (searchBtn) searchBtn.addEventListener('click', applyFilters);
+
+  /* ── 검색 초기화 ── */
+  function resetSearch() {
+    search.value = '';
+    var clear = search.parentElement.querySelector('.input-clear'); if (clear) clear.hidden = true;
+    delete tbody.dataset.forceState;
+    document.getElementById('wp-empty-search').hidden = true;
+    applyFilters();
+  }
+  document.getElementById('wp-reset').addEventListener('click', resetSearch);
+  document.querySelectorAll('[data-wp-reset]').forEach(function (b) { b.addEventListener('click', resetSearch); });
+
+  /* ── 삭제: 유효성 검사 → Confirm ── */
+  document.getElementById('wp-delete').addEventListener('click', function () {
+    var checked = selectableRows().filter(function (r) { return rowCheckbox(r).checked; });
+    if (!checked.length) { openOverlay('overlay-check'); return; }
+    openOverlay('overlay-delete');
+  });
+  document.getElementById('del-confirm').addEventListener('click', function () {
+    selectableRows().filter(function (r) { return rowCheckbox(r).checked; }).forEach(function (r) { r.remove(); });
+    closeAllOverlays();
+    checkAll.checked = false; checkAll.indeterminate = false;
+    refreshCount(); syncCheckAll();
+    toast('success', '선택한 근무지가 삭제되었어요.');
+  });
+
+  /* ── 근무지 추가 ── */
+  function mgmtCell(k1, v1, k2, v2) {
+    return '<div class="wp-mgmt-no"><span class="wp-mgmt-no__key">' + k1 + '</span><span class="wp-mgmt-no__val">' + (v1 || '-') + '</span><span class="wp-mgmt-no__key">' + k2 + '</span><span class="wp-mgmt-no__val">' + (v2 || '-') + '</span></div>';
+  }
+  function addKind() { var s = document.querySelector('#add-kind .segment__item--selected'); return s ? s.dataset.kind : '사업장'; }
+  document.getElementById('add-submit').addEventListener('click', function () {
+    var nameEl = document.getElementById('add-name');
+    var name = (nameEl.value || '').trim();
+    var nameField = nameEl.closest('.form-field');
+    if (!name) { nameField.classList.add('form-field--error'); nameEl.focus(); return; }
+    nameField.classList.remove('form-field--error');
+    var loc = (document.getElementById('add-loc').value || '').trim() || '-';
+    var goyong = (document.getElementById('add-goyong').value || '').trim();
+    var sanjae = (document.getElementById('add-sanjae').value || '').trim();
+    var gungang = (document.getElementById('add-gungang').value || '').trim();
+    var yeongeum = (document.getElementById('add-yeongeum').value || '').trim();
+    var tr = document.createElement('tr');
+    tr.className = 'table__row';
+    tr.dataset.kind = addKind();
+    tr.innerHTML =
+      '<td class="table__cell wp-check-cell"><label class="checkbox"><input type="checkbox" aria-label="' + name + ' 선택"><span class="checkbox__control" aria-hidden="true"><span class="checkbox__icon-check"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span></label></td>' +
+      '<td class="table__cell">' + addKind() + '</td>' +
+      '<td class="table__cell"><span class="wp-worksite"><span class="wp-worksite__name">' + name + '</span></span></td>' +
+      '<td class="table__cell">' + loc + '</td>' +
+      '<td class="table__cell">' + mgmtCell('고용', goyong, '산재', sanjae) + '</td>' +
+      '<td class="table__cell">' + mgmtCell('건강', gungang, '연금', yeongeum) + '</td>';
+    tbody.insertBefore(tr, document.getElementById('wp-empty-search'));
+    /* 폼 리셋 */
+    nameEl.value = ''; document.getElementById('add-loc').value = '';
+    ['add-goyong', 'add-sanjae', 'add-gungang', 'add-yeongeum'].forEach(function (id) { document.getElementById(id).value = ''; });
+    closeAllOverlays();
+    refreshCount(); syncCheckAll();
+    toast('success', '근무지가 추가되었어요.');
+  });
+
+  /* ── 시나리오 프리셋 ── */
+  window.applyWpScenario = function (name) {
+    var es = document.getElementById('wp-empty-search');
+    if (checkAll) { checkAll.checked = false; checkAll.indeterminate = false; }
+    dataRows().forEach(function (r) { var c = rowCheckbox(r); if (c && !c.disabled) c.checked = false; });
+    if (name === '검색-결과-없음') {
+      tbody.dataset.forceState = '1';
+      dataRows().forEach(function (r) { r.hidden = true; });
+      es.hidden = false;
+      var c = document.getElementById('wp-count'); if (c) c.textContent = '0';
+    } else if (name === '데이터-없음') {
+      tbody.dataset.forceState = '1';
+      es.hidden = true;
+      dataRows().forEach(function (r) { r.hidden = r.dataset.hq !== '1'; });  /* 본사만 노출 */
+      refreshCount();
+    } else { /* 데이터 있음 */
+      delete tbody.dataset.forceState;
+      es.hidden = true;
+      resetSearch();
+    }
+    syncCheckAll();
+  };
+
+  /* 초기 동기화 */
+  refreshCount();
+  syncCheckAll();
+})();
+</script>
+
+</body>
+</html>
