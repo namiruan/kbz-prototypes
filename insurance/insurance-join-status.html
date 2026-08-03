@@ -76,6 +76,9 @@
     .ws-row--complete { background: var(--color-surface-success-subtle); }  /* 취득완료 — 처리됨 */
     .ws-row--blocked  { background: var(--color-surface-disabled); }        /* 선택불가 — 제약으로 막힘 */
 
+    /* 클릭 시 4대보험 상세가 뜨는 셀 — 포인터(손 모양) 커서 */
+    .table__cell[data-overlay-open] { cursor: pointer; }
+
     /* ══ 4대보험 상세 Layer Modal (Figma 14878-5882) — 근로자정보 4대보험 탭과 동일 스타일 ══ */
     .id-subtabs { margin-bottom: var(--space-stack-lg); }
     /* 근로자 정보(이름/주민번호/사업장) — 4대보험 탭과 동일한 오픈 카드(가운데 정렬·구분선) */
@@ -1994,6 +1997,16 @@ exits: report-acquire.html, report-loss.html, report-transfer.html, report-chang
     transfer: [['신고유형', '사업장 이동'], ['전입일', '2026-01-01'], ['신고 보험', '건강보험, 국민연금'], ['변경 전', '(주)한성산업-제조'], ['변경 후', '(주)한성산업-물류센터']],
     change: [['신고유형', '보수 변경'], ['변경 사유', '착오 정정'], ['신고보험', '고용보험, 산재보험, 건강보험, 연금보험'], ['변경 전 보수월액', '4,200,000 원'], ['변경 후 보수월액', '4,500,000 원'], ['변경년월', '2026.03']]
   };
+  /* 상세 모달을 열 때 서브탭 슬라이더 재초기화 — 오버레이가 숨김(0폭) 상태로 초기화되어
+     가입정보 선택 표시가 DS와 다르게 보이는 문제 보정 */
+  document.querySelectorAll('[data-overlay-open="overlay-insurance-detail"]').forEach(function (el) {
+    el.addEventListener('click', function () {
+      var group = document.querySelector('#overlay-insurance-detail .tab-group');
+      if (!group || typeof initTab !== 'function') return;
+      requestAnimationFrame(function () { delete group.dataset.initTab; initTab(group.parentElement); });
+    });
+  });
+
   var body = document.getElementById('rv-body');
   document.querySelectorAll('#id-report-table .wi-report-row').forEach(function (row) {
     row.addEventListener('click', function () {
