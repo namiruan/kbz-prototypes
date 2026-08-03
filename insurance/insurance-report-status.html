@@ -42,6 +42,14 @@
     .rs-status-tip dt { font-weight: var(--font-weight-heading); margin-top: var(--space-gap-xs); }
     .rs-status-tip dt:first-child { margin-top: 0; }
     .rs-status-tip dd { margin: 0 0 var(--space-gap-2xs); color: var(--color-text-inverse); opacity: .82; }
+
+    /* 표 하단 보더 겹침 방지 — tbody의 :last-child가 숨김 행(빈 상태·검색 결과 등)이면
+       DS의 :last-child 보더 제거 규칙이 그 숨김 행을 겨냥해, 마지막 '보이는' 행에 border-bottom이 남아
+       컨테이너 보더와 겹쳐 두껍게 보인다. 마지막 보이는 행의 아래 보더를 제거한다. */
+    .table__body .table__row:not([hidden]):not(:has(~ .table__row:not([hidden]))) .table__cell,
+    .table__body .table__row:not([hidden]):not(:has(~ .table__row:not([hidden]))) .table__head-cell {
+      border-bottom: none;
+    }
   </style>
 </head>
 <body>

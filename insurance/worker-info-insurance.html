@@ -74,6 +74,8 @@
     .wi-report-row:hover { background: var(--color-surface-brand-subtle); }
 
     .wi-guide { margin: 0 0 var(--space-stack-md); padding-left: var(--space-gap-lg); color: var(--color-text-subtle); font-size: var(--font-size-sm); display: flex; flex-direction: column; gap: var(--space-gap-2xs); }
+    /* 안내 문구 내 경로(대괄호) — 브랜드 컬러 강조 */
+    .wi-path { color: var(--color-text-brand); }
 
     /* 서브탭마다 내용 폭이 달라 모달 폭도 탭별로 조정(부드럽게 전환) */
     .modal--lg { transition: width 0.2s ease; }
@@ -257,7 +259,7 @@ exits: index.html, report-acquire.html, report-loss.html, report-transfer.html, 
 
                     <div class="wi-guide">
                       <span>• 본 이력에는 공단 신고가 완료된 건만 표시됩니다.</span>
-                      <span>• 진행중인 신고건은 [상용근로자&gt;4대보험 관리&gt;4대보험 신고 tab]에서 확인 가능합니다.</span>
+                      <span>• 진행중인 신고건은 <span class="wi-path">[상용근로자&gt;4대보험 관리&gt;4대보험 신고 tab]</span>에서 확인 가능합니다.</span>
                     </div>
                     <div class="table-container">
                       <table class="table table--hover" id="wi-report-table" aria-label="신고 이력">
