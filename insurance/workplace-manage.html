@@ -25,6 +25,8 @@
     /* 테이블 — 근무지명은 가변, 관리번호는 고정폭 */
     .wp-table { table-layout: fixed; }
     .wp-table .table__cell, .wp-table .table__head-cell { vertical-align: middle; }
+    /* 체크된 행 강조 — 추가 모달 리스트와 동일 */
+    .wp-table .table__row.is-selected { background: var(--color-surface-brand-subtle); }
     .wp-worksite { display: inline-flex; align-items: center; gap: var(--space-gap-xs); }
     .wp-worksite__name { overflow: hidden; text-overflow: ellipsis; }
 
@@ -463,6 +465,8 @@ exits: index.html
     var checked = rows.filter(function (r) { return rowCheckbox(r).checked; });
     checkAll.checked = rows.length > 0 && checked.length === rows.length;
     checkAll.indeterminate = checked.length > 0 && checked.length < rows.length;
+    /* 체크된 행 강조 */
+    dataRows().forEach(function (r) { var c = rowCheckbox(r); r.classList.toggle('is-selected', !!(c && c.checked)); });
     /* 체크된 근무지가 하나도 없으면 삭제 버튼 비활성(btn--inactive: hover 유지 → 툴팁 안내) */
     var del = document.getElementById('wp-delete');
     if (del) del.classList.toggle('btn--inactive', checked.length === 0);
@@ -470,6 +474,7 @@ exits: index.html
   if (checkAll) checkAll.addEventListener('change', function () {
     selectableRows().forEach(function (r) { rowCheckbox(r).checked = checkAll.checked; });
     checkAll.indeterminate = false;
+    syncCheckAll();
   });
   tbody.addEventListener('change', function (e) {
     if (e.target.matches('input[type="checkbox"]')) syncCheckAll();
