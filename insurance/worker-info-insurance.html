@@ -25,7 +25,7 @@
     .acq-info-card__label { font-size: var(--font-size-sm); color: var(--color-text-subtle); }
     .acq-info-card__value { font-size: var(--font-size-base); font-weight: var(--font-weight-heading); color: var(--color-text-body); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-    /* 4대보험 카드 2×2 */
+    /* 4대보험 카드 — 세로 나열, 각 카드는 한 행(보험명 셀 + 취득일/상실일/보수월액 셀) */
     .wi-cards { display: flex; flex-direction: column; gap: var(--space-gap-md); }
     /* 카드 기본 — 근로자 정보 카드(acq-info-card)와 동일한 border 토큰 */
     .wi-card { background: var(--color-surface-base); border: var(--stroke-sm) solid var(--color-border-default); border-radius: var(--radius-md); padding: var(--space-inset-xl); }
@@ -33,18 +33,12 @@
     .wi-card[data-status="취득"] { background: var(--color-surface-success-subtle); border-color: transparent; box-shadow: none; }
     .wi-card[data-status="상실"] { background: var(--color-surface-caution-subtle); border-color: transparent; box-shadow: none; }
     .wi-card--none { background: var(--color-surface-subtle); border-color: transparent; box-shadow: none; }
-    /* 채움 배경 위 셀 구분선은 은은하게 */
-    .wi-card__cell + .wi-card__cell { border-left-color: var(--color-border-default); }
-    .wi-card__head { display: flex; align-items: center; justify-content: flex-start; gap: var(--space-gap-sm); margin-bottom: var(--space-stack-md); }
-    .wi-card__title { font-weight: var(--font-weight-heading); color: var(--color-text-body); }
-    /* 취득일·상실일·보수월액 — 가로 3열(라벨 위·값 아래), 셀 사이 구분선 */
+    /* 한 행: 보험명(뱃지 위·이름 아래) · 취득일 · 상실일 · 보수월액, 셀 사이 구분선 */
     .wi-card__rows { display: flex; }
-    .wi-card__cell { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; gap: var(--space-gap-2xs); }
-    .wi-card__cell + .wi-card__cell { border-left: var(--stroke-sm) solid var(--color-border-subtle); padding-left: var(--space-gap-xl); margin-left: var(--space-gap-xl); }
+    .wi-card__cell { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-gap-2xs); }
+    .wi-card__cell + .wi-card__cell { border-left: var(--stroke-sm) solid var(--color-border-default); padding-left: var(--space-gap-xl); margin-left: var(--space-gap-xl); }
     .wi-card__key { color: var(--color-text-subtle); font-size: var(--font-size-sm); }
-    .wi-card__val { font-weight: var(--font-weight-heading); color: var(--color-text-body); overflow: hidden; text-overflow: ellipsis; }
-    .wi-card__reason { color: var(--color-text-subtle); }
-    .wi-card__reason-empty { min-height: var(--font-size-base); }
+    .wi-card__val, .wi-card__title { font-weight: var(--font-weight-heading); color: var(--color-text-body); overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
 
     /* 섹션 소제목(피부양자·건강/연금·고용·산재·신고 이력) — 브랜드 강조 */
     .wi-subhead { display: flex; align-items: center; gap: var(--space-gap-xs); margin: var(--space-stack-xl) 0 var(--space-stack-sm); color: var(--color-text-brand); font-weight: var(--font-weight-heading); }
@@ -372,22 +366,22 @@ exits: index.html, report-acquire.html, report-loss.html, report-transfer.html, 
   function renderCard(el, key, d) {
     el.setAttribute('data-status', d.s);   /* 취득/상실/미가입 — 상태색(acq-ins-item과 통일) */
     var badge = '<span class="badge ' + BADGE[d.s] + '">' + d.s + '</span>';
-    var head = '<div class="wi-card__head"><span class="wi-card__title">' + key + '</span>' + badge + '</div>';
-    var body;
+    /* 보험명 셀 — 뱃지(위) + 보험명(아래), 취득일 등과 같은 행 */
+    var nameCell = '<div class="wi-card__cell wi-card__cell--name">' + badge + '<span class="wi-card__title">' + key + '</span></div>';
+    var rest;
     if (d.s === '미가입') {
       el.classList.add('wi-card--none');
-      body = d.reason
-        ? '<div class="wi-card__reason">제외사유: ' + esc(d.reason) + '</div>'
-        : '<div class="wi-card__reason-empty"></div>';
+      rest = d.reason
+        ? '<div class="wi-card__cell"><span class="wi-card__key">제외사유</span><span class="wi-card__val">' + esc(d.reason) + '</span></div>'
+        : '';
     } else {
       el.classList.remove('wi-card--none');
-      body = '<div class="wi-card__rows">' +
+      rest =
         '<div class="wi-card__cell"><span class="wi-card__key">취득일</span><span class="wi-card__val">' + esc(d['취득']) + '</span></div>' +
         '<div class="wi-card__cell"><span class="wi-card__key">상실일</span><span class="wi-card__val">' + esc(d['상실']) + '</span></div>' +
-        '<div class="wi-card__cell"><span class="wi-card__key">보수월액</span><span class="wi-card__val">' + esc(d['보수']) + '</span></div>' +
-        '</div>';
+        '<div class="wi-card__cell"><span class="wi-card__key">보수월액</span><span class="wi-card__val">' + esc(d['보수']) + '</span></div>';
     }
-    el.innerHTML = head + body;
+    el.innerHTML = '<div class="wi-card__rows">' + nameCell + rest + '</div>';
   }
 
   function renderDependents(list) {
