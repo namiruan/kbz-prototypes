@@ -23,12 +23,14 @@
     .pi-etc__title { color: var(--color-text-brand); font-weight: var(--font-weight-heading); margin-bottom: var(--space-stack-sm); }
 
     .pi-check-cell { width: 44px; text-align: center; }
-    .pi-quit-date { max-width: 168px; }
     .pi-none { color: var(--color-text-subtle); }
     .pi-note { width: 100%; min-height: 140px; resize: vertical; }
 
-    /* 편집형 데이터테이블 — 편집 셀 입력값은 좌측 정렬(날짜·텍스트) */
+    /* 편집형 데이터테이블 — 편집 셀 입력값은 좌측 정렬(텍스트) */
     #pi-sp-note .table__cell--edit .input { text-align: left; }
+    /* 편집 셀 내 DS 드롭다운·데이트피커는 셀 폭을 채운다(date-picker.md: width:100%) */
+    #pi-sp-note .table__cell--edit .dropdown,
+    #pi-sp-note .table__cell--edit .dp { width: 100%; }
     /* 서브탭마다 모달 폭을 내용에 맞게(4대보험 탭과 동일, 부드럽게 전환) */
     .modal--lg { transition: width 0.2s ease; }
 
@@ -166,16 +168,9 @@ exits: index.html, worker-info-insurance.html, report-loss.html
                             <th class="table__head-cell pi-check-cell" scope="col"><label class="checkbox"><input type="checkbox" data-check-all aria-label="전체 선택"><span class="checkbox__control" aria-hidden="true"><span class="checkbox__icon-check"><svg aria-hidden="true"><use href="#icon-check"/></svg></span><span class="checkbox__icon-indeterminate"></span></span></label></th>
                             <th class="table__head-cell" scope="col" style="width:64px">번호</th>
                             <th class="table__head-cell table__head-cell--input" scope="col" style="width:200px">입사일</th>
-                            <th class="table__head-cell table__head-cell--input" scope="col">퇴사일</th>
+                            <th class="table__head-cell table__head-cell--input" scope="col" style="width:200px">퇴사일</th>
                           </tr></thead>
-                          <tbody class="table__body" data-rows>
-                            <tr class="table__row">
-                              <td class="table__cell pi-check-cell"><label class="checkbox"><input type="checkbox" data-row-check aria-label="1행 선택"><span class="checkbox__control" aria-hidden="true"><span class="checkbox__icon-check"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span></label></td>
-                              <td class="table__cell" data-no>1</td>
-                              <td class="table__cell--edit"><div class="input-wrap"><input class="input input--xs" type="date" value="2012-03-01" aria-label="입사일 1행"></div></td>
-                              <td class="table__cell--edit"><div class="input-wrap"><input class="input input--xs pi-quit-date" type="date" aria-label="퇴사일 1행"></div></td>
-                            </tr>
-                          </tbody>
+                          <tbody class="table__body" data-rows></tbody>
                         </table>
                       </div>
                       </div>
@@ -212,32 +207,13 @@ exits: index.html, worker-info-insurance.html, report-loss.html
                           <thead class="table__head"><tr>
                             <th class="table__head-cell pi-check-cell" scope="col"><label class="checkbox"><input type="checkbox" data-check-all aria-label="전체 선택"><span class="checkbox__control" aria-hidden="true"><span class="checkbox__icon-check"><svg aria-hidden="true"><use href="#icon-check"/></svg></span><span class="checkbox__icon-indeterminate"></span></span></label></th>
                             <th class="table__head-cell" scope="col" style="width:56px">번호</th>
-                            <th class="table__head-cell table__head-cell--input" scope="col" style="width:140px">적용일</th>
-                            <th class="table__head-cell table__head-cell--input" scope="col" style="width:120px">부서</th>
+                            <th class="table__head-cell table__head-cell--input" scope="col" style="width:168px">적용일</th>
+                            <th class="table__head-cell table__head-cell--input" scope="col" style="width:128px">부서</th>
                             <th class="table__head-cell table__head-cell--input" scope="col" style="width:120px">직책</th>
                             <th class="table__head-cell table__head-cell--input" scope="col" style="width:120px">직위</th>
                             <th class="table__head-cell table__head-cell--input" scope="col">담당업무</th>
                           </tr></thead>
-                          <tbody class="table__body" data-rows>
-                            <tr class="table__row">
-                              <td class="table__cell pi-check-cell"><label class="checkbox"><input type="checkbox" data-row-check aria-label="1행 선택"><span class="checkbox__control" aria-hidden="true"><span class="checkbox__icon-check"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span></label></td>
-                              <td class="table__cell" data-no>1</td>
-                              <td class="table__cell--edit"><div class="input-wrap"><input class="input input--xs" type="date" value="2026-04-06" aria-label="적용일 1행"></div></td>
-                              <td class="table__cell--edit"><div class="input-wrap"><input class="input input--xs" type="text" value="개발실" aria-label="부서 1행"></div></td>
-                              <td class="table__cell--edit"><div class="input-wrap"><input class="input input--xs" type="text" value="개발실" aria-label="직책 1행"></div></td>
-                              <td class="table__cell--edit"><div class="input-wrap"><input class="input input--xs" type="text" value="과장" aria-label="직위 1행"></div></td>
-                              <td class="table__cell--edit"><div class="input-wrap"><input class="input input--xs" type="text" value="" aria-label="담당업무 1행"></div></td>
-                            </tr>
-                            <tr class="table__row">
-                              <td class="table__cell pi-check-cell"><label class="checkbox"><input type="checkbox" data-row-check aria-label="2행 선택"><span class="checkbox__control" aria-hidden="true"><span class="checkbox__icon-check"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span></label></td>
-                              <td class="table__cell" data-no>2</td>
-                              <td class="table__cell--edit"><div class="input-wrap"><input class="input input--xs" type="date" value="2026-01-01" aria-label="적용일 2행"></div></td>
-                              <td class="table__cell--edit"><div class="input-wrap"><input class="input input--xs" type="text" value="운영실" aria-label="부서 2행"></div></td>
-                              <td class="table__cell--edit"><div class="input-wrap"><input class="input input--xs" type="text" value="" aria-label="직책 2행"></div></td>
-                              <td class="table__cell--edit"><div class="input-wrap"><input class="input input--xs" type="text" value="사원" aria-label="직위 2행"></div></td>
-                              <td class="table__cell--edit"><div class="input-wrap"><input class="input input--xs" type="text" value="" aria-label="담당업무 2행"></div></td>
-                            </tr>
-                          </tbody>
+                          <tbody class="table__body" data-rows></tbody>
                         </table>
                       </div>
                       </div>
@@ -297,6 +273,8 @@ exits: index.html, worker-info-insurance.html, report-loss.html
     if (typeof initAccordion === 'function') initAccordion(root);
     if (typeof initTableSort === 'function') root.querySelectorAll('.table-container').forEach(function (el) { initTableSort(el); });
     if (typeof initSegment === 'function') root.querySelectorAll('.segment').forEach(function (el) { initSegment(el.parentElement); });
+    if (typeof initDropdown === 'function') initDropdown(root);
+    if (typeof initDatePicker === 'function') initDatePicker(root);
     if (typeof initInput === 'function') root.querySelectorAll('.input').forEach(function (el) { if (!el.closest('.input-wrap') && !el.dataset.initInput) { el.dataset.initInput = '1'; initInput(el); } });
   }
   _initComponents();
@@ -322,6 +300,70 @@ exits: index.html, worker-info-insurance.html, report-loss.html
   });
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && _ovStack.length) closeOverlay(_ovStack[_ovStack.length - 1]); });
 
+  /* ── 편집형 셀 팩토리 ── 부서·직책·직위는 DS 단일 드롭다운, 날짜는 DS 데이트피커 ── */
+  var DD_OPTS = {
+    dept:  { label: '부서', list: ['개발실', '운영실', '영업실', '경영지원실', '인사팀'] },
+    title: { label: '직책', list: ['팀장', '파트장', '실장', '팀원'] },
+    rank:  { label: '직위', list: ['사원', '주임', '대리', '과장', '차장', '부장'] }
+  };
+  function mkDropdown(key, value) {
+    var cfg = DD_OPTS[key];
+    var has = value && cfg.list.indexOf(value) > -1;
+    var lis = cfg.list.map(function (o) {
+      var sel = o === value;
+      return '<li class="dropdown__option' + (sel ? ' dropdown__option--selected' : '') + '" role="option" aria-selected="' + (sel ? 'true' : 'false') + '" tabindex="-1"><span class="dropdown__option-label">' + o + '</span></li>';
+    }).join('');
+    return '<div class="dropdown dropdown--button dropdown--menu" data-field="' + key + '">' +
+      '<button class="dropdown__trigger" type="button" aria-haspopup="listbox" aria-expanded="false" aria-label="' + cfg.label + ' 선택">' +
+      '<span class="dropdown__value' + (has ? '' : ' dropdown__value--placeholder') + '">' + (has ? value : cfg.label) + '</span>' +
+      '<span class="dropdown__chevron" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-chevron-down"/></svg></span>' +
+      '</button>' +
+      '<div class="dropdown__panel"><ul class="dropdown__list" role="listbox" aria-label="' + cfg.label + '">' + lis + '</ul></div>' +
+      '</div>';
+  }
+  function mkDP(mark, iso, name) {
+    var p = ['', '', ''], has = false;
+    if (iso) { var m = iso.split('-'); if (m.length === 3) { p = m; has = true; } }
+    return '<div class="dp' + (has ? ' dp--has-value' : '') + '" data-field="' + mark + '">' +
+      '<div class="dp__trigger" aria-haspopup="dialog" aria-label="' + name + ' 선택">' +
+      '<div class="dp__value-group">' +
+      '<input class="dp__value-part dp__value-part--year" type="text" inputmode="numeric" placeholder="YYYY" maxlength="4" aria-label="연도" autocomplete="off" value="' + p[0] + '">' +
+      '<span class="dp__value-sep" aria-hidden="true">.</span>' +
+      '<input class="dp__value-part dp__value-part--md" type="text" inputmode="numeric" placeholder="MM" maxlength="2" aria-label="월" autocomplete="off" value="' + p[1] + '">' +
+      '<span class="dp__value-sep" aria-hidden="true">.</span>' +
+      '<input class="dp__value-part dp__value-part--md" type="text" inputmode="numeric" placeholder="DD" maxlength="2" aria-label="일" autocomplete="off" value="' + p[2] + '">' +
+      '</div>' +
+      '<span class="dp__chevron" aria-hidden="true"><span class="icon icon--sm"><svg aria-hidden="true"><use href="#icon-calendar"/></svg></span></span>' +
+      '</div></div>';
+  }
+  function checkCell() {
+    return '<td class="table__cell pi-check-cell"><label class="checkbox"><input type="checkbox" data-row-check aria-label="행 선택"><span class="checkbox__control" aria-hidden="true"><span class="checkbox__icon-check"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span></label></td>';
+  }
+  function textCell(name, value) {
+    return '<td class="table__cell--edit"><div class="input-wrap"><input class="input input--xs" type="text" value="' + (value || '') + '" aria-label="' + name + '"></div></td>';
+  }
+  function joinRow(d) {
+    return checkCell() + '<td class="table__cell" data-no></td>' +
+      '<td class="table__cell--edit">' + mkDP('in', d && d.in, '입사일') + '</td>' +
+      '<td class="table__cell--edit">' + mkDP('quit', d && d.quit, '퇴사일') + '</td>';
+  }
+  function workRow(d) {
+    d = d || {};
+    return checkCell() + '<td class="table__cell" data-no></td>' +
+      '<td class="table__cell--edit">' + mkDP('apply', d.apply, '적용일') + '</td>' +
+      '<td class="table__cell--edit">' + mkDropdown('dept', d.dept) + '</td>' +
+      '<td class="table__cell--edit">' + mkDropdown('title', d.title) + '</td>' +
+      '<td class="table__cell--edit">' + mkDropdown('rank', d.rank) + '</td>' +
+      textCell('담당업무', d.task);
+  }
+  var SEED = {
+    join: [{ in: '2012-03-01', quit: '' }],
+    work: [
+      { apply: '2026-04-06', dept: '개발실', title: '팀장', rank: '과장', task: '' },
+      { apply: '2026-01-01', dept: '운영실', title: '', rank: '사원', task: '' }
+    ]
+  };
+
   /* ── 편집형 테이블(입퇴사·근무정보): 전체선택·삭제(체크 시 활성)·추가·건수 ── */
   function initSectionTable(section) {
     var tbody = section.querySelector('[data-rows]');
@@ -330,6 +372,7 @@ exits: index.html, worker-info-insurance.html, report-loss.html
     var addBtn = section.querySelector('[data-add]');
     var checkAll = section.querySelector('[data-check-all]');
     var kind = section.dataset.table;
+    var build = kind === 'join' ? joinRow : workRow;
 
     function rows() { return Array.prototype.slice.call(tbody.querySelectorAll('tr.table__row')); }
     function refresh() {
@@ -343,6 +386,16 @@ exits: index.html, worker-info-insurance.html, report-loss.html
         checkAll.indeterminate = checked.length > 0 && checked.length < rs.length;
       }
     }
+    function addRow(data) {
+      var tr = document.createElement('tr');
+      tr.className = 'table__row';
+      tr.innerHTML = build(data);
+      tbody.appendChild(tr);
+      _initComponents(tr);   /* 신규 행의 드롭다운·데이트피커 초기화 */
+      return tr;
+    }
+
+    (SEED[kind] || []).forEach(addRow);   /* 초기 데이터 시딩 */
 
     tbody.addEventListener('change', function (e) { if (e.target.matches('[data-row-check]')) refresh(); });
     if (checkAll) checkAll.addEventListener('change', function () {
@@ -354,33 +407,11 @@ exits: index.html, worker-info-insurance.html, report-loss.html
       rows().forEach(function (r) { var c = r.querySelector('[data-row-check]'); if (c && c.checked) r.remove(); });
       refresh();
     });
-    if (addBtn) addBtn.addEventListener('click', function () {
-      var tr = document.createElement('tr');
-      tr.className = 'table__row';
-      var checkCell = '<td class="table__cell pi-check-cell"><label class="checkbox"><input type="checkbox" data-row-check aria-label="행 선택"><span class="checkbox__control" aria-hidden="true"><span class="checkbox__icon-check"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span></label></td>';
-      if (kind === 'join') {
-        tr.innerHTML = checkCell +
-          '<td class="table__cell" data-no></td>' +
-          '<td class="table__cell--edit"><div class="input-wrap"><input class="input input--xs" type="date" aria-label="입사일"></div></td>' +
-          '<td class="table__cell--edit"><div class="input-wrap"><input class="input input--xs pi-quit-date" type="date" aria-label="퇴사일"></div></td>';
-      } else {
-        tr.innerHTML = checkCell +
-          '<td class="table__cell" data-no></td>' +
-          '<td class="table__cell--edit"><div class="input-wrap"><input class="input input--xs" type="date" aria-label="적용일"></div></td>' +
-          '<td class="table__cell--edit"><div class="input-wrap"><input class="input input--xs" type="text" aria-label="부서"></div></td>' +
-          '<td class="table__cell--edit"><div class="input-wrap"><input class="input input--xs" type="text" aria-label="직책"></div></td>' +
-          '<td class="table__cell--edit"><div class="input-wrap"><input class="input input--xs" type="text" aria-label="직위"></div></td>' +
-          '<td class="table__cell--edit"><div class="input-wrap"><input class="input input--xs" type="text" aria-label="담당업무"></div></td>';
-      }
-      tbody.appendChild(tr);
-      refresh();
-    });
+    if (addBtn) addBtn.addEventListener('click', function () { addRow(null); refresh(); });
 
     refresh();
   }
   document.querySelectorAll('.accordion__item[data-table]').forEach(initSectionTable);
-
-  /* 아코디언(입퇴사·근무정보)은 DS 디스클로저(initDisclosure)가 처리 */
 
   /* ── 서브탭마다 모달 폭을 내용에 맞게 조정 (4대보험 탭과 동일) ── */
   (function () {
@@ -393,16 +424,35 @@ exits: index.html, worker-info-insurance.html, report-loss.html
     fit('pi-sp-note'); /* 기본 서브탭 */
   })();
 
+  /* ── 데이트피커 값 설정·해제 헬퍼 (시나리오 제어용) ── */
+  function setDP(dp, iso) {
+    if (!dp) return;
+    var p = dp.querySelectorAll('.dp__value-part'), m = (iso || '').split('-');
+    if (m.length === 3) { p[0].value = m[0]; p[1].value = m[1]; p[2].value = m[2]; dp.classList.add('dp--has-value'); }
+  }
+  function clearDP(dp) {
+    if (!dp) return;
+    dp.querySelectorAll('.dp__value-part').forEach(function (i) { i.value = ''; });
+    dp.classList.remove('dp--has-value');
+  }
+
   /* ── 퇴사일 저장 → 상실신고 Confirm Modal (area 1) ──
-     취득된 4대보험이 있는 근로자의 퇴사일 저장 시 안내 */
+     취득된 4대보험이 있는 근로자의 퇴사일(데이트피커) 입력 완료 시 안내.
+     데이트피커는 값 선택 시 .dp 에 dp--has-value 클래스를 부여하므로 이를 감지한다. */
   var _quitShown = false;
-  document.querySelector('.accordion__item[data-table="join"] [data-rows]').addEventListener('change', function (e) {
-    if (e.target.matches('.pi-quit-date') && e.target.value) {
-      if (_quitShown) return;
-      _quitShown = true;
-      openOverlay('overlay-quit-confirm');
-    }
-  });
+  var joinBody = document.querySelector('.accordion__item[data-table="join"] [data-rows]');
+  if (joinBody) {
+    new MutationObserver(function (muts) {
+      muts.forEach(function (m) {
+        var t = m.target;
+        if (t.matches && t.matches('.dp[data-field="quit"]') && t.classList.contains('dp--has-value')) {
+          if (_quitShown) return;
+          _quitShown = true;
+          openOverlay('overlay-quit-confirm');
+        }
+      });
+    }).observe(joinBody, { attributes: true, attributeFilter: ['class'], subtree: true });
+  }
   /* 상실신고 하기 → 상실신고 화면 */
   var goLoss = document.getElementById('quit-go-loss');
   if (goLoss) goLoss.addEventListener('click', function () { location.href = 'report-loss.html?return=worker-info-personnel.html'; });
@@ -419,13 +469,14 @@ exits: index.html, worker-info-insurance.html, report-loss.html
     btn.addEventListener('click', function () {
       var name = this.dataset.scenario;
       document.querySelectorAll('.proto-nav-btn').forEach(function (b) { b.classList.toggle('is-active', b.dataset.scenario === name); });
-      var quit = document.querySelector('.accordion__item[data-table="join"] .pi-quit-date');
+      var quit = document.querySelector('.accordion__item[data-table="join"] .dp[data-field="quit"]');
       if (name === '퇴사일-등록') {
-        if (quit) quit.value = '2026-05-31';
+        _quitShown = true;          /* 옵저버 중복 실행 방지 — 아래에서 직접 오픈 */
+        setDP(quit, '2026-05-31');
         openOverlay('overlay-quit-confirm');
       } else {
         _ovStack.slice().reverse().forEach(closeOverlay);
-        if (quit) quit.value = '';
+        clearDP(quit);
         _quitShown = false;
       }
     });
