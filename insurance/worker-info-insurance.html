@@ -19,8 +19,8 @@
     .wi-subtabs { margin-bottom: var(--space-stack-lg); }
 
     /* 근로자 정보(이름/주민번호) — 타 신고 모달과 동일한 .acq-info-card 컴포넌트 사용(일관성) */
-    .acq-info-card { display: flex; border: var(--stroke-sm) solid var(--color-border-default); border-radius: var(--radius-md); background: var(--color-surface-subtle); overflow: hidden; margin-bottom: var(--space-stack-lg); }
-    .acq-info-card__item { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; align-items: center; text-align: center; gap: var(--space-gap-2xs); padding: var(--space-inset-lg); }
+    .acq-info-card { display: flex; width: fit-content; border: var(--stroke-sm) solid var(--color-border-default); border-radius: var(--radius-md); background: var(--color-surface-subtle); overflow: hidden; margin-bottom: var(--space-stack-lg); }
+    .acq-info-card__item { flex: 0 0 auto; width: 150px; display: flex; flex-direction: column; align-items: center; text-align: center; gap: var(--space-gap-2xs); padding: var(--space-inset-lg); }
     .acq-info-card__item + .acq-info-card__item { border-left: var(--stroke-sm) solid var(--color-border-default); }
     .acq-info-card__label { font-size: var(--font-size-sm); color: var(--color-text-subtle); }
     .acq-info-card__value { font-size: var(--font-size-base); font-weight: var(--font-weight-heading); color: var(--color-text-body); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -34,8 +34,12 @@
     .wi-card__box { flex: 1 1 0; min-width: 0; display: flex; gap: var(--space-gap-2xl); padding: var(--space-inset-xl); border-radius: var(--radius-md); background: var(--color-surface-subtle); }
     .wi-card[data-status="취득"] .wi-card__box { background: var(--color-surface-success-subtle); }
     .wi-card[data-status="상실"] .wi-card__box { background: var(--color-surface-caution-subtle); }
-    .wi-card--none .wi-card__box { background: var(--color-surface-subtle); }
+    .wi-card[data-status="제외"] .wi-card__box { background: var(--color-surface-subtle); }      /* 제외 — 비활성(연한 회색) */
+    .wi-card[data-status="미신고"] .wi-card__box { background: var(--color-surface-neutral); }    /* 미신고 — 중립(면이 구분되는 회색) */
+    .wi-card[data-status="미가입"] .wi-card__box { background: var(--color-surface-subtle); }     /* 공단대사 미확인 */
     .wi-card__cell { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-gap-2xs); }
+    /* 미신고 안내 셀 — 문구 + 취득 신고 링크 한 줄 */
+    .wi-card__hint-cell { flex-direction: row; align-items: center; gap: var(--space-gap-lg); }
     .wi-card__key { color: var(--color-text-subtle); font-size: var(--font-size-sm); }
     .wi-card__val, .wi-card__title { font-weight: var(--font-weight-heading); color: var(--color-text-body); overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
 
@@ -85,7 +89,7 @@ exits: index.html, report-acquire.html, report-loss.html, report-transfer.html, 
 
     <nav class="proto-nav" id="proto-nav" aria-label="시나리오 선택">
       <button class="proto-nav-btn is-active" data-scenario="전체-가입" type="button">전체 가입</button>
-      <button class="proto-nav-btn" data-scenario="일부-미가입" type="button">일부 미가입</button>
+      <button class="proto-nav-btn" data-scenario="제외-미신고" type="button">제외·미신고</button>
       <button class="proto-nav-btn" data-scenario="공단-대사" type="button">공단 대사 이력</button>
       <button class="proto-nav-btn" data-scenario="피부양자-없음" type="button">피부양자 없음</button>
     </nav>
@@ -315,7 +319,13 @@ exits: index.html, report-acquire.html, report-loss.html, report-transfer.html, 
 <script>
 /* ══════════════ 4대보험 가입정보 시나리오 렌더링 ══════════════ */
 (function () {
-  var BADGE = { '취득': 'badge--success', '상실': 'badge--caution', '미가입': 'badge--neutral' };
+  var BADGE = {
+    '취득': 'badge--success',
+    '상실': 'badge--caution',
+    '제외': 'badge--disabled',   /* 규정상 가입 대상 아님 — 비활성 톤 */
+    '미신고': 'badge--neutral',  /* 가입 대상인데 미신고 — 중립 톤 */
+    '미가입': 'badge--neutral'   /* 공단대사 미확인 */
+  };
 
   var SCEN = {
     '전체-가입': {
@@ -328,13 +338,13 @@ exits: index.html, report-acquire.html, report-loss.html, report-transfer.html, 
       },
       dependents: [['모', '이미래', '123456-1234567', '2025-01-01'], ['자녀', '김민준', '123456-1234567', '2025-01-01']]
     },
-    '일부-미가입': {
+    '제외-미신고': {
       banner: false,
       cards: {
         '국민연금': { s: '취득', 취득: '2022.03.15', 상실: '-', 보수: '3,500,000 원' },
-        '건강보험': { s: '상실', 취득: '2022.03.15', 상실: '2025.03.15', 보수: '3,600,000 원' },
-        '고용보험': { s: '미가입', reason: '대표자' },
-        '산재보험': { s: '미가입', reason: '대표자' }
+        '건강보험': { s: '미신고' },
+        '고용보험': { s: '제외', reason: '대표자' },
+        '산재보험': { s: '제외', reason: '대표자' }
       },
       dependents: [['모', '이미래', '123456-1234567', '2025-01-01'], ['자녀', '김민준', '123456-1234567', '2025-01-01']]
     },
@@ -363,18 +373,21 @@ exits: index.html, report-acquire.html, report-loss.html, report-transfer.html, 
   function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
 
   function renderCard(el, key, d) {
-    el.setAttribute('data-status', d.s);   /* 취득/상실/미가입 — 상태색(acq-ins-item과 통일) */
+    el.setAttribute('data-status', d.s);
     var badge = '<span class="badge ' + BADGE[d.s] + '">' + d.s + '</span>';
     /* 보험명 라벨 — 뱃지(위) + 보험명(아래), 배경 없음 */
     var nameEl = '<div class="wi-card__name">' + badge + '<span class="wi-card__title">' + key + '</span></div>';
     var cells;
-    if (d.s === '미가입') {
-      el.classList.add('wi-card--none');
-      cells = d.reason
-        ? '<div class="wi-card__cell"><span class="wi-card__key">제외사유</span><span class="wi-card__val">' + esc(d.reason) + '</span></div>'
-        : '';   /* 공단 대사 미가입 — 사유 없이 빈 카드(Figma) */
+    if (d.s === '제외') {
+      /* 규정상 가입 대상 아님 — 제외사유 표시(비활성 톤) */
+      cells = '<div class="wi-card__cell"><span class="wi-card__key">제외사유</span><span class="wi-card__val">' + esc(d.reason || '-') + '</span></div>';
+    } else if (d.s === '미신고') {
+      /* 가입 대상인데 미신고 — 조치 안내(중립 톤) */
+      cells = '<div class="wi-card__cell wi-card__hint-cell"><span class="wi-card__val">취득 신고 대상입니다.</span><a class="link" href="report-acquire.html?return=worker-info-insurance.html">취득 신고하기</a></div>';
+    } else if (d.s === '미가입') {
+      /* 공단대사 미확인 — 사유 없이 빈 카드 */
+      cells = '';
     } else {
-      el.classList.remove('wi-card--none');
       cells =
         '<div class="wi-card__cell"><span class="wi-card__key">취득일</span><span class="wi-card__val">' + esc(d['취득']) + '</span></div>' +
         '<div class="wi-card__cell"><span class="wi-card__key">상실일</span><span class="wi-card__val">' + esc(d['상실']) + '</span></div>' +
@@ -385,20 +398,27 @@ exits: index.html, report-acquire.html, report-loss.html, report-transfer.html, 
 
   function renderDependents(list) {
     var wrap = document.getElementById('wi-dependents');
-    if (!list.length) {
-      wrap.innerHTML = '<div class="wi-empty">피부양자 정보가 없습니다.</div>';
-      return;
-    }
-    var rows = list.map(function (r) {
-      return '<tr class="table__row"><td class="table__cell">' + esc(r[0]) + '</td><td class="table__cell">' + esc(r[1]) + '</td><td class="table__cell">' + esc(r[2]) + '</td><td class="table__cell">' + esc(r[3]) + '</td></tr>';
-    }).join('');
-    wrap.innerHTML = '<div class="table-container"><table class="table table--info" aria-label="피부양자">' +
-      '<thead class="table__head"><tr>' +
+    var head = '<thead class="table__head"><tr>' +
       '<th class="table__head-cell" scope="col" style="width:100px">관계</th>' +
       '<th class="table__head-cell" scope="col" style="width:140px">성명</th>' +
       '<th class="table__head-cell" scope="col">주민등록번호</th>' +
       '<th class="table__head-cell" scope="col" style="width:150px">취득일</th>' +
-      '</tr></thead><tbody class="table__body">' + rows + '</tbody></table></div>';
+      '</tr></thead>';
+    var body;
+    if (!list.length) {
+      /* 데이터테이블 empty-state — 헤더 유지 + 안내 행 (다른 목록 화면과 동일) */
+      body = '<tbody class="table__body"><tr class="table__row"><td class="table__cell" colspan="4">' +
+        '<div class="empty-state empty-state--compact" role="status" aria-live="polite">' +
+        '<div class="empty-state__icon" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-employee"/></svg></div>' +
+        '<div class="empty-state__body"><p class="empty-state__title text-body">피부양자 정보가 없습니다.</p></div>' +
+        '</div></td></tr></tbody>';
+    } else {
+      var rows = list.map(function (r) {
+        return '<tr class="table__row"><td class="table__cell">' + esc(r[0]) + '</td><td class="table__cell">' + esc(r[1]) + '</td><td class="table__cell">' + esc(r[2]) + '</td><td class="table__cell">' + esc(r[3]) + '</td></tr>';
+      }).join('');
+      body = '<tbody class="table__body">' + rows + '</tbody>';
+    }
+    wrap.innerHTML = '<div class="table-container"><table class="table table--info" aria-label="피부양자">' + head + body + '</table></div>';
   }
 
   window.applyWiScenario = function (name) {
