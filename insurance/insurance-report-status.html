@@ -38,7 +38,7 @@
     /* 접수일 '-' 는 옅게 */
     .rs-date-none { color: var(--color-text-subtle); }
     /* 진행상태 안내 툴팁 — 넉넉한 폭 + 좌측 정렬 */
-    .rs-status-tip { max-width: 320px; text-align: left; white-space: normal; line-height: var(--line-height-reading); }
+    .rs-status-tip { max-width: 440px; text-align: left; white-space: normal; line-height: var(--line-height-reading); }
     .rs-status-tip dt { font-weight: var(--font-weight-heading); margin-top: var(--space-gap-xs); }
     .rs-status-tip dt:first-child { margin-top: 0; }
     .rs-status-tip dd { margin: 0 0 var(--space-gap-2xs); color: var(--color-text-inverse); opacity: .82; }
@@ -178,7 +178,7 @@ exits: insurance-join-status.html, report-acquire.html, report-loss.html, report
                     <th class="table__head-cell" scope="col">주민번호</th>
                     <th class="table__head-cell" scope="col">신고 종류</th>
                     <th class="table__head-cell" scope="col">
-                      <span class="rs-help">진행 상태<span class="tooltip-wrapper" onmouseenter="this.querySelector('.tooltip-panel').classList.add('tooltip-panel--visible')" onmouseleave="this.querySelector('.tooltip-panel').classList.remove('tooltip-panel--visible')"><button class="tooltip-trigger tooltip-trigger--sm" type="button" aria-label="진행 상태 안내" onfocus="this.closest('.tooltip-wrapper').querySelector('.tooltip-panel').classList.add('tooltip-panel--visible')" onblur="this.closest('.tooltip-wrapper').querySelector('.tooltip-panel').classList.remove('tooltip-panel--visible')"><svg aria-hidden="true"><use href="#icon-help"/></svg></button><div class="tooltip-panel elevation-tooltip tooltip-panel--bottom rs-status-tip" role="tooltip"><dl><dt>임시저장</dt><dd>작성 중인 신고서가 저장된 상태</dd><dt>신고대상</dt><dd>신고가 필요하지만 아직 작성 전인 상태</dd><dt>접수완료</dt><dd>플래너 접수 완료, 공단 신고 전(수정 가능)</dd><dt>처리중</dt><dd>공단에 신고 처리 중(수정 불가)</dd><dt>반려</dt><dd>신고가 반려된 상태</dd></dl></div></span></span>
+                      <span class="rs-help">진행 상태<span class="tooltip-wrapper" onmouseenter="this.querySelector('.tooltip-panel').classList.add('tooltip-panel--visible')" onmouseleave="this.querySelector('.tooltip-panel').classList.remove('tooltip-panel--visible')"><button class="tooltip-trigger tooltip-trigger--sm" type="button" aria-label="진행 상태 안내" onfocus="this.closest('.tooltip-wrapper').querySelector('.tooltip-panel').classList.add('tooltip-panel--visible')" onblur="this.closest('.tooltip-wrapper').querySelector('.tooltip-panel').classList.remove('tooltip-panel--visible')"><svg aria-hidden="true"><use href="#icon-help"/></svg></button><div class="tooltip-panel elevation-tooltip tooltip-panel--bottom rs-status-tip" role="tooltip"><dl><dt>임시저장</dt><dd>작성 중인 신고서가 저장된 상태입니다. 이어서 작성할 수 있습니다.</dd><dt>신고대상</dt><dd>신고가 필요한 근로자이며 신고요청을 할 수 있습니다. 신고가 불필요할 경우 신고 제외 처리하여 목록에서 숨길 수 있습니다.</dd><dt>접수완료</dt><dd>공단 신고를 위한 접수가 완료된 상태입니다. 신고 내용을 수정할 수 있으며, 수정 시 변경된 내용으로 다시 접수됩니다.</dd><dt>처리중</dt><dd>공단에서 신고를 처리 중인 상태입니다. 신고 내용을 수정할 수 없습니다.</dd><dt>반려</dt><dd>반려되었습니다. 반려 사유를 확인 후 다시 작성해주세요.</dd></dl></div></span></span>
                     </th>
                     <th class="table__head-cell" scope="col">접수일</th>
                     <th class="table__head-cell table__cell--fit" scope="col">관리</th>
