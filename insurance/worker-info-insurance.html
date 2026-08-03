@@ -18,10 +18,12 @@
     /* 4대보험 섹션 서브탭 그룹 */
     .wi-subtabs { margin-bottom: var(--space-stack-lg); }
 
-    /* 근로자 정보(이름/주민번호) 헤더 */
-    .wi-person { padding-bottom: var(--space-stack-md); border-bottom: var(--stroke-sm) var(--stroke-solid) var(--color-border-subtle); margin-bottom: var(--space-stack-lg); }
-    .wi-person__name { font-size: var(--font-size-h4); font-weight: var(--font-weight-heading); color: var(--color-text-body); }
-    .wi-person__rrn { color: var(--color-text-body); margin-top: var(--space-stack-2xs); }
+    /* 근로자 정보(이름/주민번호) — 타 신고 모달과 동일한 .acq-info-card 컴포넌트 사용(일관성) */
+    .acq-info-card { display: flex; border: var(--stroke-sm) solid var(--color-border-default); border-radius: var(--radius-md); background: var(--color-surface-subtle); overflow: hidden; margin-bottom: var(--space-stack-lg); }
+    .acq-info-card__item { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; align-items: center; text-align: center; gap: var(--space-gap-2xs); padding: var(--space-inset-lg); }
+    .acq-info-card__item + .acq-info-card__item { border-left: var(--stroke-sm) solid var(--color-border-default); }
+    .acq-info-card__label { font-size: var(--font-size-sm); color: var(--color-text-subtle); }
+    .acq-info-card__value { font-size: var(--font-size-base); font-weight: var(--font-weight-heading); color: var(--color-text-body); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
     /* 4대보험 카드 2×2 */
     .wi-cards { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-gap-lg); }
@@ -149,9 +151,9 @@ exits: index.html, report-acquire.html, report-loss.html, report-transfer.html, 
                       </div>
                     </div>
 
-                    <div class="wi-person">
-                      <div class="wi-person__name">유가영</div>
-                      <div class="wi-person__rrn">123456-1234567</div>
+                    <div class="acq-info-card">
+                      <div class="acq-info-card__item"><span class="acq-info-card__label">이름</span><span class="acq-info-card__value">유가영</span></div>
+                      <div class="acq-info-card__item"><span class="acq-info-card__label">주민번호</span><span class="acq-info-card__value">123456-1234567</span></div>
                     </div>
 
                     <div class="wi-cards" id="wi-cards">
