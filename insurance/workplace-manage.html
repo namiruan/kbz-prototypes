@@ -37,10 +37,18 @@
     .wp-check-cell { text-align: center; }
     .wp-check-cell .checkbox { display: inline-flex; }
 
-    /* 근무지 추가 Modal — 관리번호 2×2 그리드 */
-    .wp-add-form { display: flex; flex-direction: column; gap: var(--space-stack-lg); }
-    .wp-add-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-gap-lg) var(--space-gap-lg); }
-    #add-kind { width: 240px; }
+    /* 근무지 추가 Modal — 플래너 근무지 선택 리스트 */
+    .wp-pick-toolbar { display: flex; align-items: center; justify-content: space-between; gap: var(--space-gap-md); margin-bottom: var(--space-stack-md); }
+    .wp-pick-filter { display: flex; align-items: center; gap: var(--space-gap-md); }
+    .wp-pick-search { display: flex; align-items: center; gap: var(--space-gap-xs); flex: 1; max-width: 360px; }
+    .wp-pick-search .input-wrap { flex: 1; min-width: 0; position: relative; }
+    .wp-pick-table-wrap { max-height: 384px; overflow-y: auto; }
+    .wp-pick-table { table-layout: fixed; }
+    .wp-pick-table .table__row.is-selected { background: var(--color-surface-brand-subtle); }
+    .wp-pick-name { color: var(--color-text-body); font-weight: var(--font-weight-heading); margin-bottom: var(--space-stack-xs); }
+    .wp-pick-nos { display: flex; gap: var(--space-gap-2xl); }
+    /* 검색 결과 없음 (모달) */
+    .wp-pick-empty { padding: var(--space-inset-2xl); text-align: center; color: var(--color-text-subtle); }
   </style>
 </head>
 <body>
@@ -234,60 +242,131 @@ exits: index.html
   </div>
 </div>
 
-<!-- ══════════════ 근무지 추가 Layer Modal ══════════════ -->
+<!-- ══════════════ 근무지 추가하기 Layer Modal — 플래너 근무지 선택 리스트 (Figma 14878-5887) ══════════════ -->
 <div id="overlay-add" data-overlay data-overlay-static>
-  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="add-title" style="width:560px">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="add-title" style="width:820px">
     <div class="modal__header">
-      <div class="modal__header-text">
-        <h2 class="modal__title text-modal-title-sm" id="add-title">근무지 추가</h2>
-        <p class="modal__description text-description">4대보험 신고 시 취득할 사업장(또는 현장)을 등록해 주세요.</p>
-      </div>
+      <h2 class="modal__title text-modal-title-sm" id="add-title">근무지 추가하기</h2>
       <button class="icon-on--lg" type="button" aria-label="닫기" data-overlay-close><svg aria-hidden="true"><use href="#icon-close"/></svg></button>
     </div>
     <div class="modal__body">
       <div class="modal__content">
-        <div class="wp-add-form">
 
-          <div class="form-field">
-            <span class="form-field__label text-form-label" id="add-kind-label">구분 <span class="form-field__required" aria-hidden="true">(필수)</span></span>
-            <div class="segment segment--md" role="radiogroup" aria-labelledby="add-kind-label" id="add-kind">
-              <span class="segment__slider" aria-hidden="true"></span>
-              <button class="segment__item segment__item--selected" role="radio" aria-checked="true" type="button" data-kind="사업장">사업장</button>
-              <button class="segment__item" role="radio" aria-checked="false" type="button" data-kind="현장">현장</button>
+        <div class="wp-pick-toolbar">
+          <div class="wp-pick-filter">
+            <div class="dropdown dropdown--button dropdown--ghost" id="add-kind-filter" data-kind="전체">
+              <button class="dropdown__trigger" type="button" aria-haspopup="listbox" aria-expanded="false" aria-label="구분 선택">
+                <span class="dropdown__value">구분 전체</span>
+                <span class="dropdown__chevron" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-chevron-down"/></svg></span>
+              </button>
+              <div class="dropdown__panel">
+                <ul class="dropdown__list" role="listbox" aria-label="구분">
+                  <li class="dropdown__option" role="option" aria-selected="true" tabindex="-1" data-kind="전체"><span class="dropdown__option-label">구분 전체</span></li>
+                  <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1" data-kind="사업장"><span class="dropdown__option-label">사업장</span></li>
+                  <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1" data-kind="현장"><span class="dropdown__option-label">현장</span></li>
+                </ul>
+              </div>
             </div>
+            <span class="table__count" aria-live="polite">내 탐색 결과 <b class="table__count-value" id="add-count">5</b></span>
           </div>
-
-          <div class="form-field">
-            <label class="form-field__label text-form-label" for="add-name">근무지명 <span class="form-field__required" aria-hidden="true">(필수)</span></label>
-            <div class="form-field__body"><input class="input" id="add-name" type="text" placeholder="근무지명을 입력해 주세요." autocomplete="off"></div>
-            <div class="form-field__footer"><p class="form-field__error text-helper" id="add-name-err" role="alert">근무지명을 입력해 주세요.</p></div>
+          <div class="wp-pick-search">
+            <div class="input-wrap">
+              <input class="input" type="search" placeholder="근무지명 또는 관리번호를 입력해주세요." aria-label="근무지명 또는 관리번호 검색" id="add-search">
+              <button class="input-clear icon-on--badge" type="button" aria-label="지우기" hidden><svg aria-hidden="true"><use href="#icon-close"/></svg></button>
+            </div>
+            <span class="tooltip-wrapper" onmouseenter="this.querySelector('.tooltip-panel').classList.add('tooltip-panel--visible')" onmouseleave="this.querySelector('.tooltip-panel').classList.remove('tooltip-panel--visible')">
+              <button class="icon-on--md" type="button" aria-label="검색초기화" id="add-reset"><svg aria-hidden="true"><use href="#icon-refresh"/></svg></button>
+              <div class="tooltip-panel elevation-tooltip tooltip-panel--bottom" role="tooltip">검색초기화</div>
+            </span>
           </div>
-
-          <div class="form-field">
-            <label class="form-field__label text-form-label" for="add-loc">소재지</label>
-            <div class="form-field__body"><input class="input" id="add-loc" type="text" placeholder="소재지를 입력해 주세요." autocomplete="off"></div>
-          </div>
-
-          <div class="wp-add-grid">
-            <div class="form-field">
-              <label class="form-field__label text-form-label" for="add-goyong">고용 관리번호</label>
-              <div class="form-field__body"><input class="input" id="add-goyong" type="text" placeholder="000-00-00000-0" autocomplete="off"></div>
-            </div>
-            <div class="form-field">
-              <label class="form-field__label text-form-label" for="add-sanjae">산재 관리번호</label>
-              <div class="form-field__body"><input class="input" id="add-sanjae" type="text" placeholder="000-00-00000-0" autocomplete="off"></div>
-            </div>
-            <div class="form-field">
-              <label class="form-field__label text-form-label" for="add-gungang">건강 관리번호</label>
-              <div class="form-field__body"><input class="input" id="add-gungang" type="text" placeholder="000-00-00000-0" autocomplete="off"></div>
-            </div>
-            <div class="form-field">
-              <label class="form-field__label text-form-label" for="add-yeongeum">연금 관리번호</label>
-              <div class="form-field__body"><input class="input" id="add-yeongeum" type="text" placeholder="000-00-00000-0" autocomplete="off"></div>
-            </div>
-          </div>
-
         </div>
+
+        <div class="table-container wp-pick-table-wrap">
+          <table class="table wp-pick-table" id="add-table" aria-label="추가할 근무지 목록">
+            <colgroup>
+              <col style="width:48px">
+              <col style="width:104px">
+              <col>
+            </colgroup>
+            <thead class="table__head">
+              <tr>
+                <th class="table__head-cell wp-check-cell" scope="col">
+                  <label class="checkbox"><input type="checkbox" id="add-check-all" aria-label="전체 선택"><span class="checkbox__control" aria-hidden="true"><span class="checkbox__icon-check"><svg aria-hidden="true"><use href="#icon-check"/></svg></span><span class="checkbox__icon-indeterminate"></span></span></label>
+                </th>
+                <th class="table__head-cell table__head-cell--sort" scope="col" aria-sort="none"><button class="table__sort-btn" aria-label="구분 정렬">구분<span class="icon icon--sm" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-sort-asc"/></svg></span></button></th>
+                <th class="table__head-cell table__head-cell--sort" scope="col" aria-sort="none"><button class="table__sort-btn" aria-label="근무지명 정렬">근무지명<span class="icon icon--sm" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-sort-asc"/></svg></span></button></th>
+              </tr>
+            </thead>
+            <tbody class="table__body" id="add-tbody">
+
+              <tr class="table__row" data-kind="사업장" data-loc="전남 목포시 후광대로 143번안길 8-7">
+                <td class="table__cell wp-check-cell"><label class="checkbox"><input type="checkbox" aria-label="(주)한성산업-물류센터 선택"><span class="checkbox__control" aria-hidden="true"><span class="checkbox__icon-check"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span></label></td>
+                <td class="table__cell">사업장</td>
+                <td class="table__cell">
+                  <div class="wp-pick-name">(주)한성산업-물류센터</div>
+                  <div class="wp-pick-nos">
+                    <div class="wp-mgmt-no"><span class="wp-mgmt-no__key">고용</span><span class="wp-mgmt-no__val">12345-6789-0-8</span><span class="wp-mgmt-no__key">산재</span><span class="wp-mgmt-no__val">12345-6789-0-8</span></div>
+                    <div class="wp-mgmt-no"><span class="wp-mgmt-no__key">건강</span><span class="wp-mgmt-no__val">12345-6789-0-8</span><span class="wp-mgmt-no__key">연금</span><span class="wp-mgmt-no__val">12345-6789-0-8</span></div>
+                  </div>
+                </td>
+              </tr>
+
+              <tr class="table__row" data-kind="현장" data-loc="광주 서구 마륵동 178-4번지 B L 3-2번지">
+                <td class="table__cell wp-check-cell"><label class="checkbox"><input type="checkbox" aria-label="장천초 현장 선택"><span class="checkbox__control" aria-hidden="true"><span class="checkbox__icon-check"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span></label></td>
+                <td class="table__cell">현장</td>
+                <td class="table__cell">
+                  <div class="wp-pick-name">장천초, 영암서호중 차양 시설공사 관급자재(차양) 구입</div>
+                  <div class="wp-pick-nos">
+                    <div class="wp-mgmt-no"><span class="wp-mgmt-no__key">고용</span><span class="wp-mgmt-no__val">12345-6789-0-8</span><span class="wp-mgmt-no__key">산재</span><span class="wp-mgmt-no__val">12345-6789-0-8</span></div>
+                    <div class="wp-mgmt-no"><span class="wp-mgmt-no__key">건강</span><span class="wp-mgmt-no__val">-</span><span class="wp-mgmt-no__key">연금</span><span class="wp-mgmt-no__val">-</span></div>
+                  </div>
+                </td>
+              </tr>
+
+              <tr class="table__row" data-kind="현장" data-loc="광주 서구 마륵동 178-4번지 B L 3-2번지">
+                <td class="table__cell wp-check-cell"><label class="checkbox"><input type="checkbox" aria-label="세풍초 현장 선택"><span class="checkbox__control" aria-hidden="true"><span class="checkbox__icon-check"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span></label></td>
+                <td class="table__cell">현장</td>
+                <td class="table__cell">
+                  <div class="wp-pick-name">세풍초 외 2교(옥곡초, 광양중) 내진보강공사 관급자재(금속제창) 구입</div>
+                  <div class="wp-pick-nos">
+                    <div class="wp-mgmt-no"><span class="wp-mgmt-no__key">고용</span><span class="wp-mgmt-no__val">12345-6789-0-8</span><span class="wp-mgmt-no__key">산재</span><span class="wp-mgmt-no__val">12345-6789-0-8</span></div>
+                    <div class="wp-mgmt-no"><span class="wp-mgmt-no__key">건강</span><span class="wp-mgmt-no__val">-</span><span class="wp-mgmt-no__key">연금</span><span class="wp-mgmt-no__val">-</span></div>
+                  </div>
+                </td>
+              </tr>
+
+              <tr class="table__row" data-kind="현장" data-loc="전남 광양시 광양읍 서천리 100">
+                <td class="table__cell wp-check-cell"><label class="checkbox"><input type="checkbox" aria-label="광양항 배후단지 현장 선택"><span class="checkbox__control" aria-hidden="true"><span class="checkbox__icon-check"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span></label></td>
+                <td class="table__cell">현장</td>
+                <td class="table__cell">
+                  <div class="wp-pick-name">광양항 배후단지 진입로 포장공사 관급자재(차양) 구입 및 설치</div>
+                  <div class="wp-pick-nos">
+                    <div class="wp-mgmt-no"><span class="wp-mgmt-no__key">고용</span><span class="wp-mgmt-no__val">12345-6789-0-8</span><span class="wp-mgmt-no__key">산재</span><span class="wp-mgmt-no__val">12345-6789-0-8</span></div>
+                    <div class="wp-mgmt-no"><span class="wp-mgmt-no__key">건강</span><span class="wp-mgmt-no__val">-</span><span class="wp-mgmt-no__key">연금</span><span class="wp-mgmt-no__val">-</span></div>
+                  </div>
+                </td>
+              </tr>
+
+              <tr class="table__row" data-kind="사업장" data-loc="서울 강남구 테헤란로 152">
+                <td class="table__cell wp-check-cell"><label class="checkbox"><input type="checkbox" aria-label="(주)한성산업-영업소 선택"><span class="checkbox__control" aria-hidden="true"><span class="checkbox__icon-check"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span></label></td>
+                <td class="table__cell">사업장</td>
+                <td class="table__cell">
+                  <div class="wp-pick-name">(주)한성산업-영업소</div>
+                  <div class="wp-pick-nos">
+                    <div class="wp-mgmt-no"><span class="wp-mgmt-no__key">고용</span><span class="wp-mgmt-no__val">12345-6789-0-8</span><span class="wp-mgmt-no__key">산재</span><span class="wp-mgmt-no__val">12345-6789-0-8</span></div>
+                    <div class="wp-mgmt-no"><span class="wp-mgmt-no__key">건강</span><span class="wp-mgmt-no__val">12345-6789-0-8</span><span class="wp-mgmt-no__key">연금</span><span class="wp-mgmt-no__val">12345-6789-0-8</span></div>
+                  </div>
+                </td>
+              </tr>
+
+              <tr class="table__row wp-pick-empty-row" id="add-empty" hidden>
+                <td class="table__cell" colspan="3"><div class="wp-pick-empty">검색 결과가 없습니다.</div></td>
+              </tr>
+
+            </tbody>
+          </table>
+        </div>
+
       </div>
     </div>
     <div class="modal__footer">
@@ -308,6 +387,7 @@ exits: index.html
     root = root || document;
     if (typeof initInput === 'function') root.querySelectorAll('.input').forEach(function (el) { if (!el.closest('.input-wrap') && !el.dataset.initInput) { el.dataset.initInput = '1'; initInput(el); } });
     if (typeof initSegment === 'function') root.querySelectorAll('.segment').forEach(function (el) { initSegment(el.parentElement); });
+    if (typeof initDropdown === 'function') root.querySelectorAll('.dropdown').forEach(function (el) { initDropdown(el.parentElement); });
     if (typeof initTableSort === 'function') root.querySelectorAll('.table-container').forEach(function (el) { initTableSort(el); });
   }
   _initComponents();
@@ -466,40 +546,119 @@ exits: index.html
     toast('success', '선택한 근무지가 삭제되었어요.');
   });
 
-  /* ── 근무지 추가 ── */
-  function mgmtCell(k1, v1, k2, v2) {
-    return '<div class="wp-mgmt-no"><span class="wp-mgmt-no__key">' + k1 + '</span><span class="wp-mgmt-no__val">' + (v1 || '-') + '</span><span class="wp-mgmt-no__key">' + k2 + '</span><span class="wp-mgmt-no__val">' + (v2 || '-') + '</span></div>';
+  /* ══════════════ 근무지 추가하기 Modal — 플래너 근무지 선택 ══════════════ */
+  var addTbody = document.getElementById('add-tbody');
+  var addCheckAll = document.getElementById('add-check-all');
+  var addSearch = document.getElementById('add-search');
+  var addFilter = document.getElementById('add-kind-filter');
+  var addEmpty = document.getElementById('add-empty');
+
+  function addRows() { return Array.prototype.filter.call(addTbody.querySelectorAll('.table__row'), function (r) { return !r.classList.contains('wp-pick-empty-row'); }); }
+  function addRowCb(r) { return r.querySelector('input[type="checkbox"]'); }
+  function addVisibleRows() { return addRows().filter(function (r) { return !r.hidden; }); }
+  function addSelectable() { return addVisibleRows(); }
+
+  function addRefreshCount() {
+    var el = document.getElementById('add-count'); if (el) el.textContent = addVisibleRows().length;
   }
-  function addKind() { var s = document.querySelector('#add-kind .segment__item--selected'); return s ? s.dataset.kind : '사업장'; }
-  document.getElementById('add-submit').addEventListener('click', function () {
-    var nameEl = document.getElementById('add-name');
-    var name = (nameEl.value || '').trim();
-    var nameField = nameEl.closest('.form-field');
-    if (!name) { nameField.classList.add('form-field--error'); nameEl.focus(); return; }
-    nameField.classList.remove('form-field--error');
-    var loc = (document.getElementById('add-loc').value || '').trim() || '-';
-    var goyong = (document.getElementById('add-goyong').value || '').trim();
-    var sanjae = (document.getElementById('add-sanjae').value || '').trim();
-    var gungang = (document.getElementById('add-gungang').value || '').trim();
-    var yeongeum = (document.getElementById('add-yeongeum').value || '').trim();
-    var tr = document.createElement('tr');
-    tr.className = 'table__row';
-    tr.dataset.kind = addKind();
-    tr.innerHTML =
-      '<td class="table__cell wp-check-cell"><label class="checkbox"><input type="checkbox" aria-label="' + name + ' 선택"><span class="checkbox__control" aria-hidden="true"><span class="checkbox__icon-check"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span></label></td>' +
-      '<td class="table__cell">' + addKind() + '</td>' +
-      '<td class="table__cell"><span class="wp-worksite"><span class="wp-worksite__name">' + name + '</span></span></td>' +
-      '<td class="table__cell">' + loc + '</td>' +
-      '<td class="table__cell">' + mgmtCell('고용', goyong, '산재', sanjae) + '</td>' +
-      '<td class="table__cell">' + mgmtCell('건강', gungang, '연금', yeongeum) + '</td>';
-    tbody.insertBefore(tr, document.getElementById('wp-empty-search'));
-    /* 폼 리셋 */
-    nameEl.value = ''; document.getElementById('add-loc').value = '';
-    ['add-goyong', 'add-sanjae', 'add-gungang', 'add-yeongeum'].forEach(function (id) { document.getElementById(id).value = ''; });
-    closeAllOverlays();
-    refreshCount(); syncCheckAll();
-    toast('success', '근무지가 추가되었어요.');
+  function addSyncCheckAll() {
+    var rows = addSelectable();
+    var checked = rows.filter(function (r) { return addRowCb(r).checked; });
+    addCheckAll.checked = rows.length > 0 && checked.length === rows.length;
+    addCheckAll.indeterminate = checked.length > 0 && checked.length < rows.length;
+  }
+  /* 체크 → 행 하이라이트 */
+  function addSyncRow(r) { r.classList.toggle('is-selected', addRowCb(r).checked); }
+
+  addCheckAll.addEventListener('change', function () {
+    addSelectable().forEach(function (r) { addRowCb(r).checked = addCheckAll.checked; addSyncRow(r); });
+    addCheckAll.indeterminate = false;
   });
+  addTbody.addEventListener('change', function (e) {
+    if (!e.target.matches('input[type="checkbox"]')) return;
+    addSyncRow(e.target.closest('.table__row'));
+    addSyncCheckAll();
+  });
+
+  /* 구분 필터 + 검색 */
+  function addKindFilter() { return addFilter.dataset.kind || '전체'; }
+  function addApplyFilters() {
+    var q = (addSearch.value || '').trim().toLowerCase();
+    var kind = addKindFilter();
+    var shown = 0;
+    addRows().forEach(function (r) {
+      var name = r.querySelector('.wp-pick-name').textContent.toLowerCase();
+      var no = r.querySelector('.wp-pick-nos').textContent.toLowerCase();
+      var ok = true;
+      if (kind !== '전체' && r.dataset.kind !== kind) ok = false;
+      if (q && name.indexOf(q) < 0 && no.indexOf(q) < 0) ok = false;
+      r.hidden = !ok; if (ok) shown++;
+    });
+    addEmpty.hidden = shown !== 0;
+    addRefreshCount(); addSyncCheckAll();
+  }
+  addSearch.addEventListener('input', function () {
+    var clear = addSearch.parentElement.querySelector('.input-clear'); if (clear) clear.hidden = !addSearch.value;
+    addApplyFilters();
+  });
+  var addClear = document.querySelector('#overlay-add .input-clear');
+  if (addClear) addClear.addEventListener('click', function () { addSearch.value = ''; this.hidden = true; addApplyFilters(); });
+  document.getElementById('add-reset').addEventListener('click', function () {
+    addSearch.value = '';
+    var clear = addSearch.parentElement.querySelector('.input-clear'); if (clear) clear.hidden = true;
+    addFilter.dataset.kind = '전체';
+    var val = addFilter.querySelector('.dropdown__value'); if (val) val.textContent = '구분 전체';
+    addFilter.querySelectorAll('.dropdown__option').forEach(function (o) { o.setAttribute('aria-selected', String(o.dataset.kind === '전체')); });
+    addApplyFilters();
+  });
+  /* 구분 드롭다운 선택 */
+  addFilter.querySelectorAll('.dropdown__option').forEach(function (o) {
+    o.addEventListener('click', function () {
+      addFilter.dataset.kind = o.dataset.kind;
+      var val = addFilter.querySelector('.dropdown__value'); if (val) val.textContent = o.querySelector('.dropdown__option-label').textContent;
+      addFilter.querySelectorAll('.dropdown__option').forEach(function (x) { x.setAttribute('aria-selected', String(x === o)); });
+      addApplyFilters();
+    });
+  });
+
+  /* 근무지 추가 버튼 열릴 때 초기화(선택 해제) */
+  document.getElementById('wp-add').addEventListener('click', function () {
+    addRows().forEach(function (r) { addRowCb(r).checked = false; addSyncRow(r); });
+    addCheckAll.checked = false; addCheckAll.indeterminate = false;
+    addSyncCheckAll();
+  });
+
+  /* 추가하기 — 유효성(체크 유무) → [근무지 목록]에 추가 + 모달에서 제거 + 새로고침 */
+  document.getElementById('add-submit').addEventListener('click', function () {
+    var checked = addSelectable().filter(function (r) { return addRowCb(r).checked; });
+    if (!checked.length) { toast('caution', '추가할 근무지를 선택해 주세요.'); return; }
+    checked.forEach(function (src) {
+      var kind = src.dataset.kind;
+      var name = src.querySelector('.wp-pick-name').textContent.trim();
+      var loc = src.dataset.loc || '-';
+      var nos = src.querySelectorAll('.wp-pick-nos .wp-mgmt-no');
+      var tr = document.createElement('tr');
+      tr.className = 'table__row';
+      tr.dataset.kind = kind;
+      tr.innerHTML =
+        '<td class="table__cell wp-check-cell"><label class="checkbox"><input type="checkbox" aria-label="' + name + ' 선택"><span class="checkbox__control" aria-hidden="true"><span class="checkbox__icon-check"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span></label></td>' +
+        '<td class="table__cell">' + kind + '</td>' +
+        '<td class="table__cell"><span class="wp-worksite"><span class="wp-worksite__name">' + name + '</span></span></td>' +
+        '<td class="table__cell">' + loc + '</td>' +
+        '<td class="table__cell">' + (nos[0] ? nos[0].outerHTML : '') + '</td>' +
+        '<td class="table__cell">' + (nos[1] ? nos[1].outerHTML : '') + '</td>';
+      tbody.insertBefore(tr, document.getElementById('wp-empty-search'));
+      src.remove();  /* 등록됨 → 추가 목록에서 제거 */
+    });
+    var n = checked.length;
+    closeAllOverlays();
+    addApplyFilters();
+    refreshCount(); syncCheckAll();
+    toast('success', n + '개 근무지가 추가되었어요.');
+  });
+
+  /* 초기 동기화(모달) */
+  addRefreshCount(); addSyncCheckAll();
 
   /* ── 시나리오 프리셋 ── */
   window.applyWpScenario = function (name) {
