@@ -37,6 +37,10 @@
 
     /* 체크박스 셀 중앙 정렬 */
     .wp-check-cell { text-align: center; }
+
+    /* 본사 행 — 고정 대표 사업장이라 강조(bold) */
+    .wp-table .table__row[data-hq] .table__cell { font-weight: var(--font-weight-heading); }
+    .wp-table .table__row[data-hq] .wp-mgmt-no__key { font-weight: var(--font-weight-body); }
     .wp-check-cell .checkbox { display: inline-flex; }
 
     /* 근무지 추가 Modal — 플래너 근무지 선택 리스트 (본문과 동일하게 근무지명·관리번호 컬럼 분리) */
