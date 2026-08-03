@@ -19,6 +19,8 @@
     .wi-subtabs { margin-bottom: var(--space-stack-lg); }
 
     /* 근로자 정보(이름/주민번호) — 타 신고 모달과 동일한 .acq-info-card 컴포넌트 사용(일관성) */
+    /* 아래 4대보험 카드가 차지하는 내용 영역(보험명 라벨 84px + 간격 + 정보값 카드 폭) 안에서 가운데 정렬 */
+    .wi-info-head { width: calc(84px + var(--space-gap-md) + 132px * 3 + var(--space-gap-lg) * 2 + var(--space-inset-xl) * 2); }
     .acq-info-card { display: flex; width: fit-content; border: var(--stroke-sm) solid var(--color-border-default); border-radius: var(--radius-md); background: var(--color-surface-subtle); overflow: hidden; margin: 0 auto var(--space-stack-lg); }
     .acq-info-card__item { flex: 0 0 auto; width: 150px; display: flex; flex-direction: column; align-items: center; text-align: center; gap: var(--space-gap-2xs); padding: var(--space-inset-lg); }
     .acq-info-card__item + .acq-info-card__item { border-left: var(--stroke-sm) solid var(--color-border-default); }
@@ -156,9 +158,11 @@ exits: index.html, report-acquire.html, report-loss.html, report-transfer.html, 
                       </div>
                     </div>
 
-                    <div class="acq-info-card">
-                      <div class="acq-info-card__item"><span class="acq-info-card__label">이름</span><span class="acq-info-card__value">유가영</span></div>
-                      <div class="acq-info-card__item"><span class="acq-info-card__label">주민번호</span><span class="acq-info-card__value">123456-1234567</span></div>
+                    <div class="wi-info-head">
+                      <div class="acq-info-card">
+                        <div class="acq-info-card__item"><span class="acq-info-card__label">이름</span><span class="acq-info-card__value">유가영</span></div>
+                        <div class="acq-info-card__item"><span class="acq-info-card__label">주민번호</span><span class="acq-info-card__value">123456-1234567</span></div>
+                      </div>
                     </div>
 
                     <div class="wi-cards" id="wi-cards">
