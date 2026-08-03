@@ -103,9 +103,12 @@ exits: index.html
               <button class="btn btn--primary btn--md" type="button" id="wp-add" data-overlay-open="overlay-add">
                 <span class="icon icon--sm" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-plus"/></svg></span>근무지 추가
               </button>
-              <button class="btn btn--secondary btn--md" type="button" id="wp-delete">
-                <span class="icon icon--sm" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-delete"/></svg></span>삭제
-              </button>
+              <span class="tooltip-wrapper" onmouseenter="if(document.getElementById('wp-delete').classList.contains('btn--inactive'))this.querySelector('.tooltip-panel').classList.add('tooltip-panel--visible')" onmouseleave="this.querySelector('.tooltip-panel').classList.remove('tooltip-panel--visible')">
+                <button class="btn btn--secondary btn--md btn--inactive" type="button" id="wp-delete" aria-describedby="wp-delete-tip">
+                  <span class="icon icon--sm" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-delete"/></svg></span>삭제
+                </button>
+                <div class="tooltip-panel elevation-tooltip tooltip-panel--bottom" id="wp-delete-tip" role="tooltip">삭제할 사업장을 체크해 주세요.</div>
+              </span>
             </div>
           </div>
 
@@ -203,22 +206,6 @@ exits: index.html
     </div>
   </main>
 
-</div>
-
-<!-- ══════════════ 근무지 미선택 Alert (삭제 유효성) ══════════════ -->
-<div id="overlay-check" data-overlay>
-  <div class="alert" role="alertdialog" aria-modal="true" aria-labelledby="chk-title">
-    <div class="alert__header">
-      <p class="text-card-title alert__title" id="chk-title">근무지를 체크해 주세요.</p>
-      <button class="icon-on--sm alert__close" type="button" aria-label="닫기" data-overlay-close><svg aria-hidden="true"><use href="#icon-close"/></svg></button>
-    </div>
-    <div class="alert__body">
-      <p class="text-description alert__description">삭제할 근무지를 하나 이상 선택해 주세요.</p>
-    </div>
-    <div class="alert__footer">
-      <button class="btn btn--primary btn--md" type="button" data-overlay-close>확인</button>
-    </div>
-  </div>
 </div>
 
 <!-- ══════════════ 근무지 삭제 확인 (Confirm) ══════════════ -->
@@ -470,12 +457,15 @@ exits: index.html
     var el = document.getElementById('wp-count'); if (el) el.textContent = visible;
   }
 
-  /* ── 전체 선택 체크박스 동기화 ── */
+  /* ── 전체 선택 체크박스 동기화 + 삭제 버튼 활성/비활성 ── */
   function syncCheckAll() {
     var rows = selectableRows();
     var checked = rows.filter(function (r) { return rowCheckbox(r).checked; });
     checkAll.checked = rows.length > 0 && checked.length === rows.length;
     checkAll.indeterminate = checked.length > 0 && checked.length < rows.length;
+    /* 체크된 근무지가 하나도 없으면 삭제 버튼 비활성(btn--inactive: hover 유지 → 툴팁 안내) */
+    var del = document.getElementById('wp-delete');
+    if (del) del.classList.toggle('btn--inactive', checked.length === 0);
   }
   if (checkAll) checkAll.addEventListener('change', function () {
     selectableRows().forEach(function (r) { rowCheckbox(r).checked = checkAll.checked; });
@@ -521,8 +511,9 @@ exits: index.html
 
   /* ── 삭제: 유효성 검사 → Confirm ── */
   document.getElementById('wp-delete').addEventListener('click', function () {
+    if (this.classList.contains('btn--inactive')) return;  /* 미선택 시 비활성(툴팁 안내) */
     var checked = selectableRows().filter(function (r) { return rowCheckbox(r).checked; });
-    if (!checked.length) { openOverlay('overlay-check'); return; }
+    if (!checked.length) return;
     openOverlay('overlay-delete');
   });
   document.getElementById('del-confirm').addEventListener('click', function () {
