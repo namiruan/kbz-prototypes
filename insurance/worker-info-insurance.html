@@ -27,8 +27,12 @@
 
     /* 4대보험 카드 2×2 */
     .wi-cards { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-gap-lg); }
-    .wi-card { border: var(--stroke-sm) var(--stroke-solid) var(--color-border-subtle); border-radius: var(--radius-md); padding: var(--space-inset-xl); }
-    .wi-card--none { background: var(--color-surface-subtle); }
+    /* 카드 기본 — 근로자 정보 카드(acq-info-card)와 동일한 border 토큰 */
+    .wi-card { background: var(--color-surface-base); border: var(--stroke-sm) solid var(--color-border-default); border-radius: var(--radius-md); padding: var(--space-inset-xl); }
+    /* 상태색 언어 — 취득신고서 .acq-ins-item과 통일: 취득=초록 라인, 상실=caution 라인, 미가입=회색 채움 */
+    .wi-card[data-status="취득"] { border-color: transparent; box-shadow: inset 0 0 0 var(--stroke-md) var(--color-border-success); }
+    .wi-card[data-status="상실"] { border-color: transparent; box-shadow: inset 0 0 0 var(--stroke-md) var(--color-border-caution-subtle); }
+    .wi-card--none { background: var(--color-surface-subtle); border-color: transparent; box-shadow: none; }
     .wi-card__head { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-stack-md); }
     .wi-card__title { font-weight: var(--font-weight-heading); color: var(--color-text-body); }
     .wi-card__rows { display: grid; grid-template-columns: auto 1fr; row-gap: var(--space-gap-sm); column-gap: var(--space-gap-lg); }
@@ -361,6 +365,7 @@ exits: index.html, report-acquire.html, report-loss.html, report-transfer.html, 
   function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
 
   function renderCard(el, key, d) {
+    el.setAttribute('data-status', d.s);   /* 취득/상실/미가입 — 상태색(acq-ins-item과 통일) */
     var badge = '<span class="badge ' + BADGE[d.s] + '">' + d.s + '</span>';
     var head = '<div class="wi-card__head"><span class="wi-card__title">' + key + '</span>' + badge + '</div>';
     var body;
