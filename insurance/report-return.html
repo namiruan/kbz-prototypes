@@ -516,6 +516,8 @@ exits: insurance-join-status.html, index.html
     var on = recvVal() === '있음';
     amt.disabled = !on;
     amt.classList.toggle('input--disabled', !on);   /* DS 비활성 스타일은 클래스로 적용 */
+    var req = document.querySelector('#r-recv-amt-field .form-field__required');
+    if (req) req.hidden = !on;   /* '없음'이면 금액 입력이 필수가 아니므로 (필수) 마커 숨김 */
     if (!on) { amt.value = ''; clearFieldState('r-recv-amt-field', 'r-recv-amt-err'); }
   }
 
