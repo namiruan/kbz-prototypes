@@ -35,11 +35,8 @@
     .wi-card[data-status="취득"] .wi-card__box { background: var(--color-surface-success-subtle); }
     .wi-card[data-status="상실"] .wi-card__box { background: var(--color-surface-caution-subtle); }
     .wi-card[data-status="제외"] .wi-card__box { background: var(--color-surface-subtle); }      /* 제외 — 비활성(연한 회색) */
-    .wi-card[data-status="미신고"] .wi-card__box { background: var(--color-surface-neutral); }    /* 미신고 — 중립(면이 구분되는 회색) */
-    .wi-card[data-status="미가입"] .wi-card__box { background: var(--color-surface-subtle); }     /* 공단대사 미확인 */
+    .wi-card[data-status="미가입"] .wi-card__box { background: var(--color-surface-subtle); }     /* 미가입 — 중립(연한 회색) */
     .wi-card__cell { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-gap-2xs); }
-    /* 미신고 안내 셀 — 문구 + 취득 신고 링크 한 줄 */
-    .wi-card__hint-cell { flex-direction: row; align-items: center; gap: var(--space-gap-lg); }
     .wi-card__key { color: var(--color-text-subtle); font-size: var(--font-size-sm); }
     .wi-card__val, .wi-card__title { font-weight: var(--font-weight-heading); color: var(--color-text-body); overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
 
@@ -89,7 +86,7 @@ exits: index.html, report-acquire.html, report-loss.html, report-transfer.html, 
 
     <nav class="proto-nav" id="proto-nav" aria-label="시나리오 선택">
       <button class="proto-nav-btn is-active" data-scenario="전체-가입" type="button">전체 가입</button>
-      <button class="proto-nav-btn" data-scenario="제외-미신고" type="button">제외·미신고</button>
+      <button class="proto-nav-btn" data-scenario="제외-미가입" type="button">제외·미가입</button>
       <button class="proto-nav-btn" data-scenario="공단-대사" type="button">공단 대사 이력</button>
       <button class="proto-nav-btn" data-scenario="피부양자-없음" type="button">피부양자 없음</button>
     </nav>
@@ -322,9 +319,8 @@ exits: index.html, report-acquire.html, report-loss.html, report-transfer.html, 
   var BADGE = {
     '취득': 'badge--success',
     '상실': 'badge--caution',
-    '제외': 'badge--disabled',   /* 규정상 가입 대상 아님 — 비활성 톤 */
-    '미신고': 'badge--neutral',  /* 가입 대상인데 미신고 — 중립 톤 */
-    '미가입': 'badge--neutral'   /* 공단대사 미확인 */
+    '제외': 'badge--disabled',   /* 규정상 가입 대상 아님(제외사유 명시) — 비활성 톤 */
+    '미가입': 'badge--neutral'   /* 미가입 — 중립 톤(신고 대상 여부는 이 화면에서 판별하지 않음) */
   };
 
   var SCEN = {
@@ -338,11 +334,11 @@ exits: index.html, report-acquire.html, report-loss.html, report-transfer.html, 
       },
       dependents: [['모', '이미래', '123456-1234567', '2025-01-01'], ['자녀', '김민준', '123456-1234567', '2025-01-01']]
     },
-    '제외-미신고': {
+    '제외-미가입': {
       banner: false,
       cards: {
         '국민연금': { s: '취득', 취득: '2022.03.15', 상실: '-', 보수: '3,500,000 원' },
-        '건강보험': { s: '미신고' },
+        '건강보험': { s: '미가입' },
         '고용보험': { s: '제외', reason: '대표자' },
         '산재보험': { s: '제외', reason: '대표자' }
       },
@@ -381,11 +377,8 @@ exits: index.html, report-acquire.html, report-loss.html, report-transfer.html, 
     if (d.s === '제외') {
       /* 규정상 가입 대상 아님 — 제외사유 표시(비활성 톤) */
       cells = '<div class="wi-card__cell"><span class="wi-card__key">제외사유</span><span class="wi-card__val">' + esc(d.reason || '-') + '</span></div>';
-    } else if (d.s === '미신고') {
-      /* 가입 대상인데 미신고 — 조치 안내(중립 톤) */
-      cells = '<div class="wi-card__cell wi-card__hint-cell"><span class="wi-card__val">취득 신고 대상입니다.</span><a class="link" href="report-acquire.html?return=worker-info-insurance.html">취득 신고하기</a></div>';
     } else if (d.s === '미가입') {
-      /* 공단대사 미확인 — 사유 없이 빈 카드 */
+      /* 미가입 — 신고 대상 여부는 이 화면에서 판별하지 않으므로 상태만 표기(사유·조치 안내 없음) */
       cells = '';
     } else {
       cells =
