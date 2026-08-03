@@ -55,11 +55,12 @@
     /* 근로자정보 이력·피부양자 테이블 — 대부분 고정값(주민번호·날짜·관리번호)이라
        전체 폭으로 늘이지 않고 내용(고정값) 폭만큼만 표시 */
     #wi-sp-worksite .table-container,
-    #wi-sp-report .table-container,
     #wi-dependents .table-container { width: fit-content; max-width: 100%; }
     #wi-sp-worksite .table,
-    #wi-sp-report .table,
     #wi-dependents .table { width: auto; }
+    /* 신고 이력 — 가입정보와 같은 모달 폭에서 표가 내용 영역을 꽉 채우도록 전체 폭 */
+    #wi-sp-report .table-container,
+    #wi-sp-report .table { width: 100%; }
 
     /* 피부양자/사업장 이력/신고 테이블 — 값 없는 셀 표시 */
     .wi-none { color: var(--color-text-subtle); }
@@ -309,7 +310,7 @@ exits: index.html, report-acquire.html, report-loss.html, report-transfer.html, 
   /* ── 서브탭마다 모달 폭을 내용에 맞게 조정 (가입정보/사업장 이력/신고 이력) ── */
   (function () {
     var modal = document.querySelector('.modal--lg');
-    var W = { 'wi-sp-join': 780, 'wi-sp-worksite': 942, 'wi-sp-report': 664 };
+    var W = { 'wi-sp-join': 780, 'wi-sp-worksite': 942, 'wi-sp-report': 780 };
     function fit(id) { if (modal && W[id]) modal.style.width = W[id] + 'px'; }
     document.querySelectorAll('.wi-subtabs .tab').forEach(function (t) {
       t.addEventListener('click', function () { fit(this.getAttribute('aria-controls')); });
