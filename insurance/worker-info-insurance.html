@@ -77,10 +77,9 @@
     /* 안내 문구 내 경로(대괄호) — 브랜드 컬러 강조 */
     .wi-path { color: var(--color-text-brand); }
 
-    /* 신고 내용 조회 모달 — 라벨/값 2열 리스트(읽기 전용) */
-    .rv-list { display: grid; grid-template-columns: max-content 1fr; column-gap: var(--space-gap-2xl); row-gap: var(--space-gap-sm); margin: 0; }
-    .rv-list dt { color: var(--color-text-subtle); }
-    .rv-list dd { margin: 0; color: var(--color-text-body); }
+    /* 신고 내용 조회 모달 — 읽기 전용 정보 테이블(table--info: 상하 구분선만). 좌우 테두리 없이 가볍게 */
+    .rv-table.table-container { border-left: 0; border-right: 0; border-radius: 0; }
+    .rv-table .table__cell.rv-key { width: 1%; white-space: nowrap; color: var(--color-text-subtle); font-weight: var(--font-weight-medium); padding-right: var(--space-gap-2xl); }
 
     /* 서브탭마다 내용 폭이 달라 모달 폭도 탭별로 조정(부드럽게 전환) */
     .modal--lg { transition: width 0.2s ease; }
@@ -307,7 +306,11 @@ exits: index.html, report-acquire.html, report-loss.html, report-transfer.html, 
       <button class="icon-on--lg" type="button" aria-label="닫기" data-overlay-close><svg aria-hidden="true"><use href="#icon-close"/></svg></button>
     </div>
     <div class="modal__body">
-      <dl class="rv-list" id="wi-view-body"></dl>
+      <div class="table-container rv-table">
+        <table class="table table--info table--dense" aria-label="신고 내용">
+          <tbody class="table__body" id="wi-view-body"></tbody>
+        </table>
+      </div>
     </div>
     <div class="modal__footer">
       <button class="btn btn--primary btn--md" type="button" data-overlay-close autofocus>확인</button>
@@ -455,7 +458,7 @@ exits: index.html, report-acquire.html, report-loss.html, report-transfer.html, 
     row.addEventListener('click', function () {
       var rows = WI_VIEW[this.dataset.report]; if (!rows) return;
       document.getElementById('wi-view-body').innerHTML = rows.map(function (r) {
-        return '<dt>' + _rvEsc(r[0]) + '</dt><dd>' + _rvEsc(r[1]) + '</dd>';
+        return '<tr class="table__row"><td class="table__cell rv-key">' + _rvEsc(r[0]) + '</td><td class="table__cell">' + _rvEsc(r[1]) + '</td></tr>';
       }).join('');
       wiOpenOverlay('wi-view-overlay');
     });
