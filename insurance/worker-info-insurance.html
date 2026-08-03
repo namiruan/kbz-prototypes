@@ -318,6 +318,38 @@ exits: index.html, report-acquire.html, report-loss.html, report-transfer.html, 
     fit('wi-sp-join'); /* 초기 탭 */
   })();
 
+  /* ── 정렬 시 실제 행 재배열 (DS initTableSort는 상태만 관리하므로 보완) ──
+     data-hq(본사 등 고정값) 행은 정렬에서 제외하고 상단 고정 */
+  function initRowReorder(table) {
+    if (!table) return;
+    var tbody = table.tBodies[0];
+    if (!tbody) return;
+    function cellText(row, idx) { var c = row.cells[idx]; return c ? c.textContent.replace(/\s+/g, ' ').trim() : ''; }
+    function reorder(colIdx, dir) {
+      var pinned = [], special = [], normal = [];
+      Array.prototype.slice.call(tbody.rows).forEach(function (r) {
+        if (r.hasAttribute('data-hq')) pinned.push(r);
+        else if (r.querySelector('.empty-state') || r.classList.contains('wp-empty-row')) special.push(r);
+        else normal.push(r);
+      });
+      normal.sort(function (a, b) {
+        var cmp = cellText(a, colIdx).localeCompare(cellText(b, colIdx), 'ko', { numeric: true });
+        return dir === 'desc' ? -cmp : cmp;
+      });
+      pinned.concat(normal, special).forEach(function (r) { tbody.appendChild(r); });
+    }
+    table.querySelectorAll('.table__head-cell--sort').forEach(function (th) {
+      var btn = th.querySelector('.table__sort-btn');
+      if (!btn) return;
+      btn.addEventListener('click', function () {
+        /* initTableSort가 먼저 실행되어 방향 클래스가 갱신된 뒤 재배열 */
+        var dir = th.classList.contains('table__head-cell--sort-desc') ? 'desc' : 'asc';
+        reorder(th.cellIndex, dir);
+      });
+    });
+  }
+  initRowReorder(document.getElementById('wi-report-table'));
+
   /* ── 프로토 스캐폴드 ── */
   document.querySelectorAll('#mode-segment .segment__item').forEach(function (btn) {
     btn.addEventListener('click', function () {
