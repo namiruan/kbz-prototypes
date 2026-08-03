@@ -31,9 +31,9 @@
     /* 편집 컨트롤(DS 드롭다운·날짜 인풋)은 editor 폭을 채운다 */
     #pi-sp-note .table__cell--editable .dropdown,
     #pi-sp-note .table__cell--editable .input-wrap { width: 100%; }
-    /* 입퇴사 표는 열이 적어 유동 열이 없다 — 내용 폭으로 두어 남는 폭이 체크·번호 열로
-       늘어나지 않게(근무정보 표와 체크박스 시작점을 동일하게 맞춤) */
-    #pi-sp-note .accordion__item[data-table="join"] table.table { table-layout: auto; width: max-content; }
+    /* 두 편집 표를 내용 폭으로 — 열이 지정 폭 그대로 유지되어 체크·번호 열이 늘어나지 않고
+       (두 표 체크박스 시작점 일치), 모달이 표 콘텐츠 폭에 맞게 줄어들 수 있다 */
+    #pi-sp-note table.table { table-layout: auto; width: max-content; }
     /* 추가(저장 대기) 행은 전체 편집형 — 셀별 수정 토글 숨기고 헤더 저장 버튼으로 일괄 확정 */
     #pi-sp-note .pi-row-adding .table__cell__edit-toggle { display: none; }
     /* 읽기 상태 값은 셀 세로 중앙 정렬, 편집 토글 버튼과 균형 */
@@ -220,7 +220,7 @@ exits: index.html, worker-info-insurance.html, report-loss.html
                             <th class="table__head-cell table__head-cell--input" scope="col" style="width:152px">부서</th>
                             <th class="table__head-cell table__head-cell--input" scope="col" style="width:140px">직책</th>
                             <th class="table__head-cell table__head-cell--input" scope="col" style="width:140px">직위</th>
-                            <th class="table__head-cell table__head-cell--input" scope="col" style="width:260px">담당업무</th>
+                            <th class="table__head-cell table__head-cell--input" scope="col" style="width:210px">담당업무</th>
                           </tr></thead>
                           <tbody class="table__body" data-rows></tbody>
                         </table>
@@ -342,7 +342,7 @@ exits: index.html, worker-info-insurance.html, report-loss.html
   /* 날짜 직접 입력 — 데이트피커 대신 공간 절약형 숫자 인풋(YYYY.MM.DD 자동 포맷 + 유효성 에러) */
   function mkDateInput(name, iso) {
     var v = iso ? iso.replace(/-/g, '.') : '';
-    return '<div class="input-wrap"><input class="input input--xs pi-date-input" type="text" inputmode="numeric" placeholder="YYYY.MM.DD" maxlength="10" value="' + v + '" aria-label="' + name + '"></div>' +
+    return '<div class="input-wrap"><input class="input input--sm pi-date-input" type="text" inputmode="numeric" placeholder="YYYY.MM.DD" maxlength="10" value="' + v + '" aria-label="' + name + '"></div>' +
       '<p class="pi-date-error text-helper" role="alert" hidden>YYYY.MM.DD 형식으로 입력해 주세요.</p>';
   }
   function fmtDate(str) {
@@ -378,7 +378,7 @@ exits: index.html, worker-info-insurance.html, report-loss.html
     return '<td class="table__cell pi-check-cell"><label class="checkbox"><input type="checkbox" data-row-check aria-label="행 선택"><span class="checkbox__control" aria-hidden="true"><span class="checkbox__icon-check"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span></label></td>';
   }
   function mkTextInput(name, value) {
-    return '<div class="input-wrap"><input class="input input--xs" type="text" value="' + (value || '') + '" aria-label="' + name + '"></div>';
+    return '<div class="input-wrap"><input class="input input--sm" type="text" value="' + (value || '') + '" aria-label="' + name + '"></div>';
   }
   /* 인라인 편집 셀 — 읽기값 + 편집 컨트롤 + 수정↔저장 토글(initTableCellEdit가 처리) */
   function editCell(editorHTML, view, attrs) {
@@ -510,11 +510,26 @@ exits: index.html, worker-info-insurance.html, report-loss.html
   }
   document.querySelectorAll('.accordion__item[data-table]').forEach(initSectionTable);
 
-  /* ── 서브탭마다 모달 폭을 내용에 맞게 조정 (4대보험 탭과 동일) ── */
+  /* ── 서브탭마다 모달 폭을 내용에 맞게 조정 ── */
   (function () {
     var modal = document.querySelector('.modal--lg');
-    var W = { 'pi-sp-info': 640, 'pi-sp-note': 1000 };
-    function fit(id) { if (modal && W[id]) modal.style.width = W[id] + 'px'; }
+    /* 인사정보는 고정 640px. 인사노트는 표 콘텐츠 폭에 맞춰 모달 폭을 계산(좌측 내비 + 패딩 +
+       가장 넓은 표). CSS fit-content는 flex 컨텍스트에서 수 px 부족하게 계산돼 표가 넘치므로
+       실제 렌더 위치를 측정해 정확히 맞춘다. */
+    function fitNote() {
+      if (!modal) return;
+      var mL = modal.getBoundingClientRect().left, need = 0;
+      modal.querySelectorAll('#pi-sp-note table.table').forEach(function (t) {
+        var r = t.getBoundingClientRect();
+        need = Math.max(need, (r.left - mL) + r.width);
+      });
+      if (need) modal.style.width = Math.ceil(need + 26) + 'px'; /* 우측 콘텐츠 패딩 + 보더 여유 */
+    }
+    function fit(id) {
+      if (!modal) return;
+      if (id === 'pi-sp-note') requestAnimationFrame(fitNote);
+      else if (id === 'pi-sp-info') modal.style.width = '640px';
+    }
     document.querySelectorAll('.pi-subtabs .tab').forEach(function (t) {
       t.addEventListener('click', function () { fit(this.getAttribute('aria-controls')); });
     });
