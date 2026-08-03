@@ -28,11 +28,13 @@
 
     /* 인라인 편집(수정↔저장) 셀 — 편집 컨트롤 입력값은 좌측 정렬(텍스트) */
     #pi-sp-note .table__cell--editable .input { text-align: left; }
-    /* 편집 컨트롤(DS 드롭다운·데이트피커)은 editor 폭을 채운다(date-picker.md: width:100%) */
+    /* 편집 컨트롤(DS 드롭다운·날짜 인풋)은 editor 폭을 채운다 */
     #pi-sp-note .table__cell--editable .dropdown,
-    #pi-sp-note .table__cell--editable .dp { width: 100%; }
+    #pi-sp-note .table__cell--editable .input-wrap { width: 100%; }
     /* 읽기 상태 값은 셀 세로 중앙 정렬, 편집 토글 버튼과 균형 */
     #pi-sp-note .table__cell--editable .table__cell__view { color: var(--color-text-body); }
+    /* 날짜 직접 입력(YYYY.MM.DD) — 데이트피커 대신 공간 절약형 숫자 인풋 + 유효성 에러 */
+    #pi-sp-note .pi-date-error { color: var(--color-text-error); margin-top: var(--space-stack-xs); line-height: var(--line-height-tight); }
     /* 서브탭마다 모달 폭을 내용에 맞게(4대보험 탭과 동일, 부드럽게 전환) */
     .modal--lg { transition: width 0.2s ease; }
 
@@ -167,10 +169,10 @@ exits: index.html, worker-info-insurance.html, report-loss.html
                       <div class="table-container">
                         <table class="table" aria-label="입퇴사">
                           <thead class="table__head"><tr>
-                            <th class="table__head-cell pi-check-cell" scope="col"><label class="checkbox"><input type="checkbox" data-check-all aria-label="전체 선택"><span class="checkbox__control" aria-hidden="true"><span class="checkbox__icon-check"><svg aria-hidden="true"><use href="#icon-check"/></svg></span><span class="checkbox__icon-indeterminate"></span></span></label></th>
-                            <th class="table__head-cell" scope="col" style="width:64px">번호</th>
-                            <th class="table__head-cell table__head-cell--input" scope="col" style="width:200px">입사일</th>
-                            <th class="table__head-cell table__head-cell--input" scope="col" style="width:200px">퇴사일</th>
+                            <th class="table__head-cell table__head-cell--input pi-check-cell" scope="col"><label class="checkbox"><input type="checkbox" data-check-all aria-label="전체 선택"><span class="checkbox__control" aria-hidden="true"><span class="checkbox__icon-check"><svg aria-hidden="true"><use href="#icon-check"/></svg></span><span class="checkbox__icon-indeterminate"></span></span></label></th>
+                            <th class="table__head-cell table__head-cell--input" scope="col" style="width:64px">번호</th>
+                            <th class="table__head-cell table__head-cell--input" scope="col" style="width:150px">입사일</th>
+                            <th class="table__head-cell table__head-cell--input" scope="col" style="width:150px">퇴사일</th>
                           </tr></thead>
                           <tbody class="table__body" data-rows></tbody>
                         </table>
@@ -207,9 +209,9 @@ exits: index.html, worker-info-insurance.html, report-loss.html
                       <div class="table-container">
                         <table class="table" aria-label="근무정보">
                           <thead class="table__head"><tr>
-                            <th class="table__head-cell pi-check-cell" scope="col"><label class="checkbox"><input type="checkbox" data-check-all aria-label="전체 선택"><span class="checkbox__control" aria-hidden="true"><span class="checkbox__icon-check"><svg aria-hidden="true"><use href="#icon-check"/></svg></span><span class="checkbox__icon-indeterminate"></span></span></label></th>
-                            <th class="table__head-cell" scope="col" style="width:56px">번호</th>
-                            <th class="table__head-cell table__head-cell--input" scope="col" style="width:188px">적용일</th>
+                            <th class="table__head-cell table__head-cell--input pi-check-cell" scope="col"><label class="checkbox"><input type="checkbox" data-check-all aria-label="전체 선택"><span class="checkbox__control" aria-hidden="true"><span class="checkbox__icon-check"><svg aria-hidden="true"><use href="#icon-check"/></svg></span><span class="checkbox__icon-indeterminate"></span></span></label></th>
+                            <th class="table__head-cell table__head-cell--input" scope="col" style="width:56px">번호</th>
+                            <th class="table__head-cell table__head-cell--input" scope="col" style="width:150px">적용일</th>
                             <th class="table__head-cell table__head-cell--input" scope="col" style="width:152px">부서</th>
                             <th class="table__head-cell table__head-cell--input" scope="col" style="width:140px">직책</th>
                             <th class="table__head-cell table__head-cell--input" scope="col" style="width:140px">직위</th>
@@ -276,8 +278,8 @@ exits: index.html, worker-info-insurance.html, report-loss.html
     if (typeof initTableSort === 'function') root.querySelectorAll('.table-container').forEach(function (el) { initTableSort(el); });
     if (typeof initSegment === 'function') root.querySelectorAll('.segment').forEach(function (el) { initSegment(el.parentElement); });
     if (typeof initDropdown === 'function') initDropdown(root);
-    if (typeof initDatePicker === 'function') initDatePicker(root);
     if (typeof initTableCellEdit === 'function') initTableCellEdit(root);
+    root.querySelectorAll('.pi-date-input').forEach(initDateInput);   /* 날짜 직접 입력(숫자·유효성) */
     if (typeof initInput === 'function') root.querySelectorAll('.input').forEach(function (el) { if (!el.closest('.input-wrap') && !el.dataset.initInput) { el.dataset.initInput = '1'; initInput(el); } });
   }
   /* 신규 추가 행은 바로 입력할 수 있게 편집 상태로 시작 */
@@ -332,20 +334,40 @@ exits: index.html, worker-info-insurance.html, report-loss.html
       '<div class="dropdown__panel"><ul class="dropdown__list" role="listbox" aria-label="' + cfg.label + '">' + lis + '</ul></div>' +
       '</div>';
   }
-  function mkDP(mark, iso, name) {
-    var p = ['', '', ''], has = false;
-    if (iso) { var m = iso.split('-'); if (m.length === 3) { p = m; has = true; } }
-    return '<div class="dp' + (has ? ' dp--has-value' : '') + '" data-field="' + mark + '">' +
-      '<div class="dp__trigger" aria-haspopup="dialog" aria-label="' + name + ' 선택">' +
-      '<div class="dp__value-group">' +
-      '<input class="dp__value-part dp__value-part--year" type="text" inputmode="numeric" placeholder="YYYY" maxlength="4" aria-label="연도" autocomplete="off" value="' + p[0] + '">' +
-      '<span class="dp__value-sep" aria-hidden="true">.</span>' +
-      '<input class="dp__value-part dp__value-part--md" type="text" inputmode="numeric" placeholder="MM" maxlength="2" aria-label="월" autocomplete="off" value="' + p[1] + '">' +
-      '<span class="dp__value-sep" aria-hidden="true">.</span>' +
-      '<input class="dp__value-part dp__value-part--md" type="text" inputmode="numeric" placeholder="DD" maxlength="2" aria-label="일" autocomplete="off" value="' + p[2] + '">' +
-      '</div>' +
-      '<span class="dp__chevron" aria-hidden="true"><span class="icon icon--sm"><svg aria-hidden="true"><use href="#icon-calendar"/></svg></span></span>' +
-      '</div></div>';
+  /* 날짜 직접 입력 — 데이트피커 대신 공간 절약형 숫자 인풋(YYYY.MM.DD 자동 포맷 + 유효성 에러) */
+  function mkDateInput(name, iso) {
+    var v = iso ? iso.replace(/-/g, '.') : '';
+    return '<div class="input-wrap"><input class="input input--xs pi-date-input" type="text" inputmode="numeric" placeholder="YYYY.MM.DD" maxlength="10" value="' + v + '" aria-label="' + name + '"></div>' +
+      '<p class="pi-date-error text-helper" role="alert" hidden>YYYY.MM.DD 형식으로 입력해 주세요.</p>';
+  }
+  function fmtDate(str) {
+    var d = (str || '').replace(/\D/g, '').slice(0, 8), out = d.slice(0, 4);
+    if (d.length > 4) out += '.' + d.slice(4, 6);
+    if (d.length > 6) out += '.' + d.slice(6, 8);
+    return out;
+  }
+  function isValidDate(s) {
+    var m = (s || '').match(/^(\d{4})\.(\d{2})\.(\d{2})$/);
+    if (!m) return false;
+    var y = +m[1], mo = +m[2], d = +m[3];
+    if (mo < 1 || mo > 12 || d < 1 || d > 31) return false;
+    var dt = new Date(y, mo - 1, d);
+    return dt.getFullYear() === y && dt.getMonth() === mo - 1 && dt.getDate() === d;
+  }
+  function initDateInput(inp) {
+    if (inp.dataset.initDate) return;
+    inp.dataset.initDate = '1';
+    var editor = inp.closest('.table__cell__editor');
+    var err = editor && editor.querySelector('.pi-date-error');
+    function setErr(show) { inp.classList.toggle('input--error', show); if (err) err.hidden = !show; }
+    inp.addEventListener('input', function () {
+      inp.value = fmtDate(inp.value);   /* 숫자만 → YYYY.MM.DD 자동 포맷 */
+      if (inp.classList.contains('input--error') && (inp.value === '' || isValidDate(inp.value))) setErr(false);
+    });
+    inp.addEventListener('blur', function () {
+      var v = inp.value.trim();
+      setErr(v !== '' && !isValidDate(v));
+    });
   }
   function checkCell() {
     return '<td class="table__cell pi-check-cell"><label class="checkbox"><input type="checkbox" data-row-check aria-label="행 선택"><span class="checkbox__control" aria-hidden="true"><span class="checkbox__icon-check"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span></label></td>';
@@ -366,13 +388,13 @@ exits: index.html, worker-info-insurance.html, report-loss.html
   function joinRow(d) {
     d = d || {};
     return checkCell() + '<td class="table__cell" data-no></td>' +
-      editCell(mkDP('in', d.in, '입사일'), dv(d.in)) +
-      editCell(mkDP('quit', d.quit, '퇴사일'), dv(d.quit), ' data-quit');
+      editCell(mkDateInput('입사일', d.in), dv(d.in)) +
+      editCell(mkDateInput('퇴사일', d.quit), dv(d.quit), ' data-quit');
   }
   function workRow(d) {
     d = d || {};
     return checkCell() + '<td class="table__cell" data-no></td>' +
-      editCell(mkDP('apply', d.apply, '적용일'), dv(d.apply)) +
+      editCell(mkDateInput('적용일', d.apply), dv(d.apply)) +
       editCell(mkDropdown('dept', d.dept), d.dept) +
       editCell(mkDropdown('title', d.title), d.title) +
       editCell(mkDropdown('rank', d.rank), d.rank) +
@@ -447,20 +469,8 @@ exits: index.html, worker-info-insurance.html, report-loss.html
     fit('pi-sp-note'); /* 기본 서브탭 */
   })();
 
-  /* ── 데이트피커 값 설정·해제 헬퍼 (시나리오 제어용) ── */
-  function setDP(dp, iso) {
-    if (!dp) return;
-    var p = dp.querySelectorAll('.dp__value-part'), m = (iso || '').split('-');
-    if (m.length === 3) { p[0].value = m[0]; p[1].value = m[1]; p[2].value = m[2]; dp.classList.add('dp--has-value'); }
-  }
-  function clearDP(dp) {
-    if (!dp) return;
-    dp.querySelectorAll('.dp__value-part').forEach(function (i) { i.value = ''; });
-    dp.classList.remove('dp--has-value');
-  }
-
   /* ── 퇴사일 저장 → 상실신고 Confirm Modal (area 1) ──
-     취득된 4대보험이 있는 근로자의 퇴사일 셀을 저장(수정→저장)해 값이 확정되면 안내.
+     취득된 4대보험이 있는 근로자의 퇴사일 셀을 저장(수정→저장)해 유효한 날짜가 확정되면 안내.
      인라인 편집 저장 시 .table__cell__view 텍스트가 갱신되므로 퇴사일 셀([data-quit])의
      읽기값 변화를 관찰한다 — 저장 버튼·Enter·시나리오 어느 경로로 저장해도 감지된다. */
   var _quitShown = false;
@@ -472,7 +482,7 @@ exits: index.html, worker-info-insurance.html, report-loss.html
         var view = host && host.closest ? host.closest('.table__cell__view') : null;
         if (!view || !view.closest('[data-quit]')) return;
         var txt = view.textContent.trim();
-        if (txt && txt !== '—' && !_quitShown) {
+        if (txt && txt !== '—' && isValidDate(txt) && !_quitShown) {
           _quitShown = true;
           openOverlay('overlay-quit-confirm');
         }
@@ -496,16 +506,16 @@ exits: index.html, worker-info-insurance.html, report-loss.html
       var name = this.dataset.scenario;
       document.querySelectorAll('.proto-nav-btn').forEach(function (b) { b.classList.toggle('is-active', b.dataset.scenario === name); });
       var quitCell = document.querySelector('.accordion__item[data-table="join"] [data-quit]');
-      var quitDP = quitCell && quitCell.querySelector('.dp[data-field="quit"]');
+      var quitInput = quitCell && quitCell.querySelector('.pi-date-input');
       var quitView = quitCell && quitCell.querySelector('.table__cell__view');
       if (name === '퇴사일-등록') {
         _quitShown = true;          /* 옵저버 중복 실행 방지 — 아래에서 직접 오픈 */
-        setDP(quitDP, '2026-05-31');
+        if (quitInput) { quitInput.value = '2026.05.31'; quitInput.classList.remove('input--error'); }
         if (quitView) quitView.textContent = '2026.05.31';   /* 저장된 읽기값 반영 */
         openOverlay('overlay-quit-confirm');
       } else {
         _ovStack.slice().reverse().forEach(closeOverlay);
-        clearDP(quitDP);
+        if (quitInput) { quitInput.value = ''; quitInput.classList.remove('input--error'); }
         if (quitView) quitView.textContent = '—';
         if (quitCell) quitCell.classList.remove('table__cell--editing');
         _quitShown = false;
