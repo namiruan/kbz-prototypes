@@ -35,9 +35,12 @@
     .wi-card--none { background: var(--color-surface-subtle); border-color: transparent; box-shadow: none; }
     .wi-card__head { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-stack-md); }
     .wi-card__title { font-weight: var(--font-weight-heading); color: var(--color-text-body); }
-    .wi-card__rows { display: grid; grid-template-columns: auto 1fr; row-gap: var(--space-gap-sm); column-gap: var(--space-gap-lg); }
-    .wi-card__key { color: var(--color-text-subtle); }
-    .wi-card__val { text-align: right; font-weight: var(--font-weight-heading); color: var(--color-text-body); }
+    /* 취득일·상실일·보수월액 — 가로 3열(라벨 위·값 아래), 셀 사이 구분선 */
+    .wi-card__rows { display: flex; }
+    .wi-card__cell { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; gap: var(--space-gap-2xs); }
+    .wi-card__cell + .wi-card__cell { border-left: var(--stroke-sm) solid var(--color-border-subtle); padding-left: var(--space-gap-xl); margin-left: var(--space-gap-xl); }
+    .wi-card__key { color: var(--color-text-subtle); font-size: var(--font-size-sm); }
+    .wi-card__val { font-weight: var(--font-weight-heading); color: var(--color-text-body); overflow: hidden; text-overflow: ellipsis; }
     .wi-card__reason { color: var(--color-text-subtle); }
     .wi-card__reason-empty { min-height: var(--font-size-base); }
 
@@ -377,9 +380,9 @@ exits: index.html, report-acquire.html, report-loss.html, report-transfer.html, 
     } else {
       el.classList.remove('wi-card--none');
       body = '<div class="wi-card__rows">' +
-        '<span class="wi-card__key">취득일</span><span class="wi-card__val">' + esc(d['취득']) + '</span>' +
-        '<span class="wi-card__key">상실일</span><span class="wi-card__val">' + esc(d['상실']) + '</span>' +
-        '<span class="wi-card__key">보수월액</span><span class="wi-card__val">' + esc(d['보수']) + '</span>' +
+        '<div class="wi-card__cell"><span class="wi-card__key">취득일</span><span class="wi-card__val">' + esc(d['취득']) + '</span></div>' +
+        '<div class="wi-card__cell"><span class="wi-card__key">상실일</span><span class="wi-card__val">' + esc(d['상실']) + '</span></div>' +
+        '<div class="wi-card__cell"><span class="wi-card__key">보수월액</span><span class="wi-card__val">' + esc(d['보수']) + '</span></div>' +
         '</div>';
     }
     el.innerHTML = head + body;
