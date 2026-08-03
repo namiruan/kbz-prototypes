@@ -302,16 +302,18 @@ exits: index.html, report-acquire.html, report-loss.html, report-transfer.html, 
 
 <!-- 신고 이력 행 클릭 → 신고 내용 조회(읽기 전용) Layer Modal (Figma 14878-5884) -->
 <div id="wi-view-overlay" data-overlay>
-  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="wi-view-title" style="width:600px;max-width:100%">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="wi-view-title" style="width:fit-content;min-width:320px;max-width:100%">
     <div class="modal__header">
       <h2 class="modal__title text-modal-title-sm" id="wi-view-title">신고 내용 조회</h2>
       <button class="icon-on--lg" type="button" aria-label="닫기" data-overlay-close><svg aria-hidden="true"><use href="#icon-close"/></svg></button>
     </div>
     <div class="modal__body">
-      <div class="table-container rv-table">
-        <table class="table table--info table--dense" aria-label="신고 내용">
-          <tbody class="table__body" id="wi-view-body"></tbody>
-        </table>
+      <div class="modal__content">
+        <div class="table-container rv-table">
+          <table class="table table--info table--dense" aria-label="신고 내용">
+            <tbody class="table__body" id="wi-view-body"></tbody>
+          </table>
+        </div>
       </div>
     </div>
     <div class="modal__footer">
