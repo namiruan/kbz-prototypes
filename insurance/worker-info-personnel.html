@@ -55,6 +55,8 @@
 
     /* 표 하단 보더 겹침 방지 (행 동적 삭제 대비) */
     .table__body .table__row:not([hidden]):not(:has(~ .table__row:not([hidden]))) .table__cell { border-bottom: none; }
+    /* 행 0건 빈 상태 행 — 구분선 제거, 안내를 셀 중앙에 여유있게 */
+    #pi-sp-note .pi-empty-row .table__cell { border-bottom: none; padding: var(--space-inset-3xl) var(--space-inset-2xl); }
   </style>
 </head>
 <body>
@@ -488,6 +490,29 @@ exits: index.html, worker-info-insurance.html, report-loss.html
     var build = kind === 'join' ? joinRow : workRow;
 
     function rows() { return Array.prototype.slice.call(tbody.querySelectorAll('tr.table__row')); }
+    /* 행 0건 빈 상태 — DS product.md/table 규칙: tbody 안 empty-state--compact.
+       편집형 표라 CTA(추가 버튼)는 아코디언 헤더에 이미 있으므로 안내 문구로 유도만 한다. */
+    function updateEmpty() {
+      var existing = tbody.querySelector('.pi-empty-row');
+      if (rows().length === 0) {
+        if (!existing) {
+          var colspan = section.querySelectorAll('thead th').length;
+          var msg = kind === 'join' ? '등록된 입퇴사 이력이 없습니다' : '등록된 근무정보가 없습니다';
+          var tr = document.createElement('tr');
+          tr.className = 'pi-empty-row';
+          tr.innerHTML = '<td class="table__cell" colspan="' + colspan + '">' +
+            '<div class="empty-state empty-state--compact" role="status">' +
+              '<div class="empty-state__body">' +
+                '<p class="empty-state__title text-body">' + msg + '</p>' +
+                '<p class="empty-state__description text-body">상단 추가 버튼으로 등록할 수 있습니다.</p>' +
+              '</div>' +
+            '</div></td>';
+          tbody.appendChild(tr);
+        }
+      } else if (existing) {
+        existing.remove();
+      }
+    }
     function refresh() {
       var rs = rows();
       if (countEl) { countEl.textContent = rs.length; countEl.setAttribute('aria-label', rs.length + '건'); }
@@ -498,6 +523,7 @@ exits: index.html, worker-info-insurance.html, report-loss.html
         checkAll.checked = rs.length > 0 && checked.length === rs.length;
         checkAll.indeterminate = checked.length > 0 && checked.length < rs.length;
       }
+      updateEmpty();
     }
     function addRow(data, editing) {
       var tr = document.createElement('tr');
