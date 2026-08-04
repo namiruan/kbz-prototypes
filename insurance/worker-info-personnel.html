@@ -19,7 +19,8 @@
     .pi-subtabs { margin-bottom: var(--space-stack-lg); }
 
     /* 인사노트 — 입퇴사·근무정보는 DS 아코디언(accordion), 기타 특이사항은 일반 섹션 */
-    .pi-etc { margin-top: var(--space-stack-2xl); }
+    /* 기타 특이사항 — 좌우 여백을 아코디언 콘텐츠(표)와 동일(inset-2xl)하게 맞춰 정렬 */
+    .pi-etc { margin-top: var(--space-stack-2xl); padding: 0 var(--space-inset-2xl); }
     .pi-etc__title { color: var(--color-text-brand); font-weight: var(--font-weight-heading); margin-bottom: var(--space-stack-sm); }
 
     .pi-check-cell { width: 44px; text-align: center; }
@@ -51,8 +52,6 @@
     /* 좌측 내비 미구현 섹션 placeholder */
     .pi-placeholder { display: flex; align-items: center; justify-content: center; min-height: 360px; }
 
-    /* Confirm(상실신고) — 안내 타이틀 강조 */
-    .alert__title.is-caution { color: var(--color-text-caution); }
 
     /* 표 하단 보더 겹침 방지 (행 동적 삭제 대비) */
     .table__body .table__row:not([hidden]):not(:has(~ .table__row:not([hidden]))) .table__cell { border-bottom: none; }
@@ -160,7 +159,7 @@ exits: index.html, worker-info-insurance.html, report-loss.html
                           <span class="badge badge--brand badge--pill badge--line" data-count aria-label="1건">1</span>
                         </button>
                         <div class="accordion__actions">
-                          <button class="btn btn--primary btn--md" type="button" data-add>
+                          <button class="btn btn--primary btn--solid btn--md" type="button" data-add>
                             <span class="icon icon--sm" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-plus"/></svg></span>추가
                           </button>
                           <span class="tooltip-wrapper" onmouseenter="if(this.querySelector('button').classList.contains('btn--inactive'))this.querySelector('.tooltip-panel').classList.add('tooltip-panel--visible')" onmouseleave="this.querySelector('.tooltip-panel').classList.remove('tooltip-panel--visible')">
@@ -200,7 +199,7 @@ exits: index.html, worker-info-insurance.html, report-loss.html
                           <span class="badge badge--brand badge--pill badge--line" data-count aria-label="2건">2</span>
                         </button>
                         <div class="accordion__actions">
-                          <button class="btn btn--primary btn--md" type="button" data-add>
+                          <button class="btn btn--primary btn--solid btn--md" type="button" data-add>
                             <span class="icon icon--sm" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-plus"/></svg></span>추가
                           </button>
                           <span class="tooltip-wrapper" onmouseenter="if(this.querySelector('button').classList.contains('btn--inactive'))this.querySelector('.tooltip-panel').classList.add('tooltip-panel--visible')" onmouseleave="this.querySelector('.tooltip-panel').classList.remove('tooltip-panel--visible')">
@@ -259,13 +258,14 @@ exits: index.html, worker-info-insurance.html, report-loss.html
 <div id="overlay-quit-confirm" data-overlay>
   <div class="alert" role="alertdialog" aria-modal="true" aria-labelledby="quit-title" aria-describedby="quit-body">
     <div class="alert__header">
-      <p class="text-card-title alert__title is-caution" id="quit-title">퇴사일이 등록되었습니다.</p>
+      <p class="text-card-title alert__title" id="quit-title">퇴사일이 등록되었습니다.</p>
+      <button class="icon-on--sm alert__close" type="button" aria-label="닫기" data-overlay-close><svg aria-hidden="true"><use href="#icon-close"/></svg></button>
     </div>
     <div class="alert__body" id="quit-body">
       <p class="text-description alert__description">4대보험 상실신고가 가능합니다.<br>지금 진행하지 않더라도, 4대보험 신고 메뉴에서 다시 진행할 수 있습니다.</p>
     </div>
     <div class="alert__footer">
-      <button class="btn btn--secondary btn--solid btn--md" type="button" data-overlay-close>다음에 하기</button>
+      <button class="btn btn--ghost btn--md" type="button" data-overlay-close>다음에 하기</button>
       <button class="btn btn--primary btn--md" type="button" id="quit-go-loss">상실신고 하기</button>
     </div>
   </div>
@@ -409,15 +409,27 @@ exits: index.html, worker-info-insurance.html, report-loss.html
     }
     return cell.querySelector('.table__cell__view').textContent;
   }
-  /* 날짜 셀이 유효하지 않은 값을 담고 있으면 true(에러 표시). 빈 값은 허용. */
+  function dateNum(s) { return +(s || '').replace(/\D/g, ''); }
+  /* 날짜 셀이 유효하지 않으면 true(에러 표시). 빈 값은 허용.
+     퇴사일([data-quit]) 셀은 같은 행 입사일 이전이면 무효. */
   function cellDateInvalid(cell) {
     var dateInp = cell.querySelector('.pi-date-input');
     if (!dateInp) return false;
     var v = dateInp.value.trim();
-    if (v === '' || isValidDate(v)) return false;
-    dateInp.classList.add('input--error');
-    var err = cell.querySelector('.pi-date-error'); if (err) err.hidden = false;
-    return true;
+    var err = cell.querySelector('.pi-date-error');
+    function fail(msg) {
+      dateInp.classList.add('input--error');
+      if (err) { err.textContent = msg; err.hidden = false; }
+      return true;
+    }
+    if (v === '') return false;
+    if (!isValidDate(v)) return fail('유효한 날짜를 입력해 주세요. (YYYY.MM.DD)');
+    if (cell.matches('[data-quit]')) {
+      var hireInp = cell.closest('tr').querySelector('[data-cell-edit]:not([data-quit]) .pi-date-input');
+      var hv = hireInp ? hireInp.value.trim() : '';
+      if (hv && isValidDate(hv) && dateNum(v) < dateNum(hv)) return fail('퇴사일은 입사일 이후여야 합니다.');
+    }
+    return false;
   }
   /* 셀 하나를 읽기 상태로 확정(값 반영 + 편집 종료 + 토글을 수정으로 복귀).
      유효하지 않은 날짜면 커밋하지 않고 편집 상태를 유지한 채 false 반환. */
@@ -501,6 +513,7 @@ exits: index.html, worker-info-insurance.html, report-loss.html
     /* 추가 ↔ 저장 토글 라벨/아이콘 */
     function setAddMode(saving) {
       if (!addBtn) return;
+      addBtn.classList.toggle('btn--solid', !saving);   /* 추가=아웃라인(line), 저장=채움(fill) */
       var u = addBtn.querySelector('use'); if (u) u.setAttribute('href', saving ? '#icon-check' : '#icon-plus');
       for (var i = 0; i < addBtn.childNodes.length; i++) {
         var n = addBtn.childNodes[i];
