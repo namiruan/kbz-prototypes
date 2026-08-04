@@ -884,11 +884,12 @@ exits: insurance-join-status.html, index.html
   body.view-mode .modal__content .dropdown--button .dropdown__trigger,
   body.view-mode .modal__content .dp .dp__trigger,
   body.view-mode .modal__content .acq-job-trigger { background: var(--color-surface-subtle); border-color: transparent; box-shadow: none; color: var(--color-text-body); }
-  /* 정정 카드(적용됨=파란 배경) 안의 변경 전/후 값 — 조회 모드에서도 배경에 묻히지 않도록
-     흰 배경 + 옅은 테두리로 또렷한 값 칩처럼 보이게 한다(일반 readonly 평면화의 예외). */
+  /* 정정 카드(적용됨=파란 배경) 안의 변경 전/후 값 — DS input--readonly 스타일 그대로.
+     view-mode 일반 규칙은 불투명 surface-subtle을 쓰지만, DS readonly는 반투명
+     surface-subtle-alpha라 색 있는 배경 위에서도 자연스럽게 섞인다. */
   body.view-mode .modal__content .corr-card .input,
   body.view-mode .modal__content .corr-card .dp .dp__trigger {
-    background: var(--color-surface-base); border-color: var(--color-border-subtle);
+    background: var(--color-surface-subtle-alpha); border-color: transparent;
   }
   body.view-mode .modal__content .dp .dp__value-part { background: transparent; }
   body.view-mode .modal__content .dropdown__chevron,
