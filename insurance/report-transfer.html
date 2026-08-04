@@ -779,6 +779,15 @@ exits: index.html
   function shake(el) { if (!el) return; el.classList.remove('motion-shake'); void el.offsetWidth; el.classList.add('motion-shake'); }
 
   /* date-picker 값 읽기 (yr/mo/dy) → YYYY-MM-DD | '' */
+  /* 실제 달력상 유효한 날짜인지(월 1~12, 일수, 윤년 반영) — 3333-33-33 등 차단 */
+  function isValidDate(s) {
+    var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s || '');
+    if (!m) return false;
+    var y = +m[1], mo = +m[2], d = +m[3];
+    if (mo < 1 || mo > 12 || d < 1 || d > 31) return false;
+    var dt = new Date(y, mo - 1, d);
+    return dt.getFullYear() === y && dt.getMonth() === (mo - 1) && dt.getDate() === d;
+  }
   function dpVal(dp) {
     if (!dp) return '';
     var y = dp.querySelector('.dp__value-part--year');
@@ -814,7 +823,16 @@ exits: index.html
   /* 캘린더 선택·입력 시 전입일 에러 해제 + 연금 동기화 (capture — 캘린더 클릭 stopPropagation 대응) */
   function onDateActivity() {
     document.querySelectorAll('#pane-panels .acq-date-dp').forEach(function (dp) {
-      if (dpVal(dp)) { dp.classList.remove('dp--error'); var ff = dp.closest('.form-field'); if (ff) ff.classList.remove('form-field--error'); }
+      var v = dpVal(dp);
+      if (!v) return;   /* 미완성이면 그대로(제출 시 뜬 '필수' 에러 유지) */
+      var ff = dp.closest('.form-field');
+      var err = ff && ff.querySelector('[id$="-in-date-err"]');
+      if (isValidDate(v)) {
+        dp.classList.remove('dp--error'); if (ff) ff.classList.remove('form-field--error');
+      } else {
+        dp.classList.add('dp--error'); if (ff) ff.classList.add('form-field--error');
+        if (err) err.textContent = '올바른 날짜를 입력해 주세요.';
+      }
     });
     Array.prototype.forEach.call(document.querySelectorAll('#pane-panels > .scenario-panel'), syncPension);
   }
@@ -825,12 +843,15 @@ exits: index.html
   function validate(panel) {
     var invalid = [], firstBad = null;
 
-    /* 전입일(캘린더) 필수 */
+    /* 전입일(캘린더) — 미선택 / 날짜 오류 구분 */
     var dField = panel.querySelector('[id$="-in-dp"]').closest('.form-field');
     var dp = dField && dField.querySelector('.dp');
-    if (!dpVal(dp)) {
+    var dErr = dField && dField.querySelector('[id$="-in-date-err"]');
+    var dv = dpVal(dp);
+    if (!dv || !isValidDate(dv)) {
       if (dp) dp.classList.add('dp--error');
       if (dField) dField.classList.add('form-field--error');
+      if (dErr) dErr.textContent = dv ? '올바른 날짜를 입력해 주세요.' : '전입일을 선택해 주세요.';
       invalid.push(dField); firstBad = firstBad || (dp && dp.querySelector('.dp__value-part--year'));
     } else {
       if (dp) dp.classList.remove('dp--error');
