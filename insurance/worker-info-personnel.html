@@ -599,15 +599,23 @@ exits: index.html, worker-info-insurance.html, report-loss.html
       modal.style.width = 'max-content';   /* 모달이 활성 콘텐츠(내비 + placeholder)를 감싸게 */
       modal.style.width = Math.ceil(modal.getBoundingClientRect().width) + 'px';
     }
-    function fit(id) {
+    /* 현재 보이는 콘텐츠를 기준으로 폭 재계산. 인사노트 표가 보이면 표 실측(fitNote),
+       그 외(인사정보·좌측 내비 범위 밖 placeholder)는 max-content 실측(fitInfo).
+       좌측 세로 내비/서브탭은 DS initTab이 패널 hidden을 토글하므로, 전환이 반영된
+       다음 프레임에 측정하도록 requestAnimationFrame으로 미룬다. */
+    function isVisible(el) { return el && !el.hidden && el.offsetParent !== null; }
+    function fitActive() {
       if (!modal) return;
-      if (id === 'pi-sp-note') requestAnimationFrame(fitNote);
-      else if (id === 'pi-sp-info') requestAnimationFrame(fitInfo);
+      requestAnimationFrame(function () {
+        if (isVisible(document.getElementById('pi-sp-note'))) fitNote();
+        else fitInfo();
+      });
     }
-    document.querySelectorAll('.pi-subtabs .tab').forEach(function (t) {
-      t.addEventListener('click', function () { fit(this.getAttribute('aria-controls')); });
+    /* 서브탭(인사정보·인사노트) + 좌측 세로 내비(범위 밖 placeholder 포함) 모두에 반응 */
+    document.querySelectorAll('.pi-subtabs .tab, .tab-group--vertical .tab').forEach(function (t) {
+      t.addEventListener('click', fitActive);
     });
-    fit('pi-sp-note'); /* 기본 서브탭 */
+    fitActive(); /* 기본(인사노트) */
   })();
 
   /* ── 퇴사일 저장 → 상실신고 Confirm Modal (area 1) ──
