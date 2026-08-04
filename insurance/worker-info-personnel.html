@@ -345,19 +345,13 @@ exits: index.html, worker-info-insurance.html, report-loss.html
   function mkDateInput(name, iso) {
     var v = iso ? iso.replace(/-/g, '.') : '';
     return '<div class="input-wrap"><input class="input input--sm pi-date-input" type="text" inputmode="numeric" placeholder="YYYY.MM.DD" maxlength="10" value="' + v + '" aria-label="' + name + '"></div>' +
-      '<p class="pi-date-error text-helper" role="alert" hidden>YYYY.MM.DD 형식으로 입력해 주세요.</p>';
+      '<p class="pi-date-error text-helper" role="alert" hidden>유효한 날짜를 입력해 주세요. (YYYY.MM.DD)</p>';
   }
-  function pad2(n) { return n < 10 ? '0' + n : '' + n; }
-  /* 숫자만 → YYYY.MM.DD 자동 포맷 + 월(01~12)·일(01~31) 범위 클램프.
-     불가능한 월/일(예: 33)은 입력 즉시 유효 범위로 보정되어 날짜 형태만 입력된다. */
+  /* 숫자만 추출해 YYYY.MM.DD 형태로 구분점(.)만 삽입한다 — 숫자 값 자체는 변환하지 않는다 */
   function fmtDate(str) {
-    var d = (str || '').replace(/\D/g, '').slice(0, 8);
-    var y = d.slice(0, 4), mo = d.slice(4, 6), dy = d.slice(6, 8);
-    if (mo.length === 2) { var m = +mo; mo = m < 1 ? '01' : m > 12 ? '12' : mo; }
-    if (dy.length === 2) { var da = +dy; dy = da < 1 ? '01' : da > 31 ? '31' : dy; }
-    var out = y;
-    if (mo) out += '.' + mo;
-    if (dy) out += '.' + dy;
+    var d = (str || '').replace(/\D/g, '').slice(0, 8), out = d.slice(0, 4);
+    if (d.length > 4) out += '.' + d.slice(4, 6);
+    if (d.length > 6) out += '.' + d.slice(6, 8);
     return out;
   }
   /* 현실적 연도 범위 — 이 범위를 벗어난 연도(예: 3333)는 유효하지 않은 날짜로 본다 */
@@ -378,30 +372,13 @@ exits: index.html, worker-info-insurance.html, report-loss.html
     var err = editor && editor.querySelector('.pi-date-error');
     function setErr(show) { inp.classList.toggle('input--error', show); if (err) err.hidden = !show; }
     inp.addEventListener('input', function () {
-      inp.value = fmtDate(inp.value);   /* 숫자만 → YYYY.MM.DD, 월·일 범위 클램프 */
+      inp.value = fmtDate(inp.value);   /* 숫자만 → YYYY.MM.DD (구분점만 삽입) */
       if (inp.classList.contains('input--error') && (inp.value === '' || isValidDate(inp.value))) setErr(false);
     });
+    /* 유효하지 않은 날짜(형식·월/일·연도 범위)면 값은 그대로 두고 에러 메시지만 표시 */
     inp.addEventListener('blur', function () {
       var v = inp.value.trim();
-      if (v === '') { setErr(false); return; }
-      var d = v.replace(/\D/g, '');
-      if (d.length === 8) {
-        /* 8자리 완성 → 실제 달력에 맞는 날짜로 보정(예: 2026.02.31 → 2026.02.28) */
-        var y = +d.slice(0, 4), m = Math.min(12, Math.max(1, +d.slice(4, 6)));
-        var maxD = new Date(y, m, 0).getDate();
-        var day = Math.min(maxD, Math.max(1, +d.slice(6, 8)));
-        if (y >= DATE_MIN_YEAR && y <= DATE_MAX_YEAR) {   /* 연도가 범위 안일 때만 확정 */
-          inp.value = y + '.' + pad2(m) + '.' + pad2(day);
-          setErr(false);
-          return;
-        }
-      }
-      /* 범위 밖 연도·미완성 입력 → 직전 유효값으로 되돌려 잘못된 날짜 저장을 막는다 */
-      var cell = inp.closest('.table__cell--editable');
-      var view = cell && cell.querySelector('.table__cell__view');
-      var prev = view ? view.textContent.trim() : '';
-      inp.value = isValidDate(prev) ? prev : '';
-      setErr(false);
+      setErr(v !== '' && !isValidDate(v));
     });
   }
   function checkCell() {
