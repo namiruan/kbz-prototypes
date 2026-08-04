@@ -20,6 +20,9 @@
     /* 진행 상태 셀 — 반려는 배지 + 돋보기(사유 hover) */
     .rs-status { display: inline-flex; align-items: center; gap: var(--space-gap-2xs); }
     .rs-status .icon { color: var(--color-text-error); }
+    /* 신고 종류·진행 상태 열 — 내용(짧은 값·배지)에 맞춰 폭 축소, 남는 폭은 다른 열이 흡수 */
+    #rs-table th:nth-child(4), #rs-table td:nth-child(4) { width: 104px; white-space: nowrap; }
+    #rs-table th:nth-child(5), #rs-table td:nth-child(5) { width: 116px; }
     /* 관리 열 — DS action-group(테이블 행 액션 전용). 셀 내 우측 정렬 */
     .table__cell--fit .action-group { white-space: nowrap; }
     /* 사업장 선택 Modal (취득 신고 요청 → 6-1 CASE-1) — 가입현황과 공용 스타일 */
