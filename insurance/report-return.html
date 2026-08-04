@@ -747,6 +747,14 @@ exits: insurance-join-status.html, index.html
   }
   body.view-mode .modal__content .radio input:checked ~ .radio__control::after { background: var(--color-text-disabled); }
   body.view-mode .modal__content .radio__label { color: var(--color-text-disabled); }
+  /* 조회 모드 첨부파일 — 추가·드래그 불가이므로 추가하기 버튼·드래그 안내문·카드 삭제 액션을 숨기고,
+     파일이 없으면 empty placeholder를 노출한다. */
+  body.view-mode .modal__content .file-upload__dropzone .btn,
+  body.view-mode .modal__content .file-upload__hint,
+  body.view-mode .modal__content .file-upload-item__actions { display: none; }
+  body.view-mode .modal__content .file-upload__dropzone:not(:has(.file-upload-item))::after {
+    content: "첨부된 파일이 없습니다"; color: var(--color-text-subtle); font-size: var(--font-size-sm);
+  }
   /* 상세보기: 원래 신고 버튼(취소/임시저장/신고요청)을 숨기고 상세보기 전용 버튼으로 대체 */
   body.detail-mode .modal__footer > .btn { display: none; }
   .detail-actions { display: inline-flex; gap: var(--space-gap-sm); }
