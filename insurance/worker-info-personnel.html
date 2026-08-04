@@ -360,10 +360,13 @@ exits: index.html, worker-info-insurance.html, report-loss.html
     if (dy) out += '.' + dy;
     return out;
   }
+  /* 현실적 연도 범위 — 이 범위를 벗어난 연도(예: 3333)는 유효하지 않은 날짜로 본다 */
+  var DATE_MIN_YEAR = 1950, DATE_MAX_YEAR = new Date().getFullYear() + 10;
   function isValidDate(s) {
     var m = (s || '').match(/^(\d{4})\.(\d{2})\.(\d{2})$/);
     if (!m) return false;
     var y = +m[1], mo = +m[2], d = +m[3];
+    if (y < DATE_MIN_YEAR || y > DATE_MAX_YEAR) return false;   /* 연도 범위 */
     if (mo < 1 || mo > 12 || d < 1 || d > 31) return false;
     var dt = new Date(y, mo - 1, d);
     return dt.getFullYear() === y && dt.getMonth() === mo - 1 && dt.getDate() === d;
@@ -387,11 +390,18 @@ exits: index.html, worker-info-insurance.html, report-loss.html
         var y = +d.slice(0, 4), m = Math.min(12, Math.max(1, +d.slice(4, 6)));
         var maxD = new Date(y, m, 0).getDate();
         var day = Math.min(maxD, Math.max(1, +d.slice(6, 8)));
-        inp.value = y + '.' + pad2(m) + '.' + pad2(day);
-        setErr(false);
-      } else {
-        setErr(true);   /* 미완성 입력은 형식 안내 */
+        if (y >= DATE_MIN_YEAR && y <= DATE_MAX_YEAR) {   /* 연도가 범위 안일 때만 확정 */
+          inp.value = y + '.' + pad2(m) + '.' + pad2(day);
+          setErr(false);
+          return;
+        }
       }
+      /* 범위 밖 연도·미완성 입력 → 직전 유효값으로 되돌려 잘못된 날짜 저장을 막는다 */
+      var cell = inp.closest('.table__cell--editable');
+      var view = cell && cell.querySelector('.table__cell__view');
+      var prev = view ? view.textContent.trim() : '';
+      inp.value = isValidDate(prev) ? prev : '';
+      setErr(false);
     });
   }
   function checkCell() {
