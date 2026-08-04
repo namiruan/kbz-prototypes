@@ -409,14 +409,27 @@ exits: index.html, worker-info-insurance.html, report-loss.html
     }
     return cell.querySelector('.table__cell__view').textContent;
   }
-  /* 셀 하나를 읽기 상태로 확정(값 반영 + 편집 종료 + 토글을 수정으로 복귀) */
+  /* 날짜 셀이 유효하지 않은 값을 담고 있으면 true(에러 표시). 빈 값은 허용. */
+  function cellDateInvalid(cell) {
+    var dateInp = cell.querySelector('.pi-date-input');
+    if (!dateInp) return false;
+    var v = dateInp.value.trim();
+    if (v === '' || isValidDate(v)) return false;
+    dateInp.classList.add('input--error');
+    var err = cell.querySelector('.pi-date-error'); if (err) err.hidden = false;
+    return true;
+  }
+  /* 셀 하나를 읽기 상태로 확정(값 반영 + 편집 종료 + 토글을 수정으로 복귀).
+     유효하지 않은 날짜면 커밋하지 않고 편집 상태를 유지한 채 false 반환. */
   function commitCell(cell) {
+    if (cellDateInvalid(cell)) return false;
     var view = cell.querySelector('.table__cell__view');
     var val = readCellValue(cell);
     view.textContent = val === '' ? '—' : val;
     cell.classList.remove('table__cell--editing');
     var tog = cell.querySelector('.table__cell__edit-toggle');
     if (tog) { tog.setAttribute('aria-label', '수정'); var u = tog.querySelector('use'); if (u) u.setAttribute('href', '#icon-edit'); }
+    return true;
   }
   function joinRow(d) {
     d = d || {};
@@ -498,12 +511,14 @@ exits: index.html, worker-info-insurance.html, report-loss.html
        저장 = 추가 중인 행들을 읽기 상태로 일괄 확정 + 버튼을 추가로 복귀. */
     if (addBtn) addBtn.addEventListener('click', function () {
       if (section.dataset.adding === '1') {
+        var allOk = true;
         Array.prototype.slice.call(tbody.querySelectorAll('tr.pi-row-adding')).forEach(function (tr) {
-          tr.querySelectorAll('.table__cell--editable').forEach(commitCell);
-          tr.classList.remove('pi-row-adding');
+          var rowOk = true;
+          tr.querySelectorAll('.table__cell--editable').forEach(function (cell) { if (commitCell(cell) === false) rowOk = false; });
+          if (rowOk) tr.classList.remove('pi-row-adding'); else allOk = false;
         });
-        section.dataset.adding = '';
-        setAddMode(false);
+        /* 유효하지 않은 날짜가 있으면 add 모드 유지(에러 표시된 채 계속 편집) */
+        if (allOk) { section.dataset.adding = ''; setAddMode(false); }
       } else {
         var tr = addRow(null, true);
         tr.classList.add('pi-row-adding');
@@ -516,6 +531,28 @@ exits: index.html, worker-info-insurance.html, report-loss.html
     refresh();
   }
   document.querySelectorAll('.accordion__item[data-table]').forEach(initSectionTable);
+
+  /* ── 유효하지 않은 날짜 셀은 저장(토글 클릭·Enter)을 막고 편집 상태 유지 ──
+     DS initTableCellEdit의 저장 핸들러보다 먼저(capture) 가로채, 잘못된 날짜가 커밋되지 않게 한다. */
+  (function () {
+    var scope = document.getElementById('pi-sp-note');
+    if (!scope) return;
+    function guard(e) {
+      var cell = e.target.closest('[data-cell-edit]');
+      if (!cell || !cell.classList.contains('table__cell--editing')) return;
+      if (!cell.querySelector('.pi-date-input')) return;   /* 날짜 셀만 대상 */
+      var isSaveClick = e.type === 'click' && e.target.closest('.table__cell__edit-toggle');
+      var isEnter = e.type === 'keydown' && e.key === 'Enter' && !e.target.closest('.dropdown__panel, .dp__panel');
+      if (!isSaveClick && !isEnter) return;
+      if (cellDateInvalid(cell)) {   /* 유효하지 않으면 저장 차단 + 에러 표시 */
+        e.stopImmediatePropagation();
+        e.preventDefault();
+        var inp = cell.querySelector('.pi-date-input'); if (inp) inp.focus();
+      }
+    }
+    scope.addEventListener('click', guard, true);
+    scope.addEventListener('keydown', guard, true);
+  })();
 
   /* ── 서브탭마다 모달 폭을 내용에 맞게 조정 ── */
   (function () {
