@@ -112,7 +112,7 @@ exits: index.html, worker-info-insurance.html, report-loss.html
               <div id="pi-panel-etc" role="tabpanel" aria-labelledby="pi-nav-info" hidden>
                 <div class="pi-placeholder">
                   <div class="empty-state empty-state--compact" role="status">
-                    <div class="empty-state__icon" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-file-drop"/></svg></div>
+                    <div class="empty-state__icon" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-triangle-alert"/></svg></div>
                     <div class="empty-state__body">
                       <p class="empty-state__title text-body">이 섹션은 인사노트 프로토타입 범위에 포함되지 않습니다.</p>
                     </div>
@@ -134,7 +134,7 @@ exits: index.html, worker-info-insurance.html, report-loss.html
                   <div id="pi-sp-info" role="tabpanel" aria-labelledby="pi-sub-info" hidden>
                     <div class="pi-placeholder">
                       <div class="empty-state empty-state--compact" role="status">
-                        <div class="empty-state__icon" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-file-drop"/></svg></div>
+                        <div class="empty-state__icon" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-triangle-alert"/></svg></div>
                         <div class="empty-state__body">
                           <p class="empty-state__title text-body">인사정보 화면은 인사노트 프로토타입 범위에 포함되지 않습니다.</p>
                         </div>
@@ -581,9 +581,10 @@ exits: index.html, worker-info-insurance.html, report-loss.html
   /* ── 서브탭마다 모달 폭을 내용에 맞게 조정 ── */
   (function () {
     var modal = document.querySelector('.modal--lg');
-    /* 인사정보는 고정 640px. 인사노트는 표 콘텐츠 폭에 맞춰 모달 폭을 계산(좌측 내비 + 패딩 +
-       가장 넓은 표). CSS fit-content는 flex 컨텍스트에서 수 px 부족하게 계산돼 표가 넘치므로
-       실제 렌더 위치를 측정해 정확히 맞춘다. */
+    /* 두 서브탭 모두 활성 콘텐츠 폭에 맞춰 모달 폭을 조정한다.
+       - 인사정보(placeholder): max-content로 모달이 좌측 내비 + 콘텐츠를 감싸게 한 뒤 실측.
+       - 인사노트(표): CSS fit-content/max-content는 flex 컨텍스트에서 수 px 부족하게 계산돼
+         표가 넘치므로, 가장 넓은 표의 렌더 위치를 측정해 정확히 맞춘다. */
     function fitNote() {
       if (!modal) return;
       var mL = modal.getBoundingClientRect().left, need = 0;
@@ -593,10 +594,15 @@ exits: index.html, worker-info-insurance.html, report-loss.html
       });
       if (need) modal.style.width = Math.ceil(need + 26) + 'px'; /* 우측 콘텐츠 패딩 + 보더 여유 */
     }
+    function fitInfo() {
+      if (!modal) return;
+      modal.style.width = 'max-content';   /* 모달이 활성 콘텐츠(내비 + placeholder)를 감싸게 */
+      modal.style.width = Math.ceil(modal.getBoundingClientRect().width) + 'px';
+    }
     function fit(id) {
       if (!modal) return;
       if (id === 'pi-sp-note') requestAnimationFrame(fitNote);
-      else if (id === 'pi-sp-info') modal.style.width = '640px';
+      else if (id === 'pi-sp-info') requestAnimationFrame(fitInfo);
     }
     document.querySelectorAll('.pi-subtabs .tab').forEach(function (t) {
       t.addEventListener('click', function () { fit(this.getAttribute('aria-controls')); });
