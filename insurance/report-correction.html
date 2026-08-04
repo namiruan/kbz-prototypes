@@ -884,6 +884,12 @@ exits: insurance-join-status.html, index.html
   body.view-mode .modal__content .dropdown--button .dropdown__trigger,
   body.view-mode .modal__content .dp .dp__trigger,
   body.view-mode .modal__content .acq-job-trigger { background: var(--color-surface-subtle); border-color: transparent; box-shadow: none; color: var(--color-text-body); }
+  /* 정정 카드(적용됨=파란 배경) 안의 변경 전/후 값 — 조회 모드에서도 배경에 묻히지 않도록
+     흰 배경 + 옅은 테두리로 또렷한 값 칩처럼 보이게 한다(일반 readonly 평면화의 예외). */
+  body.view-mode .modal__content .corr-card .input,
+  body.view-mode .modal__content .corr-card .dp .dp__trigger {
+    background: var(--color-surface-base); border-color: var(--color-border-subtle);
+  }
   body.view-mode .modal__content .dp .dp__value-part { background: transparent; }
   body.view-mode .modal__content .dropdown__chevron,
   body.view-mode .modal__content .dp__chevron { color: var(--color-text-subtle); }
