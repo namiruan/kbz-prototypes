@@ -122,6 +122,8 @@
        하나의 브라우저 가로 스크롤로 노출(컴포넌트별 개별 스크롤 지양). */
     .page { min-width: max-content; }
     .page .table__scroll { overflow-x: visible; }
+    /* 브라우저 가로 스크롤 시 페이지 배경이 끝까지 채워지도록 캔버스(html) 배경 지정 */
+    html { background: var(--color-surface-subtle); }
     .table[aria-label="4대보험 가입현황 근로자 목록"] { table-layout: auto; }
     .table[aria-label="4대보험 가입현황 근로자 목록"] th,
     .table[aria-label="4대보험 가입현황 근로자 목록"] td { white-space: nowrap; }

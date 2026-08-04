@@ -27,6 +27,9 @@
        - .table__scroll 개별 스크롤은 끄고(브라우저 스크롤로 통일) */
     .page { min-width: max-content; }
     .page .table__scroll { overflow-x: visible; }
+    /* 브라우저 가로 스크롤 시 콘텐츠가 뷰포트보다 넓어져도 페이지 배경이 끝까지 채워지도록
+       캔버스(html) 배경을 페이지 배경색과 동일하게 지정 (proto-layout 배경은 뷰포트 폭까지만) */
+    html { background: var(--color-surface-subtle); }
     #rs-table { table-layout: auto; }
     #rs-table th, #rs-table td { white-space: nowrap; }
     /* 신고 종류·진행 상태 열 — 내용(짧은 값·배지)에 맞춰 최소 폭 지정 */

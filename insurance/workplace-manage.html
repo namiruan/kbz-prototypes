@@ -46,8 +46,9 @@
       border-bottom: none;
     }
 
-    /* 본사 행 — 고정 대표 사업장이라 강조(bold) */
-    .wp-table .table__row[data-hq] .table__cell { font-weight: var(--font-weight-heading); }
+    /* 본사 행 — 고정 대표 사업장이라 강조(bold) + 아래 구분선을 한 단계 두껍게(1px→2px)로
+       대표 사업장과 추가 근무지의 구분을 강조 */
+    .wp-table .table__row[data-hq] .table__cell { font-weight: var(--font-weight-heading); border-bottom-width: var(--stroke-md); }
     .wp-table .table__row[data-hq] .wp-mgmt-no__key { font-weight: var(--font-weight-body); }
     .wp-check-cell .checkbox { display: inline-flex; }
 
@@ -62,6 +63,8 @@
        하나의 브라우저 가로 스크롤로 노출(컴포넌트별 개별 스크롤 지양). */
     .page { min-width: max-content; }
     .page .table__scroll { overflow-x: visible; }
+    /* 브라우저 가로 스크롤 시 페이지 배경이 끝까지 채워지도록 캔버스(html) 배경 지정 */
+    html { background: var(--color-surface-subtle); }
     #wp-table { table-layout: auto; }
     #wp-table th, #wp-table td { white-space: nowrap; }
   </style>
