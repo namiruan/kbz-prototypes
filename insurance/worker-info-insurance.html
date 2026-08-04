@@ -73,7 +73,8 @@
     .wi-report-row { cursor: pointer; }
     .wi-report-row:hover { background: var(--color-surface-brand-subtle); }
 
-    .wi-guide { margin: 0 0 var(--space-stack-md); padding-left: var(--space-gap-lg); color: var(--color-text-subtle); font-size: var(--font-size-sm); display: flex; flex-direction: column; gap: var(--space-gap-2xs); }
+    /* 신고이력 상단 안내 배너 — 표와의 간격 */
+    .wi-report-banner { margin-bottom: var(--space-stack-md); }
     /* 안내 문구 내 경로(대괄호) — 브랜드 컬러 강조 */
     .wi-path { color: var(--color-text-brand); }
 
@@ -263,9 +264,12 @@ exits: index.html, report-acquire.html, report-loss.html, report-transfer.html, 
                   <!-- ═══ 신고 이력 ═══ -->
                   <div id="wi-sp-report" role="tabpanel" aria-labelledby="wi-sub-report" hidden>
 
-                    <div class="wi-guide">
-                      <span>• 본 이력에는 공단 신고가 완료된 건만 표시됩니다.</span>
-                      <span>• 진행중인 신고건은 <span class="wi-path">[상용근로자&gt;4대보험 관리&gt;4대보험 신고 tab]</span>에서 확인 가능합니다.</span>
+                    <div class="banner wi-report-banner" role="status">
+                      <span class="icon--md banner__icon" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-info"/></svg></span>
+                      <div class="text-description banner__body">
+                        <p class="banner__title">본 이력에는 공단 신고가 완료된 건만 표시됩니다.</p>
+                        <p class="banner__message">진행중인 신고건은 <span class="wi-path">[상용근로자&gt;4대보험 관리&gt;4대보험 신고 tab]</span>에서 확인 가능합니다.</p>
+                      </div>
                     </div>
                     <div class="table-container">
                       <table class="table table--hover" id="wi-report-table" aria-label="신고 이력">
