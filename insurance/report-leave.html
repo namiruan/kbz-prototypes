@@ -154,11 +154,11 @@ exits: insurance-join-status.html, index.html
                       </div>
                       <div class="form-field__footer"><p class="form-field__error text-helper" id="lv-reason-err" role="alert">휴직사유를 선택해 주세요.</p></div>
                     </div>
-                    <!-- 육아휴직 대상자녀 주민등록 번호(앞 7자리) — 휴직사유 '육아휴직'일 때만 노출 -->
+                    <!-- 육아휴직 대상자녀 주민등록번호(앞 7자리) — 휴직사유 '육아휴직'일 때만 노출 -->
                     <div class="form-field lv-child-field" id="lv-child-field" hidden>
-                      <label class="form-field__label text-form-label" for="lv-child">육아휴직 대상자녀 주민등록 번호 <span class="form-field__required" aria-hidden="true">(필수)</span></label>
+                      <label class="form-field__label text-form-label" for="lv-child">육아휴직 대상자녀 주민등록번호 <span class="form-field__required" aria-hidden="true">(필수)</span></label>
                       <div class="form-field__body"><input class="input" type="text" id="lv-child" placeholder="XXXXXX-X" inputmode="numeric" maxlength="8"></div>
-                      <div class="form-field__footer"><p class="form-field__error text-helper" id="lv-child-err" role="alert">대상자녀 주민등록 번호를 입력해 주세요.</p></div>
+                      <div class="form-field__footer"><p class="form-field__error text-helper" id="lv-child-err" role="alert">대상자녀 주민등록번호를 입력해 주세요.</p></div>
                     </div>
                   </div>
 
@@ -642,7 +642,7 @@ exits: insurance-join-status.html, index.html
     /* 육아휴직 대상자녀 */
     if (reason === '육아휴직') {
       var c = $('lv-child');
-      if (!c.value.trim()) { setFieldError('lv-child-field', 'lv-child-err', '대상자녀 주민등록 번호를 입력해 주세요.'); shake(c.closest('.form-field')); firstBad = firstBad || c; ok = false; }
+      if (!c.value.trim()) { setFieldError('lv-child-field', 'lv-child-err', '대상자녀 주민등록번호를 입력해 주세요.'); shake(c.closest('.form-field')); firstBad = firstBad || c; ok = false; }
     }
     /* 첨부 필수(육아휴직·기타) */
     if ((reason === '육아휴직' || reason === '기타') && !upHasFile()) {

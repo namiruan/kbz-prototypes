@@ -140,11 +140,11 @@ exits: insurance-join-status.html, index.html
                       </div>
                       <div class="form-field__footer"><p class="form-field__error text-helper" id="r-reason-err" role="alert">휴직사유를 선택해 주세요.</p></div>
                     </div>
-                    <!-- 육아휴직 대상자녀 주민등록 번호(앞 7자리) — 휴직사유 '육아휴직'일 때만 노출 -->
+                    <!-- 육아휴직 대상자녀 주민등록번호(앞 7자리) — 휴직사유 '육아휴직'일 때만 노출 -->
                     <div class="form-field r-child-field" id="r-child-field" hidden>
-                      <label class="form-field__label text-form-label" for="r-child">육아휴직 대상자녀 주민등록 번호 <span class="form-field__required" aria-hidden="true">(필수)</span></label>
+                      <label class="form-field__label text-form-label" for="r-child">육아휴직 대상자녀 주민등록번호 <span class="form-field__required" aria-hidden="true">(필수)</span></label>
                       <div class="form-field__body"><input class="input" type="text" id="r-child" placeholder="XXXXXX-X" inputmode="numeric" maxlength="8"></div>
-                      <div class="form-field__footer"><p class="form-field__error text-helper" id="r-child-err" role="alert">대상자녀 주민등록 번호를 입력해 주세요.</p></div>
+                      <div class="form-field__footer"><p class="form-field__error text-helper" id="r-child-err" role="alert">대상자녀 주민등록번호를 입력해 주세요.</p></div>
                     </div>
                   </div>
 
@@ -603,7 +603,7 @@ exits: insurance-join-status.html, index.html
     /* 휴직기간 중 받은 보수 '있음'이면 금액 필수 */
     if (recvVal() === '있음' && !$('r-recv-amt').value.trim()) { setFieldError('r-recv-amt-field', 'r-recv-amt-err', '받은 보수를 입력해 주세요.'); shake($('r-recv-amt-field')); firstBad = firstBad || $('r-recv-amt'); ok = false; }
     /* 육아휴직 대상자녀 */
-    if (reason === '육아휴직' && !$('r-child').value.trim()) { setFieldError('r-child-field', 'r-child-err', '대상자녀 주민등록 번호를 입력해 주세요.'); shake($('r-child-field')); firstBad = firstBad || $('r-child'); ok = false; }
+    if (reason === '육아휴직' && !$('r-child').value.trim()) { setFieldError('r-child-field', 'r-child-err', '대상자녀 주민등록번호를 입력해 주세요.'); shake($('r-child-field')); firstBad = firstBad || $('r-child'); ok = false; }
     if (!ok && firstBad && firstBad.focus) firstBad.focus();
     return ok;
   }
