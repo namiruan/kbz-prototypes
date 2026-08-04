@@ -1038,6 +1038,26 @@ exits: index.html
     if (yy.length === 4 && mm && dd) return yy + '-' + ('0' + mm).slice(-2) + '-' + ('0' + dd).slice(-2);
     return '';
   }
+  /* 조회 정보 카드의 취득일(입사일) — 상실일/퇴사일은 이 날짜 이후여야 한다 */
+  function acqDate(panel) {
+    if (!panel) return '';
+    var items = panel.querySelectorAll('.acq-info-card__item');
+    for (var i = 0; i < items.length; i++) {
+      var lab = items[i].querySelector('.acq-info-card__label');
+      if (lab && lab.textContent.trim() === '취득일') {
+        var v = items[i].querySelector('.acq-info-card__value');
+        return v ? v.textContent.trim() : '';
+      }
+    }
+    return '';
+  }
+  /* 활성 날짜(퇴사일/상실일)가 취득일보다 이전이면 에러 텍스트 반환, 정상이면 '' */
+  function beforeAcqMsg(panel, dp, v) {
+    var acq = acqDate(panel);
+    if (!acq || !v || v >= acq) return '';
+    var isLeave = !!(dp && dp.closest('.acq-leave-date-field'));
+    return (isLeave ? '퇴사일' : '상실일') + '은 취득일(' + acq + ') 이후로 선택해 주세요.';
+  }
 
   function autoLossDate(panel) {
     var leaveDp = panel.querySelector('.acq-leave-date-field .dp');
@@ -1080,7 +1100,13 @@ exits: index.html
       var ff = dp.closest('.form-field');
       var err = ff && ff.querySelector('[id$="-date-err"]');
       if (isValidDate(v)) {
-        dp.classList.remove('dp--error'); if (ff) ff.classList.remove('form-field--error');
+        var acqMsg = beforeAcqMsg(dp.closest('.scenario-panel'), dp, v);
+        if (acqMsg) {
+          dp.classList.add('dp--error'); if (ff) ff.classList.add('form-field--error');
+          if (err) err.textContent = acqMsg;
+        } else {
+          dp.classList.remove('dp--error'); if (ff) ff.classList.remove('form-field--error');
+        }
       } else {
         dp.classList.add('dp--error'); if (ff) ff.classList.add('form-field--error');
         if (err) err.textContent = '올바른 날짜를 입력해 주세요.';
@@ -1185,8 +1211,16 @@ exits: index.html
         if (dErr) dErr.textContent = !dv ? (mode ? '퇴사일을 선택해 주세요.' : '상실일을 선택해 주세요.') : '올바른 날짜를 입력해 주세요.';
         invalid.push(dField); firstBad = firstBad || (dp && dp.querySelector('.dp__value-part--year'));
       } else {
-        if (dp) dp.classList.remove('dp--error');
-        dField.classList.remove('form-field--error');
+        var acqMsg = beforeAcqMsg(panel, dp, dv);
+        if (acqMsg) {
+          if (dp) dp.classList.add('dp--error');
+          dField.classList.add('form-field--error');
+          if (dErr) dErr.textContent = acqMsg;
+          invalid.push(dField); firstBad = firstBad || (dp && dp.querySelector('.dp__value-part--year'));
+        } else {
+          if (dp) dp.classList.remove('dp--error');
+          dField.classList.remove('form-field--error');
+        }
       }
     }
 
