@@ -58,6 +58,9 @@
     .wp-pick-table .table__row.is-selected { background: var(--color-surface-brand-subtle); }
     /* 검색 결과 없음 (모달) */
     .wp-pick-empty { padding: var(--space-inset-2xl); text-align: center; color: var(--color-text-subtle); }
+      /* 데이터테이블: 셀 1줄 내용 이하로 줄지 않게 — 내용 기반 폭 + 셀 nowrap, 좁으면 .table__scroll 가로 스크롤 */
+    #wp-table { table-layout: auto; }
+    #wp-table th, #wp-table td { white-space: nowrap; }
   </style>
 </head>
 <body>
@@ -134,6 +137,7 @@ exits: index.html
               </div>
             </div>
 
+            <div class="table__scroll">
             <table class="table wp-table" id="wp-table" aria-label="근무지 목록">
               <colgroup>
                 <col style="width:48px">
@@ -212,6 +216,7 @@ exits: index.html
 
               </tbody>
             </table>
+            </div>
           </div>
 
         </div>
