@@ -351,7 +351,7 @@ exits: index.html, worker-info-insurance.html, report-loss.html
   function mkDateInput(name, iso) {
     var v = iso ? iso.replace(/-/g, '.') : '';
     return '<div class="input-wrap"><input class="input input--sm pi-date-input" type="text" inputmode="numeric" placeholder="YYYY.MM.DD" maxlength="10" value="' + v + '" aria-label="' + name + '"></div>' +
-      '<p class="pi-date-error text-helper" role="alert" hidden>유효한 날짜를 입력해 주세요. (YYYY.MM.DD)</p>';
+      '<p class="pi-date-error text-helper" role="alert" hidden>올바른 날짜를 입력해 주세요.</p>';
   }
   /* 숫자만 추출해 YYYY.MM.DD 형태로 구분점(.)만 삽입한다 — 숫자 값 자체는 변환하지 않는다 */
   function fmtDate(str) {
@@ -429,7 +429,7 @@ exits: index.html, worker-info-insurance.html, report-loss.html
       return true;
     }
     if (v === '') return false;
-    if (!isValidDate(v)) return fail('유효한 날짜를 입력해 주세요. (YYYY.MM.DD)');
+    if (!isValidDate(v)) return fail('올바른 날짜를 입력해 주세요.');
     if (cell.matches('[data-quit]')) {
       var hireInp = cell.closest('tr').querySelector('[data-cell-edit]:not([data-quit]) .pi-date-input');
       var hv = hireInp ? hireInp.value.trim() : '';
