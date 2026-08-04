@@ -22,7 +22,8 @@
        열 너비는 colgroup에서 200px 지정 — table-layout:fixed라 부족하면 잘린다 */
     .cell-insurance { white-space: nowrap; }
     .cell-insurance > * + * { margin-left: var(--space-gap-xs); }
-    /* 툴팁 2열 그리드 — 보수월액(4-5) 보험명/금액, 가입보험(4-3) 보험명/제외·미가입 사유 공용.
+    /* 툴팁 2열 그리드 — 보수월액(4-5) 보험명/금액, 가입보험(4-3) 보험명/제외 사유 공용.
+       (미가입은 사유·조치 없이 사실만 표기 → 툴팁 없음, 근로자정보>가입정보와 동일)
        tooltip-panel이 width:max-content라 그리드가 폭을 결정한다 */
     .tip-grid { display: grid; grid-template-columns: auto auto; column-gap: var(--space-gap-md); row-gap: var(--space-gap-xs); }
     .tip-grid > :nth-child(even) { text-align: right; }
@@ -293,7 +294,7 @@ exits: report-acquire.html, report-loss.html, report-transfer.html, report-chang
                         <span class="badge badge--success">고용<span class="sr-only"> 취득</span></span>
                         <span class="badge badge--success">산재<span class="sr-only"> 취득</span></span>
                         <span class="badge badge--success">건강<span class="sr-only"> 취득</span></span>
-                        <span class="tooltip-wrapper" onmouseenter="this.querySelector('.tooltip-panel').classList.add('tooltip-panel--visible')" onmouseleave="this.querySelector('.tooltip-panel').classList.remove('tooltip-panel--visible')"><span class="badge badge--neutral" aria-describedby="tip-nojoin-6">연금<span class="sr-only"> 미가입 — 납부예외 신청</span></span><div class="tooltip-panel elevation-tooltip tooltip-panel--left" id="tip-nojoin-6" role="tooltip"><span class="tip-grid"><span>미가입 사유</span><span>납부예외 신청</span></span></div></span>
+                        <span class="badge badge--neutral">연금<span class="sr-only"> 미가입</span></span>
                       </td>
                       <td class="table__cell table__cell--number" data-overlay-open="overlay-insurance-detail">2,500,000</td>
                       <td class="table__cell table__cell--action">
@@ -433,7 +434,7 @@ exits: report-acquire.html, report-loss.html, report-transfer.html, report-chang
                         <span class="badge badge--success">고용<span class="sr-only"> 취득</span></span>
                         <span class="badge badge--success">산재<span class="sr-only"> 취득</span></span>
                         <span class="badge badge--success">건강<span class="sr-only"> 취득</span></span>
-                        <span class="tooltip-wrapper" onmouseenter="this.querySelector('.tooltip-panel').classList.add('tooltip-panel--visible')" onmouseleave="this.querySelector('.tooltip-panel').classList.remove('tooltip-panel--visible')"><span class="badge badge--neutral" aria-describedby="tip-nojoin-5">연금<span class="sr-only"> 미가입 — 타 사업장 가입</span></span><div class="tooltip-panel elevation-tooltip tooltip-panel--left" id="tip-nojoin-5" role="tooltip"><span class="tip-grid"><span>미가입 사유</span><span>타 사업장 가입</span></span></div></span>
+                        <span class="badge badge--neutral">연금<span class="sr-only"> 미가입</span></span>
                       </td>
                       <td class="table__cell table__cell--number" data-overlay-open="overlay-insurance-detail">3,000,000</td>
                       <td class="table__cell table__cell--action">
