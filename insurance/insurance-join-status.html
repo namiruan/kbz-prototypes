@@ -118,8 +118,10 @@
     .rv-table.table-container { border-left: 0; border-right: 0; border-radius: 0; width: fit-content; max-width: 100%; margin-left: auto; margin-right: auto; }
     .rv-table .table__cell.rv-key { width: 1%; white-space: nowrap; color: var(--color-text-subtle); font-weight: var(--font-weight-medium); padding-right: var(--space-gap-2xl); }
     .rv-table .table__cell.rv-brand { color: var(--color-text-brand); font-weight: var(--font-weight-heading); }
-    /* 데이터테이블: 셀 1줄 내용 이하로 줄지 않게 — 내용 기반 폭(table-layout:auto) + 셀 nowrap.
-       이미 .table__scroll로 감싸져 있어, 좁아지면 가로 스크롤로 끝까지 볼 수 있다. */
+    /* 필터바·데이터테이블을 최소(내용 1줄) 너비 이하로 줄이지 않고, 좁아지면 페이지 전체를
+       하나의 브라우저 가로 스크롤로 노출(컴포넌트별 개별 스크롤 지양). */
+    .page { min-width: max-content; }
+    .page .table__scroll { overflow-x: visible; }
     .table[aria-label="4대보험 가입현황 근로자 목록"] { table-layout: auto; }
     .table[aria-label="4대보험 가입현황 근로자 목록"] th,
     .table[aria-label="4대보험 가입현황 근로자 목록"] td { white-space: nowrap; }
