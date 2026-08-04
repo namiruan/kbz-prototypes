@@ -473,7 +473,16 @@ exits: index.html, worker-info-insurance.html, report-loss.html
     var delBtn = section.querySelector('[data-del]');
     var addBtn = section.querySelector('[data-add]');
     var checkAll = section.querySelector('[data-check-all]');
+    var header = section.querySelector('.accordion__header');
     var kind = section.dataset.table;
+
+    /* 접힌 아코디언에서 추가·삭제 등 목록 변경 버튼을 누르면, 결과(추가 행·삭제 반영)를
+       확인할 수 있도록 아코디언을 펼친다. */
+    function expandSection() {
+      if (section.classList.contains('accordion__item--expanded')) return;
+      section.classList.add('accordion__item--expanded');
+      if (header) header.setAttribute('aria-expanded', 'true');
+    }
     var build = kind === 'join' ? joinRow : workRow;
 
     function rows() { return Array.prototype.slice.call(tbody.querySelectorAll('tr.table__row')); }
@@ -507,6 +516,7 @@ exits: index.html, worker-info-insurance.html, report-loss.html
     });
     if (delBtn) delBtn.addEventListener('click', function () {
       if (delBtn.classList.contains('btn--inactive')) return;
+      expandSection();
       rows().forEach(function (r) { var c = r.querySelector('[data-row-check]'); if (c && c.checked) r.remove(); });
       refresh();
     });
@@ -523,6 +533,7 @@ exits: index.html, worker-info-insurance.html, report-loss.html
     /* 추가 = 전체 편집형 새 행(모든 셀 입력 상태) + 버튼을 저장으로 전환.
        저장 = 추가 중인 행들을 읽기 상태로 일괄 확정 + 버튼을 추가로 복귀. */
     if (addBtn) addBtn.addEventListener('click', function () {
+      expandSection();   /* 접혀 있으면 먼저 펼쳐 추가·저장 결과가 보이게 */
       if (section.dataset.adding === '1') {
         var allOk = true;
         Array.prototype.slice.call(tbody.querySelectorAll('tr.pi-row-adding')).forEach(function (tr) {
