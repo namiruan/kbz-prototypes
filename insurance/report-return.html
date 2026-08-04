@@ -733,6 +733,20 @@ exits: insurance-join-status.html, index.html
   body.view-mode .modal__content .segment__slider { background: var(--color-surface-base); box-shadow: none; }
   body.view-mode .modal__content .segment__item { color: var(--color-text-subtle); }
   body.view-mode .modal__content .segment__item--selected { color: var(--color-text-body); }
+  /* 체크박스·라디오 — 조회 모드에선 선택 가능한 컨트롤도 DS disabled 외형으로 통일(checkbox.md·radio.md).
+     panel 마크업에 --disabled 클래스가 없으므로 view-mode 스코프에서 동일한 시각 상태를 강제한다. */
+  body.view-mode .modal__content .checkbox__control,
+  body.view-mode .modal__content .checkbox input:checked ~ .checkbox__control,
+  body.view-mode .modal__content .checkbox input:indeterminate ~ .checkbox__control {
+    background: var(--color-surface-disabled); border-color: var(--color-border-disabled); color: var(--color-text-disabled);
+  }
+  body.view-mode .modal__content .checkbox__label { color: var(--color-text-disabled); }
+  body.view-mode .modal__content .radio__control,
+  body.view-mode .modal__content .radio input:checked ~ .radio__control {
+    background: var(--color-surface-disabled); border-color: var(--color-border-disabled);
+  }
+  body.view-mode .modal__content .radio input:checked ~ .radio__control::after { background: var(--color-text-disabled); }
+  body.view-mode .modal__content .radio__label { color: var(--color-text-disabled); }
   /* 상세보기: 원래 신고 버튼(취소/임시저장/신고요청)을 숨기고 상세보기 전용 버튼으로 대체 */
   body.detail-mode .modal__footer > .btn { display: none; }
   .detail-actions { display: inline-flex; gap: var(--space-gap-sm); }
