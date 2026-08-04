@@ -183,7 +183,7 @@ exits: insurance-join-status.html, index.html
                   <div class="corr-items" id="c1-items">
                     <span class="text-card-title" id="c1-items-label">정정신고 항목</span>
                     <!-- 2-1 area — 선택된 정정신고 항목 없을 경우: 타이틀 라벨 바로 아래 안내 -->
-                    <p class="corr-empty-hint text-helper" id="c1-empty-hint">정정할 항목을 선택하면 입력란이 표시돼요.</p>
+                    <p class="corr-empty-hint text-body" id="c1-empty-hint">정정할 항목을 선택하면 입력란이 표시돼요.</p>
 
                     <div class="corr-cards" role="group" aria-labelledby="c1-items-label">
 
@@ -931,6 +931,8 @@ exits: insurance-join-status.html, index.html
   /* 상세보기: 원래 신고 버튼(취소/임시저장/신고요청)을 숨기고 상세보기 전용 버튼으로 대체 */
   body.detail-mode .modal__footer > .btn { display: none; }
   .detail-actions { display: inline-flex; gap: var(--space-gap-sm); }
+  /* 섹션 소제목 — h4(17)에서 한 단계 축소(15px), 알럿 제목은 유지 */
+  .text-card-title:not(.alert__title) { font-size: var(--font-size-lg); }
 </style>
 <script>
 (function () {

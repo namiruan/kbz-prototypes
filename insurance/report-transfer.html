@@ -994,6 +994,8 @@ exits: index.html
   /* 상세보기: 원래 신고 버튼(취소/임시저장/신고요청)을 숨기고 상세보기 전용 버튼으로 대체 */
   body.detail-mode .modal__footer > .btn { display: none; }
   .detail-actions { display: inline-flex; gap: var(--space-gap-sm); }
+  /* 섹션 소제목 — h4(17)에서 한 단계 축소(15px), 알럿 제목은 유지 */
+  .text-card-title:not(.alert__title) { font-size: var(--font-size-lg); }
 </style>
 <script>
 (function () {
