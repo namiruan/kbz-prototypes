@@ -756,6 +756,13 @@ exits: insurance-join-status.html, index.html
       if (/^\d{4}-\d{2}-\d{2}$/.test(this.value) && !isValidDate(this.value)) { setFieldError(fid, 'c1-ld-after-err', '올바른 날짜를 입력해 주세요.'); return; }
       if (this.value.trim() && f.classList.contains('form-field--error')) clearFieldState(fid, 'c1-ld-after-err');
     });
+    /* blur 시 DS initInput이 '값만 있으면 complete'로 표시하므로, 미완성·잘못된 날짜(예: "3")를
+       유효로 오인하지 않게 재검증한다. 비어있지 않고 유효한 전체 날짜가 아니면 에러로 되돌린다. */
+    el.addEventListener('blur', function () {
+      var v = this.value.trim();
+      var f = this.closest('.form-field'); var fid = f.id || (f.id = 'c1-ld-after-field');
+      if (v && !isValidDate(v)) setFieldError(fid, 'c1-ld-after-err', '올바른 날짜를 입력해 주세요.');
+    });
   })();
   var ccReason = document.getElementById('c1-cc-reason');
   if (ccReason) ccReason.addEventListener('input', function () {

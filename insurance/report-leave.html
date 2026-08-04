@@ -596,6 +596,11 @@ exits: insurance-join-status.html, index.html
       if (/[^0-9-]/.test(raw)) { dpFieldError(id, '숫자만 입력해 주세요.'); return; }
       liveValidateDates(id);
     });
+    /* blur 시 DS initInput이 '값만 있으면 complete'로 표시하므로, 미완성·잘못된 날짜(예: "3")를
+       유효로 오인하지 않게 재검증한다(dpVal은 유효한 전체 날짜만 값 반환). */
+    el.addEventListener('blur', function () {
+      if (this.value.trim() && !dpVal(id)) dpFieldError(id, '올바른 날짜를 입력해 주세요.');
+    });
   });
   /* 육아휴직 대상자녀 — XXXXXX-X 자동 하이픈(숫자 7자리). 숫자 외 문자 입력 시 '숫자만' 에러 */
   var child = $('lv-child');
