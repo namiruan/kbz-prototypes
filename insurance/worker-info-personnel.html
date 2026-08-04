@@ -81,6 +81,8 @@ exits: index.html, worker-info-insurance.html, report-loss.html
     <nav class="proto-nav" id="proto-nav" aria-label="시나리오 선택">
       <button class="proto-nav-btn is-active" data-scenario="기본" type="button">기본</button>
       <button class="proto-nav-btn" data-scenario="퇴사일-등록" type="button">퇴사일 등록</button>
+      <button class="proto-nav-btn" data-scenario="퇴사-완료" type="button">퇴사 완료</button>
+      <button class="proto-nav-btn" data-scenario="빈-상태" type="button">빈 상태</button>
     </nav>
   </aside>
 
@@ -580,6 +582,15 @@ exits: index.html, worker-info-insurance.html, report-loss.html
       refresh();
     });
 
+    /* 시나리오 전환용 — 표 데이터를 통째로 교체(읽기 상태). 추가 모드는 해제. */
+    section.piSetRows = function (list) {
+      rows().forEach(function (r) { r.remove(); });
+      section.dataset.adding = '';
+      setAddMode(false);
+      (list || []).forEach(function (d) { addRow(d, false); });
+      refresh();
+    };
+
     refresh();
   }
   document.querySelectorAll('.accordion__item[data-table]').forEach(initSectionTable);
@@ -678,24 +689,36 @@ exits: index.html, worker-info-insurance.html, report-loss.html
       document.getElementById('proto-nav-divider').hidden = interactive;
     });
   });
+  var joinSec = document.querySelector('.accordion__item[data-table="join"]');
+  var workSec = document.querySelector('.accordion__item[data-table="work"]');
   document.querySelectorAll('.proto-nav-btn').forEach(function (btn) {
     btn.addEventListener('click', function () {
       var name = this.dataset.scenario;
       document.querySelectorAll('.proto-nav-btn').forEach(function (b) { b.classList.toggle('is-active', b.dataset.scenario === name); });
-      var quitCell = document.querySelector('.accordion__item[data-table="join"] [data-quit]');
-      var quitInput = quitCell && quitCell.querySelector('.pi-date-input');
-      var quitView = quitCell && quitCell.querySelector('.table__cell__view');
+      _ovStack.slice().reverse().forEach(closeOverlay);
+      /* 퇴사일이 이미 채워지는 시나리오는 옵저버가 상실신고 모달을 자동 오픈하지 않도록 미리 표시 */
+      _quitShown = (name === '퇴사-완료' || name === '퇴사일-등록');
+
+      /* 시나리오별 표 데이터 재구성 */
+      if (name === '빈-상태') {
+        if (joinSec.piSetRows) joinSec.piSetRows([]);
+        if (workSec.piSetRows) workSec.piSetRows([]);
+      } else if (name === '퇴사-완료') {
+        if (joinSec.piSetRows) joinSec.piSetRows([{ in: '2012-03-01', quit: '2026-05-31' }]);
+        if (workSec.piSetRows) workSec.piSetRows(SEED.work);
+      } else {   /* 기본 · 퇴사일-등록 */
+        if (joinSec.piSetRows) joinSec.piSetRows(SEED.join);
+        if (workSec.piSetRows) workSec.piSetRows(SEED.work);
+      }
+
+      /* 퇴사일 등록: 기본 데이터에서 퇴사일을 채우고 상실신고 Confirm 모달을 직접 오픈 */
       if (name === '퇴사일-등록') {
-        _quitShown = true;          /* 옵저버 중복 실행 방지 — 아래에서 직접 오픈 */
+        var quitCell = document.querySelector('.accordion__item[data-table="join"] [data-quit]');
+        var quitInput = quitCell && quitCell.querySelector('.pi-date-input');
+        var quitView = quitCell && quitCell.querySelector('.table__cell__view');
         if (quitInput) { quitInput.value = '2026.05.31'; quitInput.classList.remove('input--error'); }
-        if (quitView) quitView.textContent = '2026.05.31';   /* 저장된 읽기값 반영 */
+        if (quitView) quitView.textContent = '2026.05.31';
         openOverlay('overlay-quit-confirm');
-      } else {
-        _ovStack.slice().reverse().forEach(closeOverlay);
-        if (quitInput) { quitInput.value = ''; quitInput.classList.remove('input--error'); }
-        if (quitView) quitView.textContent = '—';
-        if (quitCell) quitCell.classList.remove('table__cell--editing');
-        _quitShown = false;
       }
     });
   });
