@@ -267,7 +267,6 @@ exits: report-acquire.html, report-loss.html, report-transfer.html, report-chang
                   <colgroup>
                     <col style="width:115px">
                     <col style="width:90px">
-                    <col style="width:140px">
                     <col>
                     <col style="width:72px">
                     <col style="width:200px">
@@ -279,7 +278,6 @@ exits: report-acquire.html, report-loss.html, report-transfer.html, report-chang
                       <th class="table__head-cell table__head-cell--sort" scope="col" aria-sort="none"><button class="table__sort-btn" aria-label="부서 정렬">부서<span class="tooltip-wrapper" onmouseenter="this.querySelector('.tooltip-panel').classList.add('tooltip-panel--visible')" onmouseleave="this.querySelector('.tooltip-panel').classList.remove('tooltip-panel--visible')"><span class="icon icon--sm" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-sort-asc"/></svg></span><div class="tooltip-panel elevation-tooltip tooltip-panel--bottom" role="tooltip">오름차순</div></span></button></th>
                       <th class="table__head-cell table__head-cell--sort table__head-cell--sort-asc" scope="col" aria-sort="ascending"><button class="table__sort-btn" aria-label="이름 오름차순 정렬됨">이름<span class="tooltip-wrapper" onmouseenter="this.querySelector('.tooltip-panel').classList.add('tooltip-panel--visible')" onmouseleave="this.querySelector('.tooltip-panel').classList.remove('tooltip-panel--visible')"><span class="icon icon--sm icon--brand" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-sort-asc"/></svg></span><div class="tooltip-panel elevation-tooltip tooltip-panel--bottom" role="tooltip">내림차순으로 정렬</div></span></button></th>
                       <th class="table__head-cell" scope="col">주민번호</th>
-                      <th class="table__head-cell table__head-cell--sort" scope="col" aria-sort="none"><button class="table__sort-btn" aria-label="사업장 정렬">사업장<span class="tooltip-wrapper" onmouseenter="this.querySelector('.tooltip-panel').classList.add('tooltip-panel--visible')" onmouseleave="this.querySelector('.tooltip-panel').classList.remove('tooltip-panel--visible')"><span class="icon icon--sm" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-sort-asc"/></svg></span><div class="tooltip-panel elevation-tooltip tooltip-panel--bottom" role="tooltip">오름차순</div></span></button></th>
                       <th class="table__head-cell table__cell--fit" scope="col">자격</th>
                       <th class="table__head-cell" scope="col">가입 보험</th>
                       <th class="table__head-cell table__head-cell--sort" scope="col" aria-sort="none"><button class="table__sort-btn" aria-label="보수월액 정렬">보수월액<span class="tooltip-wrapper" onmouseenter="this.querySelector('.tooltip-panel').classList.add('tooltip-panel--visible')" onmouseleave="this.querySelector('.tooltip-panel').classList.remove('tooltip-panel--visible')"><span class="icon icon--sm" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-sort-asc"/></svg></span><div class="tooltip-panel elevation-tooltip tooltip-panel--bottom" role="tooltip">오름차순</div></span></button></th>
@@ -289,10 +287,9 @@ exits: report-acquire.html, report-loss.html, report-transfer.html, report-chang
                   <tbody class="table__body">
 
                     <tr class="table__row">
-                      <td class="table__cell" data-overlay-open="overlay-insurance-detail">품질관리팀</td>
+                      <td class="table__cell" data-overlay-open="overlay-insurance-detail">취득 가능 · 산재 취득완료</td>
                       <td class="table__cell" data-overlay-open="overlay-insurance-detail">이영희</td>
                       <td class="table__cell" data-overlay-open="overlay-insurance-detail">030145-9876543</td>
-                      <td class="table__cell" data-overlay-open="overlay-insurance-detail">취득 가능 · 산재 취득완료</td>
                       <td class="table__cell table__cell--fit" data-overlay-open="overlay-insurance-detail"><span class="badge badge--success badge--line">취득</span></td>
                       <td class="table__cell cell-insurance" data-overlay-open="overlay-insurance-detail">
                         <span class="badge badge--success">고용<span class="sr-only"> 취득</span></span>
@@ -325,10 +322,9 @@ exits: report-acquire.html, report-loss.html, report-transfer.html, report-chang
 
                     <!-- 자진신고 사업장 케이스 — 취득 가능 + Step 조건 없음 → 취득 모달에서 산재 '자진신고사업장 선택불가' -->
                     <tr class="table__row">
-                      <td class="table__cell" data-overlay-open="overlay-insurance-detail">총무팀</td>
+                      <td class="table__cell" data-overlay-open="overlay-insurance-detail">자진신고 사업장 · 산재 선택불가</td>
                       <td class="table__cell" data-overlay-open="overlay-insurance-detail">한서연</td>
                       <td class="table__cell" data-overlay-open="overlay-insurance-detail">960712-2233448</td>
-                      <td class="table__cell" data-overlay-open="overlay-insurance-detail">자진신고 사업장 · 산재 선택불가</td>
                       <td class="table__cell table__cell--fit" data-overlay-open="overlay-insurance-detail"><span class="badge badge--success badge--line">취득</span></td>
                       <td class="table__cell cell-insurance" data-overlay-open="overlay-insurance-detail">
                         <span class="badge badge--success">고용<span class="sr-only"> 취득</span></span>
@@ -359,10 +355,9 @@ exits: report-acquire.html, report-loss.html, report-transfer.html, report-chang
                     </tr>
 
                     <tr class="table__row">
-                      <td class="table__cell" data-overlay-open="overlay-insurance-detail">인사팀</td>
+                      <td class="table__cell" data-overlay-open="overlay-insurance-detail">Step1 · 접수완료 신고</td>
                       <td class="table__cell" data-overlay-open="overlay-insurance-detail">김철수</td>
                       <td class="table__cell" data-overlay-open="overlay-insurance-detail">020130-3456789</td>
-                      <td class="table__cell" data-overlay-open="overlay-insurance-detail">Step1 · 접수완료 신고</td>
                       <td class="table__cell table__cell--fit" data-overlay-open="overlay-insurance-detail"><span class="badge badge--success badge--line">취득</span></td>
                       <td class="table__cell cell-insurance" data-overlay-open="overlay-insurance-detail">
                         <span class="badge badge--success">고용<span class="sr-only"> 취득</span></span>
@@ -394,10 +389,9 @@ exits: report-acquire.html, report-loss.html, report-transfer.html, report-chang
                     </tr>
 
                     <tr class="table__row">
-                      <td class="table__cell" data-overlay-open="overlay-insurance-detail">연구개발팀</td>
+                      <td class="table__cell" data-overlay-open="overlay-insurance-detail">Step2 · 임시저장</td>
                       <td class="table__cell" data-overlay-open="overlay-insurance-detail">박진수</td>
                       <td class="table__cell" data-overlay-open="overlay-insurance-detail">040234-4567890</td>
-                      <td class="table__cell" data-overlay-open="overlay-insurance-detail">Step2 · 임시저장</td>
                       <td class="table__cell table__cell--fit" data-overlay-open="overlay-insurance-detail"><span class="badge badge--success badge--line">취득</span></td>
                       <td class="table__cell cell-insurance" data-overlay-open="overlay-insurance-detail">
                         <span class="badge badge--success">고용<span class="sr-only"> 취득</span></span>
@@ -429,10 +423,9 @@ exits: report-acquire.html, report-loss.html, report-transfer.html, report-chang
 
                     <!-- Step-3: 다른 유형 신고서가 접수된 상태 — 신고 클릭 시 안내 Alert(overlay-step3) -->
                     <tr class="table__row">
-                      <td class="table__cell" data-overlay-open="overlay-insurance-detail">인사팀</td>
+                      <td class="table__cell" data-overlay-open="overlay-insurance-detail">Step3 · 다른유형 접수 중</td>
                       <td class="table__cell" data-overlay-open="overlay-insurance-detail">정다은</td>
                       <td class="table__cell" data-overlay-open="overlay-insurance-detail">950312-2233445</td>
-                      <td class="table__cell" data-overlay-open="overlay-insurance-detail">Step3 · 다른유형 접수 중</td>
                       <td class="table__cell table__cell--fit" data-overlay-open="overlay-insurance-detail"><span class="badge badge--success badge--line">취득</span></td>
                       <td class="table__cell cell-insurance" data-overlay-open="overlay-insurance-detail">
                         <span class="badge badge--success">고용<span class="sr-only"> 취득</span></span>
@@ -463,10 +456,9 @@ exits: report-acquire.html, report-loss.html, report-transfer.html, report-chang
                     </tr>
 
                     <tr class="table__row">
-                      <td class="table__cell" data-overlay-open="overlay-insurance-detail">개발팀</td>
+                      <td class="table__cell" data-overlay-open="overlay-insurance-detail">Step4 · 반려 신고</td>
                       <td class="table__cell" data-overlay-open="overlay-insurance-detail">이영호</td>
                       <td class="table__cell" data-overlay-open="overlay-insurance-detail">040500-1234567</td>
-                      <td class="table__cell" data-overlay-open="overlay-insurance-detail">Step4 · 반려 신고</td>
                       <td class="table__cell table__cell--fit" data-overlay-open="overlay-insurance-detail"><span class="badge badge--success badge--line">취득</span></td>
                       <td class="table__cell cell-insurance" data-overlay-open="overlay-insurance-detail">
                         <span class="badge badge--success">고용<span class="sr-only"> 취득</span></span>
@@ -499,10 +491,9 @@ exits: report-acquire.html, report-loss.html, report-transfer.html, report-chang
 
                     <!-- 자격: 상실 — 드롭다운 옵션이 취득·정정 2개로 축소된다 (6 area) -->
                     <tr class="table__row">
-                      <td class="table__cell" data-overlay-open="overlay-insurance-detail">인사팀</td>
+                      <td class="table__cell" data-overlay-open="overlay-insurance-detail">Step5 · 상실신고 대상자</td>
                       <td class="table__cell" data-overlay-open="overlay-insurance-detail">박준형</td>
                       <td class="table__cell" data-overlay-open="overlay-insurance-detail">040700-3456789</td>
-                      <td class="table__cell" data-overlay-open="overlay-insurance-detail">Step5 · 상실신고 대상자</td>
                       <td class="table__cell table__cell--fit" data-overlay-open="overlay-insurance-detail"><span class="badge badge--caution badge--line">상실</span></td>
                       <td class="table__cell cell-insurance" data-overlay-open="overlay-insurance-detail">
                         <span class="badge badge--caution">고용<span class="sr-only"> 상실</span></span>
@@ -645,7 +636,6 @@ exits: report-acquire.html, report-loss.html, report-transfer.html, report-chang
                   <colgroup>
                     <col style="width:115px">
                     <col style="width:90px">
-                    <col style="width:140px">
                     <col>
                     <col style="width:72px">
                     <col style="width:200px">
@@ -657,7 +647,6 @@ exits: report-acquire.html, report-loss.html, report-transfer.html, report-chang
                       <th class="table__head-cell table__head-cell--sort" scope="col" aria-sort="none"><button class="table__sort-btn" aria-label="부서 정렬">부서<span class="tooltip-wrapper" onmouseenter="this.querySelector('.tooltip-panel').classList.add('tooltip-panel--visible')" onmouseleave="this.querySelector('.tooltip-panel').classList.remove('tooltip-panel--visible')"><span class="icon icon--sm" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-sort-asc"/></svg></span><div class="tooltip-panel elevation-tooltip tooltip-panel--bottom" role="tooltip">오름차순</div></span></button></th>
                       <th class="table__head-cell table__head-cell--sort table__head-cell--sort-asc" scope="col" aria-sort="ascending"><button class="table__sort-btn" aria-label="이름 오름차순 정렬됨">이름<span class="tooltip-wrapper" onmouseenter="this.querySelector('.tooltip-panel').classList.add('tooltip-panel--visible')" onmouseleave="this.querySelector('.tooltip-panel').classList.remove('tooltip-panel--visible')"><span class="icon icon--sm icon--brand" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-sort-asc"/></svg></span><div class="tooltip-panel elevation-tooltip tooltip-panel--bottom" role="tooltip">내림차순으로 정렬</div></span></button></th>
                       <th class="table__head-cell" scope="col">주민번호</th>
-                      <th class="table__head-cell table__head-cell--sort" scope="col" aria-sort="none"><button class="table__sort-btn" aria-label="사업장 정렬">사업장<span class="tooltip-wrapper" onmouseenter="this.querySelector('.tooltip-panel').classList.add('tooltip-panel--visible')" onmouseleave="this.querySelector('.tooltip-panel').classList.remove('tooltip-panel--visible')"><span class="icon icon--sm" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-sort-asc"/></svg></span><div class="tooltip-panel elevation-tooltip tooltip-panel--bottom" role="tooltip">오름차순</div></span></button></th>
                       <th class="table__head-cell table__cell--fit" scope="col">자격</th>
                       <th class="table__head-cell" scope="col">가입 보험</th>
                       <th class="table__head-cell table__head-cell--sort" scope="col" aria-sort="none"><button class="table__sort-btn" aria-label="보수월액 정렬">보수월액<span class="tooltip-wrapper" onmouseenter="this.querySelector('.tooltip-panel').classList.add('tooltip-panel--visible')" onmouseleave="this.querySelector('.tooltip-panel').classList.remove('tooltip-panel--visible')"><span class="icon icon--sm" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-sort-asc"/></svg></span><div class="tooltip-panel elevation-tooltip tooltip-panel--bottom" role="tooltip">오름차순</div></span></button></th>
@@ -799,7 +788,6 @@ exits: report-acquire.html, report-loss.html, report-transfer.html, report-chang
                   <colgroup>
                     <col style="width:115px">
                     <col style="width:90px">
-                    <col style="width:140px">
                     <col>
                     <col style="width:72px">
                     <col style="width:200px">
@@ -811,7 +799,6 @@ exits: report-acquire.html, report-loss.html, report-transfer.html, report-chang
                       <th class="table__head-cell table__head-cell--sort" scope="col" aria-sort="none"><button class="table__sort-btn" aria-label="부서 정렬">부서<span class="tooltip-wrapper" onmouseenter="this.querySelector('.tooltip-panel').classList.add('tooltip-panel--visible')" onmouseleave="this.querySelector('.tooltip-panel').classList.remove('tooltip-panel--visible')"><span class="icon icon--sm" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-sort-asc"/></svg></span><div class="tooltip-panel elevation-tooltip tooltip-panel--bottom" role="tooltip">오름차순</div></span></button></th>
                       <th class="table__head-cell table__head-cell--sort table__head-cell--sort-asc" scope="col" aria-sort="ascending"><button class="table__sort-btn" aria-label="이름 오름차순 정렬됨">이름<span class="tooltip-wrapper" onmouseenter="this.querySelector('.tooltip-panel').classList.add('tooltip-panel--visible')" onmouseleave="this.querySelector('.tooltip-panel').classList.remove('tooltip-panel--visible')"><span class="icon icon--sm icon--brand" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-sort-asc"/></svg></span><div class="tooltip-panel elevation-tooltip tooltip-panel--bottom" role="tooltip">내림차순으로 정렬</div></span></button></th>
                       <th class="table__head-cell" scope="col">주민번호</th>
-                      <th class="table__head-cell table__head-cell--sort" scope="col" aria-sort="none"><button class="table__sort-btn" aria-label="사업장 정렬">사업장<span class="tooltip-wrapper" onmouseenter="this.querySelector('.tooltip-panel').classList.add('tooltip-panel--visible')" onmouseleave="this.querySelector('.tooltip-panel').classList.remove('tooltip-panel--visible')"><span class="icon icon--sm" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-sort-asc"/></svg></span><div class="tooltip-panel elevation-tooltip tooltip-panel--bottom" role="tooltip">오름차순</div></span></button></th>
                       <th class="table__head-cell table__cell--fit" scope="col">자격</th>
                       <th class="table__head-cell" scope="col">가입 보험</th>
                       <th class="table__head-cell table__head-cell--sort" scope="col" aria-sort="none"><button class="table__sort-btn" aria-label="보수월액 정렬">보수월액<span class="tooltip-wrapper" onmouseenter="this.querySelector('.tooltip-panel').classList.add('tooltip-panel--visible')" onmouseleave="this.querySelector('.tooltip-panel').classList.remove('tooltip-panel--visible')"><span class="icon icon--sm" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-sort-asc"/></svg></span><div class="tooltip-panel elevation-tooltip tooltip-panel--bottom" role="tooltip">오름차순</div></span></button></th>
@@ -950,7 +937,6 @@ exits: report-acquire.html, report-loss.html, report-transfer.html, report-chang
                   <colgroup>
                     <col style="width:115px">
                     <col style="width:90px">
-                    <col style="width:140px">
                     <col>
                     <col style="width:72px">
                     <col style="width:200px">
@@ -962,7 +948,6 @@ exits: report-acquire.html, report-loss.html, report-transfer.html, report-chang
                       <th class="table__head-cell table__head-cell--sort" scope="col" aria-sort="none"><button class="table__sort-btn" aria-label="부서 정렬">부서<span class="tooltip-wrapper" onmouseenter="this.querySelector('.tooltip-panel').classList.add('tooltip-panel--visible')" onmouseleave="this.querySelector('.tooltip-panel').classList.remove('tooltip-panel--visible')"><span class="icon icon--sm" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-sort-asc"/></svg></span><div class="tooltip-panel elevation-tooltip tooltip-panel--bottom" role="tooltip">오름차순</div></span></button></th>
                       <th class="table__head-cell table__head-cell--sort table__head-cell--sort-asc" scope="col" aria-sort="ascending"><button class="table__sort-btn" aria-label="이름 오름차순 정렬됨">이름<span class="tooltip-wrapper" onmouseenter="this.querySelector('.tooltip-panel').classList.add('tooltip-panel--visible')" onmouseleave="this.querySelector('.tooltip-panel').classList.remove('tooltip-panel--visible')"><span class="icon icon--sm icon--brand" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-sort-asc"/></svg></span><div class="tooltip-panel elevation-tooltip tooltip-panel--bottom" role="tooltip">내림차순으로 정렬</div></span></button></th>
                       <th class="table__head-cell" scope="col">주민번호</th>
-                      <th class="table__head-cell table__head-cell--sort" scope="col" aria-sort="none"><button class="table__sort-btn" aria-label="사업장 정렬">사업장<span class="tooltip-wrapper" onmouseenter="this.querySelector('.tooltip-panel').classList.add('tooltip-panel--visible')" onmouseleave="this.querySelector('.tooltip-panel').classList.remove('tooltip-panel--visible')"><span class="icon icon--sm" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-sort-asc"/></svg></span><div class="tooltip-panel elevation-tooltip tooltip-panel--bottom" role="tooltip">오름차순</div></span></button></th>
                       <th class="table__head-cell table__cell--fit" scope="col">자격</th>
                       <th class="table__head-cell" scope="col">가입 보험</th>
                       <th class="table__head-cell table__head-cell--sort" scope="col" aria-sort="none"><button class="table__sort-btn" aria-label="보수월액 정렬">보수월액<span class="tooltip-wrapper" onmouseenter="this.querySelector('.tooltip-panel').classList.add('tooltip-panel--visible')" onmouseleave="this.querySelector('.tooltip-panel').classList.remove('tooltip-panel--visible')"><span class="icon icon--sm" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-sort-asc"/></svg></span><div class="tooltip-panel elevation-tooltip tooltip-panel--bottom" role="tooltip">오름차순</div></span></button></th>
@@ -971,50 +956,45 @@ exits: report-acquire.html, report-loss.html, report-transfer.html, report-chang
                   </thead>
                   <tbody class="table__body">
                     <tr class="table__row">
-                      <td class="table__cell"><span class="skeleton skeleton--text" style="width:72px" aria-hidden="true"></span></td>
+                      <td class="table__cell"><span class="skeleton skeleton--text" style="width:160px" aria-hidden="true"></span></td>
                       <td class="table__cell"><span class="skeleton skeleton--text" style="width:56px" aria-hidden="true"></span></td>
                       <td class="table__cell"><span class="skeleton skeleton--text" style="width:120px" aria-hidden="true"></span></td>
-                      <td class="table__cell"><span class="skeleton skeleton--text" style="width:160px" aria-hidden="true"></span></td>
                       <td class="table__cell"><span class="skeleton skeleton--text" style="width:40px" aria-hidden="true"></span></td>
                       <td class="table__cell"><span class="skeleton skeleton--text" style="width:140px" aria-hidden="true"></span></td>
                       <td class="table__cell"><span class="skeleton skeleton--text" style="width:88px" aria-hidden="true"></span></td>
                       <td class="table__cell"><span class="skeleton skeleton--text" style="width:64px" aria-hidden="true"></span></td>
                     </tr>
                     <tr class="table__row">
-                      <td class="table__cell"><span class="skeleton skeleton--text" style="width:64px" aria-hidden="true"></span></td>
+                      <td class="table__cell"><span class="skeleton skeleton--text" style="width:150px" aria-hidden="true"></span></td>
                       <td class="table__cell"><span class="skeleton skeleton--text" style="width:48px" aria-hidden="true"></span></td>
                       <td class="table__cell"><span class="skeleton skeleton--text" style="width:120px" aria-hidden="true"></span></td>
-                      <td class="table__cell"><span class="skeleton skeleton--text" style="width:150px" aria-hidden="true"></span></td>
                       <td class="table__cell"><span class="skeleton skeleton--text" style="width:40px" aria-hidden="true"></span></td>
                       <td class="table__cell"><span class="skeleton skeleton--text" style="width:140px" aria-hidden="true"></span></td>
                       <td class="table__cell"><span class="skeleton skeleton--text" style="width:80px" aria-hidden="true"></span></td>
                       <td class="table__cell"><span class="skeleton skeleton--text" style="width:64px" aria-hidden="true"></span></td>
                     </tr>
                     <tr class="table__row">
-                      <td class="table__cell"><span class="skeleton skeleton--text" style="width:80px" aria-hidden="true"></span></td>
+                      <td class="table__cell"><span class="skeleton skeleton--text" style="width:170px" aria-hidden="true"></span></td>
                       <td class="table__cell"><span class="skeleton skeleton--text" style="width:52px" aria-hidden="true"></span></td>
                       <td class="table__cell"><span class="skeleton skeleton--text" style="width:120px" aria-hidden="true"></span></td>
-                      <td class="table__cell"><span class="skeleton skeleton--text" style="width:170px" aria-hidden="true"></span></td>
                       <td class="table__cell"><span class="skeleton skeleton--text" style="width:40px" aria-hidden="true"></span></td>
                       <td class="table__cell"><span class="skeleton skeleton--text" style="width:140px" aria-hidden="true"></span></td>
                       <td class="table__cell"><span class="skeleton skeleton--text" style="width:96px" aria-hidden="true"></span></td>
                       <td class="table__cell"><span class="skeleton skeleton--text" style="width:64px" aria-hidden="true"></span></td>
                     </tr>
                     <tr class="table__row">
-                      <td class="table__cell"><span class="skeleton skeleton--text" style="width:70px" aria-hidden="true"></span></td>
+                      <td class="table__cell"><span class="skeleton skeleton--text" style="width:155px" aria-hidden="true"></span></td>
                       <td class="table__cell"><span class="skeleton skeleton--text" style="width:50px" aria-hidden="true"></span></td>
                       <td class="table__cell"><span class="skeleton skeleton--text" style="width:120px" aria-hidden="true"></span></td>
-                      <td class="table__cell"><span class="skeleton skeleton--text" style="width:155px" aria-hidden="true"></span></td>
                       <td class="table__cell"><span class="skeleton skeleton--text" style="width:40px" aria-hidden="true"></span></td>
                       <td class="table__cell"><span class="skeleton skeleton--text" style="width:140px" aria-hidden="true"></span></td>
                       <td class="table__cell"><span class="skeleton skeleton--text" style="width:84px" aria-hidden="true"></span></td>
                       <td class="table__cell"><span class="skeleton skeleton--text" style="width:64px" aria-hidden="true"></span></td>
                     </tr>
                     <tr class="table__row">
-                      <td class="table__cell"><span class="skeleton skeleton--text" style="width:66px" aria-hidden="true"></span></td>
+                      <td class="table__cell"><span class="skeleton skeleton--text" style="width:165px" aria-hidden="true"></span></td>
                       <td class="table__cell"><span class="skeleton skeleton--text" style="width:54px" aria-hidden="true"></span></td>
                       <td class="table__cell"><span class="skeleton skeleton--text" style="width:120px" aria-hidden="true"></span></td>
-                      <td class="table__cell"><span class="skeleton skeleton--text" style="width:165px" aria-hidden="true"></span></td>
                       <td class="table__cell"><span class="skeleton skeleton--text" style="width:40px" aria-hidden="true"></span></td>
                       <td class="table__cell"><span class="skeleton skeleton--text" style="width:140px" aria-hidden="true"></span></td>
                       <td class="table__cell"><span class="skeleton skeleton--text" style="width:76px" aria-hidden="true"></span></td>
@@ -1138,7 +1118,6 @@ exits: report-acquire.html, report-loss.html, report-transfer.html, report-chang
                   <colgroup>
                     <col style="width:115px">
                     <col style="width:90px">
-                    <col style="width:140px">
                     <col>
                     <col style="width:72px">
                     <col style="width:200px">
@@ -1150,7 +1129,6 @@ exits: report-acquire.html, report-loss.html, report-transfer.html, report-chang
                       <th class="table__head-cell table__head-cell--sort" scope="col" aria-sort="none"><button class="table__sort-btn" aria-label="부서 정렬">부서<span class="tooltip-wrapper" onmouseenter="this.querySelector('.tooltip-panel').classList.add('tooltip-panel--visible')" onmouseleave="this.querySelector('.tooltip-panel').classList.remove('tooltip-panel--visible')"><span class="icon icon--sm" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-sort-asc"/></svg></span><div class="tooltip-panel elevation-tooltip tooltip-panel--bottom" role="tooltip">오름차순</div></span></button></th>
                       <th class="table__head-cell table__head-cell--sort table__head-cell--sort-asc" scope="col" aria-sort="ascending"><button class="table__sort-btn" aria-label="이름 오름차순 정렬됨">이름<span class="tooltip-wrapper" onmouseenter="this.querySelector('.tooltip-panel').classList.add('tooltip-panel--visible')" onmouseleave="this.querySelector('.tooltip-panel').classList.remove('tooltip-panel--visible')"><span class="icon icon--sm icon--brand" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-sort-asc"/></svg></span><div class="tooltip-panel elevation-tooltip tooltip-panel--bottom" role="tooltip">내림차순으로 정렬</div></span></button></th>
                       <th class="table__head-cell" scope="col">주민번호</th>
-                      <th class="table__head-cell table__head-cell--sort" scope="col" aria-sort="none"><button class="table__sort-btn" aria-label="사업장 정렬">사업장<span class="tooltip-wrapper" onmouseenter="this.querySelector('.tooltip-panel').classList.add('tooltip-panel--visible')" onmouseleave="this.querySelector('.tooltip-panel').classList.remove('tooltip-panel--visible')"><span class="icon icon--sm" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-sort-asc"/></svg></span><div class="tooltip-panel elevation-tooltip tooltip-panel--bottom" role="tooltip">오름차순</div></span></button></th>
                       <th class="table__head-cell table__cell--fit" scope="col">자격</th>
                       <th class="table__head-cell" scope="col">가입 보험</th>
                       <th class="table__head-cell table__head-cell--sort" scope="col" aria-sort="none"><button class="table__sort-btn" aria-label="보수월액 정렬">보수월액<span class="tooltip-wrapper" onmouseenter="this.querySelector('.tooltip-panel').classList.add('tooltip-panel--visible')" onmouseleave="this.querySelector('.tooltip-panel').classList.remove('tooltip-panel--visible')"><span class="icon icon--sm" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-sort-asc"/></svg></span><div class="tooltip-panel elevation-tooltip tooltip-panel--bottom" role="tooltip">오름차순</div></span></button></th>
