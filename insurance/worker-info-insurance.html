@@ -201,8 +201,11 @@ exits: index.html, report-acquire.html, report-loss.html, report-transfer.html, 
                       <div class="wi-card" data-ins="산재보험"></div>
                     </div>
 
-                    <div class="wi-subhead">피부양자</div>
-                    <div id="wi-dependents"></div>
+                    <!-- 피부양자는 건강보험이 가입(취득)일 때만 노출 — 미가입·제외 시 섹션 전체 숨김 -->
+                    <div id="wi-dependents-section">
+                      <div class="wi-subhead">피부양자</div>
+                      <div id="wi-dependents"></div>
+                    </div>
 
                   </div>
 
@@ -582,7 +585,12 @@ exits: index.html, report-acquire.html, report-loss.html, report-transfer.html, 
       var key = el.dataset.ins;
       renderCard(el, key, sc.cards[key]);
     });
-    renderDependents(sc.dependents);
+    /* 피부양자는 건강보험이 가입(취득)일 때만 노출 — 미가입·제외 시 섹션 숨김 */
+    var health = sc.cards['건강보험'];
+    var showDep = !!health && health.s === '취득';
+    var depSec = document.getElementById('wi-dependents-section');
+    if (depSec) depSec.hidden = !showDep;
+    if (showDep) renderDependents(sc.dependents);
   };
 
   /* 초기 렌더 */
