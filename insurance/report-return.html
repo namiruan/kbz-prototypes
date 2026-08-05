@@ -148,7 +148,7 @@ exits: insurance-join-status.html, index.html
                     </div>
                   </div>
 
-                  <!-- 1-2·1-4 — 복직일(데이트피커) · 연금보험 재제출 납부여부 한 줄 -->
+                  <!-- 1-2·1-4 — 복직일(데이트피커) · 연금보험 재개월 납부여부 한 줄 -->
                   <div class="r-row">
                     <div class="form-field" id="r-date-field">
                       <label class="form-field__label text-form-label" for="r-in-yr">복직일 <span class="form-field__required" aria-hidden="true">(필수)</span></label>
@@ -169,7 +169,7 @@ exits: insurance-join-status.html, index.html
                       <div class="form-field__footer"><p class="form-field__error text-helper" id="r-date-err" role="alert">복직일을 선택해 주세요.</p></div>
                     </div>
                     <div class="form-field r-radio-field">
-                      <span class="form-field__label text-form-label" id="r-pension-label">연금보험 재제출 납부여부 <span class="form-field__required" aria-hidden="true">(필수)</span></span>
+                      <span class="form-field__label text-form-label" id="r-pension-label">연금보험 재개월 납부여부 <span class="form-field__required" aria-hidden="true">(필수)</span></span>
                       <div class="form-field__body">
                         <fieldset class="radio-group radio-group--horizontal" aria-labelledby="r-pension-label">
                           <label class="radio"><input type="radio" name="r-pension" value="희망"><span class="radio__control" aria-hidden="true"></span><span class="radio__label">희망</span></label>
@@ -553,10 +553,37 @@ exits: insurance-join-status.html, index.html
     dp.classList.toggle('dp--has-value', !!y);
     dateErr(null);
   }
+  /* 복직일이 초일(1일)이면 연금보험 재개월 납부여부를 '희망'으로 강제하고 수정 불가로 잠근다.
+     초일 외로 바뀌면 다시 활성화하고, 강제로 바꿔둔 값이면 기본(미희망)으로 되돌린다. */
+  var pensionForced = false;
+  function syncPension() {
+    var v = dpVal();
+    var isFirst = !!v && isValidDate(v) && parseInt(v.slice(8, 10), 10) === 1;
+    var radios = root.querySelectorAll('input[name="r-pension"]');
+    Array.prototype.forEach.call(radios, function (r) {
+      var lbl = r.closest('.radio');
+      if (isFirst) {
+        r.checked = (r.value === '희망');
+        r.disabled = true;
+        if (lbl) lbl.classList.add('radio--disabled');
+      } else {
+        r.disabled = false;
+        if (lbl) lbl.classList.remove('radio--disabled');
+      }
+    });
+    if (isFirst) pensionForced = true;
+    else if (pensionForced) {   /* 강제로 세팅했던 값이면 기본(미희망)으로 복원 */
+      Array.prototype.forEach.call(radios, function (r) { r.checked = (r.value === '미희망'); });
+      pensionForced = false;
+    }
+  }
+
   /* 복직일 — 캘린더 선택·직접 입력 시 유효성 즉시 검증(형식 완성 후 실제 날짜인지). 데이트피커 부품은 DS가 숫자만 필터.
-     값이 미완성이면 아무 것도 하지 않는다(제출 시 뜬 '필수' 에러를 클릭만으로 지우지 않기 위함) */
+     값이 미완성이면 날짜 에러는 건드리지 않되(제출 시 뜬 '필수' 에러를 클릭만으로 지우지 않기 위함),
+     초일 여부에 따른 연금 재개월 잠금은 항상 동기화한다. */
   function onDateActivity() {
     var v = dpVal();
+    syncPension();
     if (!v) return;
     dateErr(isValidDate(v) ? null : '올바른 날짜를 입력해 주세요.');
   }
@@ -672,7 +699,7 @@ exits: insurance-join-status.html, index.html
     clearFieldState('r-child-field', 'r-child-err');
     var memo = $('r-memo'); if (memo) memo.value = '';
     $('r-reason-field').classList.remove('form-field--error');
-    /* 연금보험 재제출 납부여부 — 기본 미희망 */
+    /* 연금보험 재개월 납부여부 — 기본 미희망 */
     var mihui = document.querySelector('input[name="r-pension"][value="미희망"]'); if (mihui) mihui.checked = true;
     /* 휴직사유 프리셋 */
     if (name === '첫-진입') {
@@ -689,10 +716,12 @@ exits: insurance-join-status.html, index.html
       $('r-child').value = '200315-3';
       ddApply('r-recv', '있음'); refreshRecv(); $('r-recv-amt').value = '1,200,000';
     }
+    /* 복직일이 초일이면 연금 재개월 납부여부를 '희망'으로 강제 잠금(데모 값 2027-08-01 포함) */
+    pensionForced = false; syncPension();
   };
 
   /* 초기 동기화 */
-  refreshReason(); refreshRecv();
+  refreshReason(); refreshRecv(); syncPension();
 
   /* 첨부파일 세로 높이 — 보이는 본문 영역에 맞춤(실측) */
   function syncUploadHeight(panel) {
