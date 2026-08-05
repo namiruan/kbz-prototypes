@@ -209,21 +209,6 @@ exits: report-acquire.html, report-loss.html, report-transfer.html, report-chang
                 <div class="tooltip-panel elevation-tooltip tooltip-panel--bottom" id="tip-dept-1" role="tooltip"></div>
                 </div>
 
-                <div class="dropdown dropdown--button dropdown--ghost dropdown--multi" data-placeholder="모든 사업장" id="fb-site-1">
-                  <button class="dropdown__trigger" type="button" aria-haspopup="listbox" aria-expanded="false" aria-label="사업장 선택" aria-describedby="tip-site-1">
-                    <span class="dropdown__value dropdown__value--placeholder">모든 사업장</span>
-                    <span class="dropdown__count" hidden></span>
-                    <span class="dropdown__chevron" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-chevron-down"/></svg></span>
-                  </button>
-                  <div class="dropdown__panel">
-                    <ul class="dropdown__list" role="listbox" aria-label="사업장" aria-multiselectable="true">
-                      <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-checkbox" aria-hidden="true"><span class="dropdown__option-checkbox__icon"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span><span class="dropdown__option-label">주식회사 테크노로직 본사</span></li>
-                      <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-checkbox" aria-hidden="true"><span class="dropdown__option-checkbox__icon"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span><span class="dropdown__option-label">관산초 우천로 포장공사 현장</span></li>
-                    </ul>
-                  </div>
-                <div class="tooltip-panel elevation-tooltip tooltip-panel--bottom" id="tip-site-1" role="tooltip"></div>
-                </div>
-
                 <div class="dropdown dropdown--button dropdown--ghost dropdown--multi" data-placeholder="모든 자격상태" id="fb-status-1">
                   <button class="dropdown__trigger" type="button" aria-haspopup="listbox" aria-expanded="false" aria-label="자격상태 선택" aria-describedby="tip-status-1">
                     <span class="dropdown__value">취득</span>
@@ -486,7 +471,8 @@ exits: report-acquire.html, report-loss.html, report-transfer.html, report-chang
                           </button>
                           <div class="dropdown__panel">
                             <ul class="dropdown__list" role="listbox" aria-label="신고 유형">
-                              <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1" data-report="취득"><span class="dropdown__option-label">취득</span></li>
+                              <!-- 4대보험 모두 취득 상태 → '취득' 비활성(김철수·이영호와 동일 규칙) -->
+                              <li class="dropdown__option dropdown__option--disabled" role="option" aria-selected="false" aria-disabled="true" data-report="취득"><span class="tooltip-wrapper" onmouseenter="this.querySelector('.tooltip-panel').classList.add('tooltip-panel--visible')" onmouseleave="this.querySelector('.tooltip-panel').classList.remove('tooltip-panel--visible')" aria-describedby="tip-acq-r6"><span class="dropdown__option-label">취득</span><div class="tooltip-panel elevation-tooltip tooltip-panel--left" id="tip-acq-r6" role="tooltip">4대보험이 모두 취득 상태예요</div></span></li>
                               <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1" data-report="상실"><span class="dropdown__option-label">상실</span></li>
                               <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1" data-report="사업장 이동"><span class="dropdown__option-label">사업장 이동</span></li>
                               <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1" data-report="보수변경"><span class="dropdown__option-label">보수변경</span></li>
@@ -610,21 +596,6 @@ exits: report-acquire.html, report-loss.html, report-transfer.html, report-chang
                     </ul>
                   </div>
                 <div class="tooltip-panel elevation-tooltip tooltip-panel--bottom" id="tip-dept-2" role="tooltip"></div>
-                </div>
-
-                <div class="dropdown dropdown--button dropdown--ghost dropdown--multi" data-placeholder="모든 사업장" id="fb-site-2">
-                  <button class="dropdown__trigger" type="button" aria-haspopup="listbox" aria-expanded="false" aria-label="사업장 선택" aria-describedby="tip-site-2">
-                    <span class="dropdown__value dropdown__value--placeholder">모든 사업장</span>
-                    <span class="dropdown__count" hidden></span>
-                    <span class="dropdown__chevron" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-chevron-down"/></svg></span>
-                  </button>
-                  <div class="dropdown__panel">
-                    <ul class="dropdown__list" role="listbox" aria-label="사업장" aria-multiselectable="true">
-                      <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-checkbox" aria-hidden="true"><span class="dropdown__option-checkbox__icon"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span><span class="dropdown__option-label">주식회사 테크노로직 본사</span></li>
-                      <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-checkbox" aria-hidden="true"><span class="dropdown__option-checkbox__icon"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span><span class="dropdown__option-label">관산초 우천로 포장공사 현장</span></li>
-                    </ul>
-                  </div>
-                <div class="tooltip-panel elevation-tooltip tooltip-panel--bottom" id="tip-site-2" role="tooltip"></div>
                 </div>
 
                 <div class="dropdown dropdown--button dropdown--ghost dropdown--multi" data-placeholder="모든 자격상태" id="fb-status-2">
@@ -764,21 +735,6 @@ exits: report-acquire.html, report-loss.html, report-transfer.html, report-chang
                 <div class="tooltip-panel elevation-tooltip tooltip-panel--bottom" id="tip-dept-3" role="tooltip"></div>
                 </div>
 
-                <div class="dropdown dropdown--button dropdown--ghost dropdown--multi" data-placeholder="모든 사업장" id="fb-site-3">
-                  <button class="dropdown__trigger" type="button" aria-haspopup="listbox" aria-expanded="false" aria-label="사업장 선택" aria-describedby="tip-site-3">
-                    <span class="dropdown__value dropdown__value--placeholder">모든 사업장</span>
-                    <span class="dropdown__count" hidden></span>
-                    <span class="dropdown__chevron" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-chevron-down"/></svg></span>
-                  </button>
-                  <div class="dropdown__panel">
-                    <ul class="dropdown__list" role="listbox" aria-label="사업장" aria-multiselectable="true">
-                      <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-checkbox" aria-hidden="true"><span class="dropdown__option-checkbox__icon"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span><span class="dropdown__option-label">주식회사 테크노로직 본사</span></li>
-                      <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-checkbox" aria-hidden="true"><span class="dropdown__option-checkbox__icon"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span><span class="dropdown__option-label">관산초 우천로 포장공사 현장</span></li>
-                    </ul>
-                  </div>
-                <div class="tooltip-panel elevation-tooltip tooltip-panel--bottom" id="tip-site-3" role="tooltip"></div>
-                </div>
-
                 <div class="dropdown dropdown--button dropdown--ghost dropdown--multi" data-placeholder="모든 자격상태" id="fb-status-3">
                   <button class="dropdown__trigger" type="button" aria-haspopup="listbox" aria-expanded="false" aria-label="자격상태 선택" aria-describedby="tip-status-3">
                     <span class="dropdown__value">취득</span>
@@ -911,21 +867,6 @@ exits: report-acquire.html, report-loss.html, report-transfer.html, report-chang
                     </ul>
                   </div>
                 <div class="tooltip-panel elevation-tooltip tooltip-panel--bottom" id="tip-dept-4" role="tooltip"></div>
-                </div>
-
-                <div class="dropdown dropdown--button dropdown--ghost dropdown--multi" data-placeholder="모든 사업장" id="fb-site-4">
-                  <button class="dropdown__trigger" type="button" aria-haspopup="listbox" aria-expanded="false" aria-label="사업장 선택" aria-describedby="tip-site-4">
-                    <span class="dropdown__value dropdown__value--placeholder">모든 사업장</span>
-                    <span class="dropdown__count" hidden></span>
-                    <span class="dropdown__chevron" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-chevron-down"/></svg></span>
-                  </button>
-                  <div class="dropdown__panel">
-                    <ul class="dropdown__list" role="listbox" aria-label="사업장" aria-multiselectable="true">
-                      <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-checkbox" aria-hidden="true"><span class="dropdown__option-checkbox__icon"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span><span class="dropdown__option-label">주식회사 테크노로직 본사</span></li>
-                      <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-checkbox" aria-hidden="true"><span class="dropdown__option-checkbox__icon"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span><span class="dropdown__option-label">관산초 우천로 포장공사 현장</span></li>
-                    </ul>
-                  </div>
-                <div class="tooltip-panel elevation-tooltip tooltip-panel--bottom" id="tip-site-4" role="tooltip"></div>
                 </div>
 
                 <div class="dropdown dropdown--button dropdown--ghost dropdown--multi" data-placeholder="모든 자격상태" id="fb-status-4">
@@ -1092,21 +1033,6 @@ exits: report-acquire.html, report-loss.html, report-transfer.html, report-chang
                     </ul>
                   </div>
                 <div class="tooltip-panel elevation-tooltip tooltip-panel--bottom" id="tip-dept-5" role="tooltip"></div>
-                </div>
-
-                <div class="dropdown dropdown--button dropdown--ghost dropdown--multi" data-placeholder="모든 사업장" id="fb-site-5">
-                  <button class="dropdown__trigger" type="button" aria-haspopup="listbox" aria-expanded="false" aria-label="사업장 선택" aria-describedby="tip-site-5">
-                    <span class="dropdown__value dropdown__value--placeholder">모든 사업장</span>
-                    <span class="dropdown__count" hidden></span>
-                    <span class="dropdown__chevron" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-chevron-down"/></svg></span>
-                  </button>
-                  <div class="dropdown__panel">
-                    <ul class="dropdown__list" role="listbox" aria-label="사업장" aria-multiselectable="true">
-                      <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-checkbox" aria-hidden="true"><span class="dropdown__option-checkbox__icon"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span><span class="dropdown__option-label">주식회사 테크노로직 본사</span></li>
-                      <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-checkbox" aria-hidden="true"><span class="dropdown__option-checkbox__icon"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span><span class="dropdown__option-label">관산초 우천로 포장공사 현장</span></li>
-                    </ul>
-                  </div>
-                <div class="tooltip-panel elevation-tooltip tooltip-panel--bottom" id="tip-site-5" role="tooltip"></div>
                 </div>
 
                 <div class="dropdown dropdown--button dropdown--ghost dropdown--multi" data-placeholder="모든 자격상태" id="fb-status-5">
@@ -1606,7 +1532,7 @@ exits: report-acquire.html, report-loss.html, report-transfer.html, report-chang
   var resetBtn    = panel.querySelector('.filter-bar__reset-wrap button');
   var baseRows    = Array.prototype.slice.call(tbody.querySelectorAll('tr.table__row'));
 
-  var COL = { dept: 0, name: 1, rrn: 2, site: 3, status: 4 };
+  var COL = { dept: 0, name: 1, rrn: 2, status: 3 };
 
   function cellText(row, i) { return row.cells[i].textContent.replace(/\s+/g, ' ').trim(); }
   function selectedLabels(id) {
@@ -1644,7 +1570,6 @@ exits: report-acquire.html, report-loss.html, report-transfer.html, report-chang
   /* 1~7. 필터·검색 적용 → 행 표시/숨김 + 건수 갱신 + 0건 처리 */
   function applyFilters() {
     var dept   = selectedLabels('fb-dept-1');
-    var site   = selectedLabels('fb-site-1');
     var status = selectedLabels('fb-status-1');
     var q      = searchInput ? searchInput.value.trim() : '';
 
@@ -1652,8 +1577,7 @@ exits: report-acquire.html, report-loss.html, report-transfer.html, report-chang
     baseRows.forEach(function (row) {
       var ok = true;
       if (dept.length   && dept.indexOf(cellText(row, COL.dept)) === -1)     ok = false;   /* 1 */
-      if (site.length   && site.indexOf(cellText(row, COL.site)) === -1)     ok = false;   /* 2 */
-      if (status.length && status.indexOf(cellText(row, COL.status)) === -1) ok = false;   /* 3 */
+      if (status.length && status.indexOf(cellText(row, COL.status)) === -1) ok = false;   /* 2 */
       if (q) {                                                                              /* 4 */
         var hay = cellText(row, COL.name) + ' ' + cellText(row, COL.rrn);
         if (hay.indexOf(q) === -1) ok = false;
@@ -1703,7 +1627,17 @@ exits: report-acquire.html, report-loss.html, report-transfer.html, report-chang
   });
 
   /* 9~12. 신고 유형 선택 → Step-1~5 검증 분기 */
-  var MOCK = [{}, { jajin: true }, { step1: true }, { step2: true }, { step3: true }, { step4: true }, { step5: true }];
+  /* 행별 시나리오 — 행 순서와 무관하게 신고하기 드롭다운 id로 매핑(행 추가·정렬에도 안전) */
+  var MOCK = {
+    'dd-report-r1': {},               /* 이영희 — 취득 가능(건강·연금 미가입) */
+    'dd-report-r8': {},               /* 최민서 — 취득/상실 혼재(고용 상실) */
+    'dd-report-r7': { jajin: true },  /* 한서연 — 자진신고 사업장(산재 선택불가) */
+    'dd-report-r2': { step1: true },  /* 김철수 — 접수완료 */
+    'dd-report-r3': { step2: true },  /* 박진수 — 임시저장 */
+    'dd-report-r6': { step3: true },  /* 정다은 — 다른유형 접수 중 */
+    'dd-report-r4': { step4: true },  /* 이영호 — 반려 */
+    'dd-report-r5': { step5: true }   /* 박준형 — 상실 대상 */
+  };
   var STEP_OVERLAY = { step1: 'overlay-step1', step2: 'overlay-step2', step3: 'overlay-step3', step4: 'overlay-step4', step5: 'overlay-step5' };
 
   /* ── 11. 신고 유형 → 분리된 신고 프로토타입 파일로 이동 ──────────────
@@ -1770,7 +1704,8 @@ exits: report-acquire.html, report-loss.html, report-transfer.html, report-chang
     if (opt.classList.contains('dropdown__option--disabled')) return;   /* 비활성 옵션(4대보험 모두 취득 시 '취득') 무시 */
     var row  = opt.closest('tr.table__row');
     var kind = opt.dataset.report;
-    var mock = MOCK[baseRows.indexOf(row)] || {};
+    var dd   = row.querySelector('[id^="dd-report-"]');
+    var mock = (dd && MOCK[dd.id]) || {};
 
     /* 12. 상실 대상자 + '상실'·'정정' 선택 → Step-5 예외(정정은 상실용 정정 모달로 분기) */
     if (mock.step5 && (kind === '상실' || kind === '정정')) { goToReport(kind, row); return; }
