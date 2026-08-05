@@ -1698,6 +1698,71 @@ exits: report-acquire.html, report-loss.html, report-transfer.html, report-chang
 
   function openOverlay(id) { var el = document.getElementById(id); if (el) el.classList.add('is-open'); }
 
+  /* 10b. 사업장 선택 Modal을 클릭한 행의 실제 가입 상태로 구성.
+     정적 공용 템플릿이 행마다 다른 가입 현황과 어긋나던 문제 해결 —
+     취득: 이미 취득한 보험은 '취득완료'로 잠그고, 미가입·상실만 선택 가능.
+     산재는 고용과 같은 사업장이라 독립 선택칸이 없어 완료/차단 배지만 표시. */
+  function rowInsStatus(row) {
+    var out = {};
+    var cell = row.querySelector('td.cell-insurance');
+    if (cell) Array.prototype.forEach.call(cell.querySelectorAll('.badge'), function (b) {
+      var t = b.textContent;
+      var key = t.indexOf('고용') === 0 ? 'goyong'
+              : t.indexOf('산재') === 0 ? 'sanjae'
+              : t.indexOf('건강') === 0 ? 'gungang'
+              : t.indexOf('연금') === 0 ? 'yeongum' : null;
+      if (!key) return;
+      out[key] = b.classList.contains('badge--success') ? '취득'
+               : b.classList.contains('badge--caution') ? '상실'
+               : b.classList.contains('badge--disabled') ? '제외' : '미가입';
+    });
+    return out;
+  }
+  function setWsRow(rowEl, state, reasonText) {
+    if (!rowEl) return;
+    var cb    = rowEl.querySelector('input[type="checkbox"]');
+    var label = rowEl.querySelector('.checkbox');
+    var sel   = rowEl.querySelector('.ws-row__select');
+    var badge = rowEl.querySelector('#ws-sanjae-reason, .ws-row__reason');
+    rowEl.classList.remove('ws-row--complete', 'ws-row--blocked');
+    if (state === 'select') {
+      if (cb)    { cb.disabled = false; cb.checked = false; cb.removeAttribute('aria-disabled'); cb.removeAttribute('tabindex'); }
+      if (label) label.classList.remove('checkbox--disabled');
+      if (sel)   sel.hidden = true;
+      if (badge) { if (badge.id) badge.hidden = true; else badge.parentNode.removeChild(badge); }   /* 고정 배지(산재)는 숨김, 주입 배지는 제거 */
+      return;
+    }
+    rowEl.classList.add(state === 'complete' ? 'ws-row--complete' : 'ws-row--blocked');
+    if (cb)    { cb.checked = false; cb.disabled = true; cb.setAttribute('aria-disabled', 'true'); cb.tabIndex = -1; }
+    if (label) label.classList.add('checkbox--disabled');
+    if (sel)   sel.hidden = true;
+    if (!badge) { badge = document.createElement('span'); badge.className = 'badge ws-row__reason'; rowEl.appendChild(badge); }
+    badge.hidden = false;
+    var base = badge.id ? 'badge' : 'badge ws-row__reason';
+    if (state === 'complete') { badge.textContent = '취득완료'; badge.className = base + ' badge--success badge--fill'; }
+    else { badge.textContent = reasonText || '선택불가'; badge.className = base + ' badge--neutral badge--disabled'; }
+  }
+  function configureWorksite(row, kind, mock) {
+    var desc    = document.getElementById('ws-desc');
+    var goyong  = document.querySelector('#overlay-worksite .ws-row[data-ins="goyong"]');
+    var sanjae  = document.querySelector('#overlay-worksite .ws-row[data-ins="sanjae"]');
+    var gungang = document.querySelector('#overlay-worksite .ws-row[data-ins="gungang"]');
+    if (kind === '취득') {
+      if (desc) desc.textContent = '취득신고 할 보험을 선택하고, 각 사업장을 지정해주세요.';
+      var st = rowInsStatus(row);
+      setWsRow(goyong, st.goyong === '취득' ? 'complete' : 'select');           /* 취득 완료면 잠금, 미가입·상실이면 취득 가능 */
+      if (mock.jajin || st.sanjae === '제외') setWsRow(sanjae, 'blocked', '자진신고사업장 선택불가');
+      else                                     setWsRow(sanjae, 'complete');      /* 산재는 고용과 함께 성립 — 취득완료로 표시 */
+      var g = st.gungang || st.yeongum;
+      setWsRow(gungang, g === '취득' ? 'complete' : 'select');
+    } else {   /* 사업장 이동 — 취득한 보험이 이동 대상(일반 동작), 산재는 자진신고 안내 */
+      if (desc) desc.textContent = '이동 신고할 보험을 선택하고, 각 사업장을 지정해주세요.';
+      setWsRow(goyong, 'select');
+      setWsRow(sanjae, 'blocked', '자진신고사업장 선택불가');
+      setWsRow(gungang, 'select');
+    }
+  }
+
   tbody.addEventListener('click', function (e) {
     var opt = e.target.closest('.table__cell--action .dropdown__option');
     if (!opt) return;
@@ -1714,25 +1779,7 @@ exits: report-acquire.html, report-loss.html, report-transfer.html, report-chang
     if (hit) { openOverlay(STEP_OVERLAY[hit]); return; }                                     /* 9 */
 
     if (kind === '취득' || kind === '사업장 이동') {                                          /* 10 */
-      /* 6-1·6-3 공용 Modal — 진입 경로에 따라 문구와 disabled 사유가 다르다.
-         사업장 이동에는 '취득완료' 선택 불가 규칙이 없다 (이미 취득한 보험이 이동 대상). */
-      var desc   = document.getElementById('ws-desc');
-      var reason = document.getElementById('ws-sanjae-reason');
-      var sanjaeRow = document.querySelector('#overlay-worksite .ws-row[data-ins="sanjae"]');
-      if (kind === '취득') {
-        if (desc)   desc.textContent = '취득신고 할 보험을 선택하고, 각 사업장을 지정해주세요.';
-        if (mock.jajin) {   /* 본사가 자진신고 사업장 → 산재 취득 불가 */
-          if (reason) { reason.textContent = '자진신고사업장 선택불가'; reason.className = 'badge badge--neutral badge--disabled'; }
-          if (sanjaeRow) { sanjaeRow.classList.remove('ws-row--complete'); sanjaeRow.classList.add('ws-row--blocked'); }
-        } else {
-          if (reason) { reason.textContent = '취득완료'; reason.className = 'badge badge--success badge--fill'; }
-          if (sanjaeRow) { sanjaeRow.classList.add('ws-row--complete'); sanjaeRow.classList.remove('ws-row--blocked'); }
-        }
-      } else {
-        if (desc)   desc.textContent = '이동 신고할 보험을 선택하고, 각 사업장을 지정해주세요.';
-        if (reason) { reason.textContent = '자진신고사업장 선택불가'; reason.className = 'badge badge--neutral badge--disabled'; }
-        if (sanjaeRow) { sanjaeRow.classList.remove('ws-row--complete'); sanjaeRow.classList.add('ws-row--blocked'); }
-      }
+      configureWorksite(row, kind, mock);   /* 6-1·6-3 공용 Modal을 행의 실제 가입 상태로 구성 */
       var wsEl = document.getElementById('overlay-worksite');
       if (wsEl) wsEl.dataset.entry = kind;
       openOverlay('overlay-worksite');
