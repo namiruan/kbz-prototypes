@@ -50,6 +50,9 @@
     /* 섹션 소제목(피부양자·건강/연금·고용·산재·신고 이력) — 브랜드 강조 */
     .wi-subhead { display: flex; align-items: center; gap: var(--space-gap-xs); margin: var(--space-stack-xl) 0 var(--space-stack-sm); color: var(--color-text-brand); font-weight: var(--font-weight-heading); }
     .wi-subhead:first-child { margin-top: 0; }
+    /* 피부양자 섹션 래퍼 — 소제목이 래퍼의 first-child라 margin-top이 0이 되므로,
+       위 카드와의 간격(기존 .wi-subhead margin-top과 동일)을 래퍼에서 준다 */
+    #wi-dependents-section { margin-top: var(--space-stack-xl); }
     .wi-subhead__count { color: var(--color-text-subtle); font-weight: var(--font-weight-body); }
 
     /* 근로자정보 이력·피부양자 테이블 — 대부분 고정값(주민번호·날짜·관리번호)이라
