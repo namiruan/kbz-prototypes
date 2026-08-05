@@ -131,6 +131,25 @@ exits: insurance-join-status.html, report-acquire.html, report-loss.html, report
                   </div>
                 </div>
 
+                <div class="dropdown dropdown--button dropdown--ghost dropdown--multi" data-placeholder="모든 신고종류" id="rs-kind">
+                  <button class="dropdown__trigger" type="button" aria-haspopup="listbox" aria-expanded="false" aria-label="신고종류 선택">
+                    <span class="dropdown__value dropdown__value--placeholder">모든 신고종류</span>
+                    <span class="dropdown__count" hidden></span>
+                    <span class="dropdown__chevron" aria-hidden="true"><svg aria-hidden="true"><use href="#icon-chevron-down"/></svg></span>
+                  </button>
+                  <div class="dropdown__panel">
+                    <ul class="dropdown__list" role="listbox" aria-label="신고종류" aria-multiselectable="true">
+                      <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-checkbox" aria-hidden="true"><span class="dropdown__option-checkbox__icon"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span><span class="dropdown__option-label">취득</span></li>
+                      <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-checkbox" aria-hidden="true"><span class="dropdown__option-checkbox__icon"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span><span class="dropdown__option-label">상실</span></li>
+                      <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-checkbox" aria-hidden="true"><span class="dropdown__option-checkbox__icon"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span><span class="dropdown__option-label">사업장 이동</span></li>
+                      <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-checkbox" aria-hidden="true"><span class="dropdown__option-checkbox__icon"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span><span class="dropdown__option-label">보수변경</span></li>
+                      <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-checkbox" aria-hidden="true"><span class="dropdown__option-checkbox__icon"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span><span class="dropdown__option-label">정정</span></li>
+                      <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-checkbox" aria-hidden="true"><span class="dropdown__option-checkbox__icon"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span><span class="dropdown__option-label">휴직</span></li>
+                      <li class="dropdown__option" role="option" aria-selected="false" tabindex="-1"><span class="dropdown__option-checkbox" aria-hidden="true"><span class="dropdown__option-checkbox__icon"><svg aria-hidden="true"><use href="#icon-check"/></svg></span></span><span class="dropdown__option-label">복직</span></li>
+                    </ul>
+                  </div>
+                </div>
+
                 <div class="dropdown dropdown--button dropdown--ghost dropdown--multi" data-placeholder="모든 진행상태" id="rs-status">
                   <button class="dropdown__trigger" type="button" aria-haspopup="listbox" aria-expanded="false" aria-label="진행상태 선택">
                     <span class="dropdown__value dropdown__value--placeholder">모든 진행상태</span>
@@ -175,7 +194,6 @@ exits: insurance-join-status.html, report-acquire.html, report-loss.html, report
               <div class="table__toolbar">
                 <div class="table__title-group">
                   <span class="table__count" aria-live="polite">총 <b class="table__count-value" id="rs-count">11</b>건</span>
-                  <div class="table__title" id="rs-tbl-title">탐색 결과</div>
                 </div>
                 <div class="table__toolbar-actions">
                   <span class="tooltip-wrapper" onmouseenter="this.querySelector('.tooltip-panel').classList.add('tooltip-panel--visible')" onmouseleave="this.querySelector('.tooltip-panel').classList.remove('tooltip-panel--visible')">
@@ -186,7 +204,7 @@ exits: insurance-join-status.html, report-acquire.html, report-loss.html, report
               </div>
 
               <div class="table__scroll">
-              <table class="table" aria-labelledby="rs-tbl-title" id="rs-table">
+              <table class="table" aria-label="신고 대상 및 진행현황 목록" id="rs-table">
                 <thead class="table__head">
                   <tr>
                     <th class="table__head-cell" scope="col">부서</th>
@@ -578,13 +596,14 @@ exits: insurance-join-status.html, report-acquire.html, report-loss.html, report
     /* 검색/데이터없음 시나리오가 강제된 경우엔 필터를 덮어쓰지 않는다 */
     if (tbody.dataset.forceEmpty) return;
     var q = (document.getElementById('rs-search').value || '').trim().toLowerCase();
-    var depts = selectedLabels('rs-dept'), statuses = selectedLabels('rs-status');
+    var depts = selectedLabels('rs-dept'), kinds = selectedLabels('rs-kind'), statuses = selectedLabels('rs-status');
     var shown = 0;
     dataRows().forEach(function (r) {
       var name = r.children[1].textContent.toLowerCase(), rrn = r.children[2].textContent.toLowerCase();
       var ok = true;
       if (q && name.indexOf(q) < 0 && rrn.indexOf(q) < 0) ok = false;
       if (depts.length && depts.indexOf(r.dataset.dept) < 0) ok = false;
+      if (kinds.length && kinds.indexOf(r.dataset.kind) < 0) ok = false;
       if (statuses.length && statuses.indexOf(r.dataset.status) < 0) ok = false;
       r.hidden = !ok; if (ok) shown++;
     });
@@ -602,7 +621,7 @@ exits: insurance-join-status.html, report-acquire.html, report-loss.html, report
   /* 검색 초기화 */
   function resetFilters() {
     if (search) { search.value = ''; var clr = search.parentElement.querySelector('.input-clear'); if (clr) clr.hidden = true; }
-    ['rs-dept', 'rs-status'].forEach(function (id) {
+    ['rs-dept', 'rs-kind', 'rs-status'].forEach(function (id) {
       var dd = document.getElementById(id); if (!dd) return;
       dd.querySelectorAll('.dropdown__option[aria-selected="true"]').forEach(function (o) { o.setAttribute('aria-selected', 'false'); o.classList.remove('dropdown__option--selected'); });
       var val = dd.querySelector('.dropdown__value'), cnt = dd.querySelector('.dropdown__count');
