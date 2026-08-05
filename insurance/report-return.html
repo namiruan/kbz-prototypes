@@ -78,6 +78,7 @@ exits: insurance-join-status.html, index.html
       <button class="proto-nav-btn" data-scenario="육아휴직" type="button">육아휴직 복직</button>
       <button class="proto-nav-btn" data-scenario="출산전후휴가" type="button">출산전후휴가 복직</button>
       <button class="proto-nav-btn" data-scenario="기타" type="button">기타 휴직 복직</button>
+      <button class="proto-nav-btn" data-scenario="초일-복직" type="button">초일(1일) 복직</button>
       <button class="proto-nav-btn" data-scenario="상세보기" type="button">상세보기(조회)</button>
     </nav>
   </aside>
@@ -709,9 +710,11 @@ exits: insurance-join-status.html, index.html
     } else if (name === '육아휴직') { ddApply('r-reason', '육아휴직'); }
     else if (name === '출산전후휴가') { ddApply('r-reason', '출산전후휴가'); }
     else if (name === '기타') { ddApply('r-reason', '기타'); }
+    else if (name === '초일-복직') { ddApply('r-reason', '기타'); }
     refreshReason();
-    /* 데모 값 채우기(첫 진입 제외) */
-    if (name !== '첫-진입') { setDpDate('2027', '08', '01'); }
+    /* 데모 복직일 — '초일 복직'만 1일(연금 재개월 '희망' 강제 데모), 나머지는 15일(납부여부 선택 가능이 기본) */
+    if (name === '초일-복직') { setDpDate('2027', '08', '01'); }
+    else if (name !== '첫-진입') { setDpDate('2027', '08', '15'); }
     if (name === '육아휴직') {
       $('r-child').value = '200315-3';
       ddApply('r-recv', '있음'); refreshRecv(); $('r-recv-amt').value = '1,200,000';
