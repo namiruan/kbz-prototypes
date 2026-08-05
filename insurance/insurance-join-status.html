@@ -122,17 +122,18 @@
        하나의 브라우저 가로 스크롤로 노출(컴포넌트별 개별 스크롤 지양). */
     /* 데이터테이블이 table-layout:fixed(min-width:1080px)라, .page도 고정 floor로 둔다.
        (max-content는 fixed 테이블의 auto 열과 충돌해 열이 비정상 확장됨) */
-    .page { min-width: 1100px; }
+    .page { min-width: 1112px; }
     .page .table__scroll { overflow-x: visible; }
     /* 브라우저 가로 스크롤 시 페이지 배경이 끝까지 채워지도록 캔버스(html) 배경 지정 */
     html { background: var(--color-surface-subtle); }
     /* table-layout:fixed — 열 폭을 내용이 아니라 colgroup으로 고정해, 데이터/빈 상태/로딩 등
        모든 시나리오에서 열 폭이 동일하게 나오도록. 좁아지면 min-width로 브라우저 가로 스크롤. */
-    .table[aria-label="4대보험 가입현황 근로자 목록"] { table-layout: fixed; min-width: 1100px; }
+    .table[aria-label="4대보험 가입현황 근로자 목록"] { table-layout: fixed; min-width: 1112px; }
     .table[aria-label="4대보험 가입현황 근로자 목록"] th,
     .table[aria-label="4대보험 가입현황 근로자 목록"] td { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     /* 가입 보험 셀은 뱃지 묶음이라 말줄임 대신 그대로 노출 */
-    .table[aria-label="4대보험 가입현황 근로자 목록"] td.cell-insurance { overflow: visible; text-overflow: clip; }
+    .table[aria-label="4대보험 가입현황 근로자 목록"] td.cell-insurance,
+    .table[aria-label="4대보험 가입현황 근로자 목록"] td:nth-child(3) { overflow: visible; text-overflow: clip; }
     /* 보수월액(6번째 열) 데이터 좌측 정렬 — 기본 table__cell--number 우측 정렬 override.
        헤더 라벨도 sort 버튼 space-between으로 좌측이라 정렬이 맞는다. */
     .table[aria-label="4대보험 가입현황 근로자 목록"] td:nth-child(6) { text-align: left; }
@@ -276,7 +277,7 @@ exits: report-acquire.html, report-loss.html, report-transfer.html, report-chang
                   <colgroup>
                     <col>
                     <col style="width:120px">
-                    <col style="width:132px">
+                    <col style="width:144px">
                     <col style="width:72px">
                     <col style="width:200px">
                     <col style="width:180px">
@@ -645,7 +646,7 @@ exits: report-acquire.html, report-loss.html, report-transfer.html, report-chang
                   <colgroup>
                     <col>
                     <col style="width:120px">
-                    <col style="width:132px">
+                    <col style="width:144px">
                     <col style="width:72px">
                     <col style="width:200px">
                     <col style="width:180px">
@@ -797,7 +798,7 @@ exits: report-acquire.html, report-loss.html, report-transfer.html, report-chang
                   <colgroup>
                     <col>
                     <col style="width:120px">
-                    <col style="width:132px">
+                    <col style="width:144px">
                     <col style="width:72px">
                     <col style="width:200px">
                     <col style="width:180px">
@@ -946,7 +947,7 @@ exits: report-acquire.html, report-loss.html, report-transfer.html, report-chang
                   <colgroup>
                     <col>
                     <col style="width:120px">
-                    <col style="width:132px">
+                    <col style="width:144px">
                     <col style="width:72px">
                     <col style="width:200px">
                     <col style="width:180px">
@@ -1127,7 +1128,7 @@ exits: report-acquire.html, report-loss.html, report-transfer.html, report-chang
                   <colgroup>
                     <col>
                     <col style="width:120px">
-                    <col style="width:132px">
+                    <col style="width:144px">
                     <col style="width:72px">
                     <col style="width:200px">
                     <col style="width:180px">
