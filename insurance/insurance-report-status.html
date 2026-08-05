@@ -35,6 +35,8 @@
     /* 신고 종류·진행 상태 열 — 내용(짧은 값·배지)에 맞춰 최소 폭 지정 */
     #rs-table th:nth-child(4), #rs-table td:nth-child(4) { width: 104px; }
     #rs-table th:nth-child(5), #rs-table td:nth-child(5) { width: 116px; }
+    /* 신고종류 필터는 고정 7종 — DS 기본 max-height(220px) 스크롤 없이 전부 노출 */
+    #rs-kind .dropdown__list { max-height: none; }
     /* 관리 열 — DS action-group(테이블 행 액션 전용). 셀 내 우측 정렬 */
     .table__cell--fit .action-group { white-space: nowrap; }
     /* 사업장 선택 Modal (취득 신고 요청 → 6-1 CASE-1) — 가입현황과 공용 스타일 */
