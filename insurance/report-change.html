@@ -2065,6 +2065,14 @@ exits: index.html
     background: var(--color-surface-disabled); border-color: var(--color-border-disabled); color: var(--color-text-disabled);
   }
   body.view-mode .modal__content .checkbox__label { color: var(--color-text-disabled); }
+  /* 신고 대상 보험 체크박스는 푸터(.acq-target-footer)에 있어 .modal__content 스코프 밖 —
+     조회 모드에선 여기도 동일하게 비활성 외형 + 상호작용 차단(활성 opt-in 보험도 잠금 표시) */
+  body.view-mode .acq-target-footer .checkbox { pointer-events: none; }
+  body.view-mode .acq-target-footer .checkbox__control,
+  body.view-mode .acq-target-footer .checkbox input:checked ~ .checkbox__control {
+    background: var(--color-surface-disabled); border-color: var(--color-border-disabled); color: var(--color-text-disabled);
+  }
+  body.view-mode .acq-target-footer .checkbox__label { color: var(--color-text-disabled); }
   body.view-mode .modal__content .radio__control,
   body.view-mode .modal__content .radio input:checked ~ .radio__control {
     background: var(--color-surface-disabled); border-color: var(--color-border-disabled);
