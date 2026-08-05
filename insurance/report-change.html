@@ -1757,8 +1757,8 @@ exits: index.html
     var over20 = rate != null && ((reason === '보수인상' && rate >= 20) || (reason === '보수인하' && rate <= -20));
 
     if (reason === '착오정정') {
-      /* 착오정정: 고용·산재·국민연금 잠금 체크, 건강만 해제 가능(체크 여부는 사용자 값 보존) */
-      setBox(e.emp, true, false); setBox(e.acc, true, false); setBox(e.pen, true, false); enableBox(e.hea);
+      /* 착오정정: 4대보험 모두 잠금 체크(건강도 다른 보험과 동일하게 checked + disabled) */
+      setBox(e.emp, true, false); setBox(e.acc, true, false); setBox(e.pen, true, false); setBox(e.hea, true, false);
       if (e.rateField) e.rateField.hidden = true;
       if (e.pensionDoc) e.pensionDoc.hidden = true;
       if (e.fileReq) e.fileReq.hidden = false;
