@@ -2030,5 +2030,66 @@ exits: report-acquire.html, report-loss.html, report-transfer.html, report-chang
 })();
 </script>
 
+<script>
+/* 검색 지우기(X) 버튼 위치 — DS filter-bar positionClear 패턴 반영.
+   프로토 전용 필터 스크립트엔 이 처리가 없어 정적 시나리오(검색 결과 없음)의 X가
+   입력 텍스트 옆이 아니라 우측 끝에 고정돼 DS 문서와 달라 보이던 것 보정. */
+(function () {
+  var _canvas = document.createElement('canvas');
+  function textWidth(input) {
+    var cs = getComputedStyle(input);
+    var ctx = _canvas.getContext('2d');
+    ctx.font = cs.fontWeight + ' ' + cs.fontSize + ' ' + cs.fontFamily;
+    return ctx.measureText(input.value).width;
+  }
+  function positionClear(input) {
+    var wrap = input.closest('.input-wrap');
+    var btn  = wrap && wrap.querySelector('.input-clear');
+    if (!btn || btn.hidden) return;
+    var cs = getComputedStyle(input);
+    var left = parseFloat(cs.paddingLeft) + textWidth(input) + 4;
+    if (input.offsetWidth) {   /* 레이아웃 확정 시에만 우측 한계로 클램프 */
+      var max = input.offsetWidth - parseFloat(cs.paddingRight) - (btn.offsetWidth || 16);
+      left = Math.min(left, max);
+    }
+    btn.style.left = left + 'px';
+    btn.style.right = 'auto';
+  }
+  function syncClear(input) {
+    var wrap = input.closest('.input-wrap');
+    var btn  = wrap && wrap.querySelector('.input-clear');
+    if (!btn) return;
+    var has = !!input.value;
+    btn.hidden = !has;
+    if (wrap) wrap.classList.toggle('input-wrap--clearable', has);
+    if (has) positionClear(input);
+  }
+  function positionAll() {
+    document.querySelectorAll('.filter-bar__search input[type="search"]').forEach(function (input) {
+      var wrap = input.closest('.input-wrap');
+      var btn  = wrap && wrap.querySelector('.input-clear');
+      if (btn && !btn.hidden && input.value) positionClear(input);
+    });
+  }
+  document.querySelectorAll('.filter-bar__search input[type="search"]').forEach(function (input) {
+    input.addEventListener('input', function () { syncClear(input); });
+    var wrap = input.closest('.input-wrap');
+    var btn  = wrap && wrap.querySelector('.input-clear');
+    if (btn) btn.addEventListener('click', function () {
+      input.value = '';
+      syncClear(input);
+      input.focus();
+      var sbtn = input.closest('.filter-bar__search').querySelector('.icon-on--md[aria-label="검색"]');
+      if (sbtn) sbtn.click();   /* 인터랙티브 패널이면 검색 재실행, 정적 패널이면 무해 */
+    });
+  });
+  positionAll();
+  document.querySelectorAll('.proto-nav-btn').forEach(function (b) {
+    b.addEventListener('click', function () { requestAnimationFrame(positionAll); });
+  });
+  window.addEventListener('resize', positionAll);
+})();
+</script>
+
 </body>
 </html>
